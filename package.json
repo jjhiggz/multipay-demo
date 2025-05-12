@@ -17,5 +17,11 @@
     "db:generate": "bun run --filter server db:generate",
     "db:migrate": "bun run --filter server db:migrate"
   },
-  "packageManager": "bun@1.2.13"
+  "packageManager": "bun@1.2.13",
+  "dependencies": {
+    "bcryptjs": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0"
+  }
 }

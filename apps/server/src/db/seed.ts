@@ -1,8 +1,23 @@
+import { auth } from "@/lib/auth";
 import { db } from "./index";
-import { user, account } from "./schema/auth";
-import bcrypt from "bcryptjs";
+import {
+  user,
+  account,
+  session,
+  verification,
+  transaction,
+} from "./schema/auth";
 
-async function createUser({
+const resetDatabase = async () => {
+  await db.delete(transaction);
+  await db.delete(session);
+  await db.delete(account);
+  await db.delete(verification);
+  await db.delete(user);
+  console.log("Database reset complete");
+};
+
+const createUser = async ({
   email,
   name,
   password,
@@ -10,33 +25,25 @@ async function createUser({
   email: string;
   name: string;
   password: string;
-}) {
-  const now = new Date();
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const userId = crypto.randomUUID();
-  await db.insert(user).values({
-    id: userId,
-    name,
+}) => {
+  await auth.api.signUpEmail({
+    body: {
+      email,
+      name,
+      password,
+    },
+  });
+  return {
     email,
-    emailVerified: true,
-    createdAt: now,
-    updatedAt: now,
-  } as any);
-  await db.insert(account).values({
-    id: crypto.randomUUID(),
-    accountId: email,
-    providerId: "email",
-    userId,
-    password: hashedPassword,
-    createdAt: now,
-    updatedAt: now,
-  } as any);
-  return { id: userId, email, name };
-}
+    name,
+    password,
+  };
+};
 
-async function main() {
+const main = async () => {
+  await resetDatabase();
   const user1 = await createUser({
-    email: "user1@example.com",
+    email: "jon@jon.com",
     name: "User One",
     password: "password123",
   });
@@ -46,7 +53,7 @@ async function main() {
     password: "password456",
   });
   console.log("Seeded users:", { user1, user2 });
-}
+};
 
 main().catch((err) => {
   console.error(err);
