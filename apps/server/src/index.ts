@@ -20,7 +20,10 @@ app.use(
   })
 );
 
-app.on(["POST", "GET"], "/api/auth/**", (c) => auth.handler(c.req.raw));
+app.on(["POST", "GET"], "/api/auth/**", (c) => {
+  console.log(c);
+  return auth.handler(c.req.raw);
+});
 
 const handler = new RPCHandler(appRouter);
 app.use("/rpc/*", async (c, next) => {
@@ -34,8 +37,6 @@ app.use("/rpc/*", async (c, next) => {
   }
   await next();
 });
-
-
 
 app.get("/", (c) => {
   return c.text("OK");

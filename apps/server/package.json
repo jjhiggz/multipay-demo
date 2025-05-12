@@ -3,6 +3,7 @@
     "@libsql/client": "^0.15.5",
     "@orpc/client": "^1.2.0",
     "@orpc/server": "^1.2.0",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",
     "better-auth": "^1.2.7",
     "dotenv": "^16.4.7",
@@ -12,6 +13,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^3.0.0",
     "@types/bun": "^1.2.6",
     "drizzle-kit": "^0.30.5",
@@ -28,7 +30,7 @@
     "db:local": "turso dev --db-file local.db",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx src/db/seed.ts",
+    "db:seed": "bun src/db/seed.ts",
     "db:studio": "drizzle-kit studio",
     "dev": "bun run --hot src/index.ts",
     "start": "bun run dist/src/index.js"

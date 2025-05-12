@@ -4,11 +4,11 @@ import type { AppRouter } from '../../../server/src/routers/index'
 import type { RouterClient } from '@orpc/server' // For explicitly typing the client if needed
 import { createORPCVueQueryUtils } from '@orpc/vue-query'
 
-const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
+const backendUrl = 'http://localhost:3000'
 
 // Create an RPCLink instance
 const rpcLink = new RPCLink({
-  url: `${backendUrl}/api`,
+  url: `${backendUrl}/rpc`,
   fetch: (url: string | URL | Request, options?: RequestInit): Promise<Response> => {
     return fetch(url, {
       ...options,

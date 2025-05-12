@@ -53,3 +53,18 @@ export const verification = sqliteTable("verification", {
   createdAt: integer("created_at", { mode: "timestamp" }),
   updatedAt: integer("updated_at", { mode: "timestamp" }),
 });
+
+export const transaction = sqliteTable("transaction", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id),
+  sendAmount: integer("send_amount").notNull(),
+  sendCurrency: text("send_currency").notNull(),
+  receiveAmount: integer("receive_amount").notNull(),
+  receiveCurrency: text("receive_currency").notNull(),
+  completedAt: integer("completed_at", { mode: "timestamp" }),
+  status: text("status").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});

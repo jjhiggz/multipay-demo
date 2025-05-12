@@ -11,7 +11,7 @@ async function createUser({
   name: string;
   password: string;
 }) {
-  const now = Date.now();
+  const now = new Date();
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = crypto.randomUUID();
   await db.insert(user).values({

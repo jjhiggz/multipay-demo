@@ -79,6 +79,7 @@ import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useCurrentUser, GET_CURRENT_USER_QUERY_KEY } from '../composables/useAuth'
 import { useQueryClient } from '@tanstack/vue-query'
+import { authClient } from '../services/authClient'
 
 const email = ref('')
 const password = ref('')
@@ -93,15 +94,12 @@ const handleLogin = async () => {
   isLoading.value = true
   error.value = null
   try {
-    const response = await fetch('/api/auth/sign-in', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.value, password: password.value }),
-      credentials: 'include',
+    const { data, error: authError } = await authClient.signIn.email({
+      email: email.value,
+      password: password.value,
     })
-    const responseData = await response.json()
-    if (!response.ok) {
-      throw new Error(responseData.message || 'Login failed')
+    if (authError) {
+      throw new Error(authError.message || 'Login failed')
     }
     // Refetch user after login
     await queryClient.invalidateQueries({ queryKey: GET_CURRENT_USER_QUERY_KEY })
