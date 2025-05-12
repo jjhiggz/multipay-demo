@@ -7,24 +7,7 @@
     >
       <span class="block truncate">{{ formattedSelectedDate }}</span>
       <span class="right-0 absolute inset-y-0 flex items-center pr-2 pointer-events-none">
-        <svg
-          class="w-5 h-5 text-gray-400"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M10 3a.75.75 0 01.75.75v10.5a.75.75 0 01-1.5 0V3.75A.75.75 0 0110 3zm-3.25 9.5a.75.75 0 010 1.5h6.5a.75.75 0 010-1.5h-6.5z"
-            clip-rule="evenodd"
-          />
-          <path
-            fill-rule="evenodd"
-            d="M5.22 14.28a.75.75 0 001.06 0l7.5-7.5a.75.75 0 10-1.06-1.06L6.28 13.22a.75.75 0 000 1.06z"
-            clip-rule="evenodd"
-            transform="rotate(45 10 10)"
-          />
-        </svg>
+        <Icon icon="mdi:calendar" class="w-5 h-5 text-gray-400" />
       </span>
     </button>
 
@@ -44,19 +27,7 @@
             type="button"
             class="hover:bg-gray-100 p-1 rounded-full focus:outline-none"
           >
-            <svg
-              class="w-5 h-5 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
+            <Icon icon="mdi:chevron-left" class="w-5 h-5 text-gray-500" />
           </button>
           <div class="font-semibold text-sm">{{ monthYearLabel }}</div>
           <button
@@ -64,19 +35,7 @@
             type="button"
             class="hover:bg-gray-100 p-1 rounded-full focus:outline-none"
           >
-            <svg
-              class="w-5 h-5 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
+            <Icon icon="mdi:chevron-right" class="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
@@ -114,6 +73,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { Icon } from '@iconify/vue'
 import {
   startOfMonth,
   endOfMonth,
