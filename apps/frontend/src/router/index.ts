@@ -28,6 +28,11 @@ const routes = [
     name: 'multi-pay',
     component: () => import('../views/MultiPayView.vue'),
   },
+  {
+    path: '/james-multi',
+    name: 'james-multi',
+    component: () => import('../views/JamesMultiPayView.vue'),
+  },
 ]
 
 const router = createRouter({
