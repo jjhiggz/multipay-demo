@@ -23,6 +23,11 @@ const routes = [
     component: () => import('../views/DashboardView.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/multi-pay',
+    name: 'multi-pay',
+    component: () => import('../views/MultiPayView.vue'),
+  },
 ]
 
 const router = createRouter({
