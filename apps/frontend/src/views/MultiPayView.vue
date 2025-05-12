@@ -48,9 +48,7 @@
         <div class="gap-4 grid grid-cols-1 md:grid-cols-4 mb-8">
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Send on</label>
-            <select class="px-3 py-2 border rounded w-full">
-              <option>April 21st, 2025</option>
-            </select>
+            <CalendarDropdown v-model="sendDate" />
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
@@ -75,6 +73,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import logoUrl from '../assets/logo.svg'
-// No logic yet, just static layout
+import CalendarDropdown from '@/components/CalendarDropdown.vue'
+
+const sendDate = ref<Date | null>(new Date()) // Initialize with today's date
 </script>
