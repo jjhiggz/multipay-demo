@@ -6,12 +6,7 @@
         <!-- Logo using imported SVG -->
         <img :src="logoUrl" alt="Logo" class="w-10 h-10" />
       </div>
-      <ProfileDropdown
-        :is-loading="authSession.isPending"
-        :error="authSession.error"
-        :session-data="authSession.data"
-        :active-organization-state="{ value: authOrg }"
-      />
+      <ProfileDropdown />
     </header>
 
     <!-- Main Content -->
@@ -49,14 +44,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import logoUrl from '../assets/logo.svg'
-import CalendarDropdown from '@/components/CalendarDropdown.vue'
-import { authClient } from '@/services/authClient'
+import CalendarDropdown from '../components/CalendarDropdown.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
-const authSession = authClient.useSession()
-const authOrg = authClient.useActiveOrganization()
-watch(authOrg, console.log)
 
-const sendDate = ref<Date | null>(new Date()) // Initialize with today's date
+const sendDate = ref<Date | null>(new Date())
 </script>

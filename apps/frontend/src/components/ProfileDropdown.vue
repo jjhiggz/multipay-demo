@@ -6,8 +6,10 @@
       class="flex items-center bg-white shadow-sm px-4 py-2 rounded-xl cursor-pointer"
     >
       <!-- Loading/Error states -->
-      <div v-if="isLoading" class="px-4 py-2 text-gray-500">Loading...</div>
-      <div v-else-if="error" class="px-4 py-2 text-red-500">Error</div>
+      <div v-if="isSessionLoading || isOrgLoadingHint" class="px-4 py-2 text-gray-500">
+        Loading...
+      </div>
+      <div v-else-if="sessionError || orgErrorHint" class="px-4 py-2 text-red-500">Error</div>
       <template v-else-if="currentUser || activeOrganization">
         <!-- User Icon -->
         <div
@@ -64,67 +66,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-// Import PropType as a type
-import type { PropType } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
+// Removed PropType as props are being removed
 import { useRouter } from 'vue-router'
-import { authClient } from '../services/authClient' // Adjust path if needed
-
-// Define types for props for better clarity
-interface User {
-  id: string
-  name?: string | null
-  email?: string | null
-}
-
-interface Organization {
-  id: string
-  name: string
-}
-
-// Type for the session data expected from useAuthSession
-interface SessionData {
-  user: User | null | undefined
-}
-
-// Type for the organization state atom
-interface OrgStateAtom {
-  value:
-    | {
-        data: Organization | null | undefined
-        // Potentially other atom properties like isLoading, error might exist
-      }
-    | null
-    | undefined
-}
-
-const props = defineProps({
-  // Pass loading/error states from the parent where hooks are called
-  isLoading: {
-    type: Boolean,
-    default: false,
-  },
-  error: {
-    type: Error as PropType<Error | null>,
-    default: null,
-  },
-  // Pass the results of the composables
-  sessionData: {
-    type: Object as PropType<SessionData | null | undefined>,
-    default: null,
-  },
-  activeOrganizationState: {
-    type: Object as PropType<OrgStateAtom | null | undefined>,
-    default: null,
-  },
-})
+import { authClient } from '../services/authClient'
 
 const router = useRouter()
 const isOpen = ref(false)
 
-// Use computed properties to safely access nested data
-const currentUser = computed(() => props.sessionData?.user)
-const activeOrganization = computed(() => props.activeOrganizationState?.value?.data)
+// Use hooks directly within the component
+const sessionState = authClient.useSession()
+const activeOrgStateAtom = authClient.useActiveOrganization()
+
+// --- Reactive Computeds from sessionState ---
+const isSessionLoading = computed(() => sessionState.value?.isPending)
+// Assuming sessionState.value might contain an error property if fetching fails
+const sessionError = computed(() => sessionState.value?.error)
+const currentUser = computed(() => sessionState.value?.data?.user)
+
+// --- Reactive Computeds/State from activeOrgStateAtom ---
+// activeOrgStateAtom is now the Ref itself.
+const activeOrganization = computed(() => activeOrgStateAtom.value?.data)
+
+// Placeholder hints for org loading/error - ideally useActiveOrganization provides these
+const isOrgLoadingHint = computed(() => isSessionLoading.value) // Org data depends on session
+const orgErrorHint = computed(() => sessionError.value) // If session fails, org will too
 
 const orgName = computed(() => {
   const name = activeOrganization.value?.name
@@ -136,26 +102,34 @@ const userName = computed(() => {
 })
 
 const toggleDropdown = () => {
-  // Only toggle if not loading and no error
-  if (!props.isLoading && !props.error) {
+  if (!isSessionLoading.value && !sessionError.value) {
     isOpen.value = !isOpen.value
   }
 }
 
 const handleLogout = async () => {
-  isOpen.value = false // Close dropdown immediately
+  isOpen.value = false
   try {
-    await authClient.signOut() // Use the correct sign-out method
-    // No need to manually invalidate queries usually, router guard handles redirect
-    // and next page load should refetch session.
+    await authClient.signOut()
     router.push({ name: 'home' })
   } catch (error) {
     console.error('Logout failed:', error)
     alert('Logout failed. Please try again.')
-    // Still attempt redirect even if sign out API fails, session might be invalid anyway
     router.push({ name: 'home' })
   }
 }
+
+// Optional: Log values for debugging
+watchEffect(() => {
+  console.log('ProfileDropdown: sessionState.value:', sessionState.value)
+  console.log('ProfileDropdown: currentUser:', currentUser.value)
+  console.log('ProfileDropdown: activeOrgStateAtom (the ref):', activeOrgStateAtom)
+  console.log('ProfileDropdown: activeOrgStateAtom.value:', activeOrgStateAtom.value)
+  console.log(
+    'ProfileDropdown: activeOrganization (derived from .value.data):',
+    activeOrganization.value,
+  )
+})
 </script>
 
 <style scoped>

@@ -194,6 +194,28 @@ const main = async () => {
     orgName: "India",
   });
 
+  console.log("\nVerifying user-organization links...");
+  const usersWithOrgs = await db
+    .select({
+      userName: user.name,
+      userEmail: user.email, // For more specific logging if needed
+      orgName: organization.name,
+      memberRole: member.role,
+    })
+    .from(user)
+    .innerJoin(member, eq(user.id, member.userId))
+    .innerJoin(organization, eq(member.organizationId, organization.id));
+
+  if (usersWithOrgs.length === 0) {
+    console.log("No users found linked to organizations.");
+  } else {
+    usersWithOrgs.forEach((link) => {
+      console.log(
+        `User '${link.userName}' (${link.userEmail}) belongs to organization '${link.orgName}' as role '${link.memberRole}'`
+      );
+    });
+  }
+
   console.log("\nSeeding complete.");
 };
 
