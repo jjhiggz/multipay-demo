@@ -34,6 +34,28 @@ export const appRouter = {
     }),
   recipients: publicProcedure
     .input(z.object({ organizationId: z.string() }))
+    .output(
+      z.object({
+        recipients: z.array(
+          z.object({
+            recipient: z.object({
+              recipientId: z.number(),
+              recipientDisplayName: z.string(),
+              currencyCode: z.string(),
+              bankCountryCode: z.string(),
+              bankName: z.string(),
+              accountNumber: z.string(),
+            }),
+            fields: z.array(
+              z.object({
+                name: z.string(),
+                value: z.string(),
+              })
+            ),
+          })
+        ),
+      })
+    )
     .handler(async ({ input }) => {
       const rows = await db
         .select()
