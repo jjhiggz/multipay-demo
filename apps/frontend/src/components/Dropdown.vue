@@ -2,7 +2,7 @@
   <div :class="rootClass" ref="rootRef">
     <slot name="trigger">
       <button
-        :class="triggerClass"
+        :class="triggerClass + ' flex items-center justify-between w-full'"
         @click="toggle"
         :disabled="disabled"
         type="button"
@@ -10,7 +10,17 @@
         :aria-expanded="open"
         ref="triggerRef"
       >
-        {{ selectedLabel }}
+        <span class="flex-1 text-left">{{ selectedLabel }}</span>
+        <svg
+          class="ml-2 w-4 h-4 transition-transform duration-200"
+          :class="{ 'rotate-180': open }"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
     </slot>
     <transition name="fade">
@@ -129,5 +139,8 @@ onBeforeUnmount(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+.rotate-180 {
+  transform: rotate(180deg);
 }
 </style>
