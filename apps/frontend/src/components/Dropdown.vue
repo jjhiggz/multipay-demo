@@ -62,9 +62,18 @@
         <div class="flex-1 overflow-y-auto custom-scrollbar">
           <ul>
             <li
-              v-for="option in options"
+              v-for="(option, idx) in options"
               :key="option.value"
-              :class="itemClassComputed(option)"
+              :ref="(el) => setOptionRef(el, idx)"
+              :class="[
+                itemClassComputed(option),
+                {
+                  'bg-gray-100 text-gray-900':
+                    idx === activeIndex && option.value !== modelValue?.value,
+                  'bg-blue-50 border border-blue-100': option.value === modelValue?.value,
+                  'font-bold': option.value === modelValue?.value,
+                },
+              ]"
               role="option"
               :aria-selected="option.value === modelValue?.value"
               @click="select(option)"
@@ -186,6 +195,44 @@ const onSearch = () => {
   emit('search', searchValue.value)
 }
 
+const activeIndex = ref<number>(-1)
+const optionRefs = ref<(HTMLElement | null)[]>([])
+
+function setOptionRef(el: Element | { $el?: Element } | null, idx: number) {
+  // If el is a Vue component instance, use its $el
+  const domEl = el && (el as any).$el ? (el as any).$el : el
+  optionRefs.value[idx] = domEl instanceof HTMLElement ? domEl : null
+}
+
+function moveActiveIndex(delta: number) {
+  if (!open.value || !props.options.length) return
+  let next = activeIndex.value + delta
+  if (next < 0) next = props.options.length - 1
+  if (next >= props.options.length) next = 0
+  activeIndex.value = next
+  scrollActiveOptionIntoView()
+}
+
+function scrollActiveOptionIntoView() {
+  nextTick(() => {
+    const el = optionRefs.value[activeIndex.value]
+    if (el && el.scrollIntoView) {
+      el.scrollIntoView({ block: 'nearest' })
+    }
+  })
+}
+
+watch(open, (val) => {
+  if (val) {
+    // Set activeIndex to selected or first option
+    const selectedIdx = props.options.findIndex(
+      (opt) => opt.value === (props.modelValue?.value ?? props.modelValue),
+    )
+    activeIndex.value = selectedIdx >= 0 ? selectedIdx : 0
+    nextTick(() => scrollActiveOptionIntoView())
+  }
+})
+
 const onKeydown = (e: KeyboardEvent) => {
   if (!open.value) return
   if (e.key === 'Escape') {
@@ -193,12 +240,19 @@ const onKeydown = (e: KeyboardEvent) => {
     emit('search-closed')
     e.stopPropagation()
     e.preventDefault()
+  } else if (e.key === 'ArrowDown') {
+    moveActiveIndex(1)
+    e.preventDefault()
+  } else if (e.key === 'ArrowUp') {
+    moveActiveIndex(-1)
+    e.preventDefault()
+  } else if (e.key === 'Enter') {
+    if (activeIndex.value >= 0 && activeIndex.value < props.options.length) {
+      select(props.options[activeIndex.value])
+      e.preventDefault()
+    }
   }
 }
-
-watch(open, (val) => {
-  if (val) updateMenuWidth()
-})
 
 onMounted(() => {
   document.addEventListener('mousedown', onClickOutside)
