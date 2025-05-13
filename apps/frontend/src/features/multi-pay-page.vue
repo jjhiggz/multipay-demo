@@ -7,10 +7,10 @@
         <img :src="logoUrl" alt="Logo" class="w-10 h-10" />
       </div>
       <ProfileDropdown
-        :is-loading="isSessionLoading"
-        :error="sessionError"
-        :session-data="sessionData"
-        :active-organization-state="activeOrganizationState"
+        :is-loading="authSession.isPending"
+        :error="authSession.error"
+        :session-data="authSession.data"
+        :active-organization-state="{ value: authOrg }"
       />
     </header>
 
@@ -49,16 +49,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import logoUrl from '../assets/logo.svg'
 import CalendarDropdown from '@/components/CalendarDropdown.vue'
 import { authClient } from '@/services/authClient'
-import { useAuthSession } from '@/composables/useAuthSession'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
+const authSession = authClient.useSession()
+const authOrg = authClient.useActiveOrganization()
+watch(authOrg, console.log)
 
 const sendDate = ref<Date | null>(new Date()) // Initialize with today's date
-
-const { data: sessionData, isLoading: isSessionLoading, error: sessionError } = useAuthSession()
-
-const activeOrganizationState = authClient.useActiveOrganization
 </script>

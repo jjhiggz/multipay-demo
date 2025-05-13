@@ -1,4 +1,4 @@
-import { createAuthClient } from 'better-auth/client'
+import { createAuthClient } from 'better-auth/vue'
 import { organizationClient } from 'better-auth/client/plugins' // Import the client plugin
 
 export const authClient = createAuthClient({
