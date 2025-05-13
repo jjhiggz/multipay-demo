@@ -5,16 +5,16 @@ import {
   account,
   session,
   verification,
-  transaction,
   organization,
+  invitation,
   member,
-} from "./schema/auth";
+} from "./schema/auth-schema";
 
 const resetDatabase = async () => {
-  await db.delete(transaction);
   await db.delete(session);
   await db.delete(member);
   await db.delete(organization);
+  await db.delete(invitation);
   await db.delete(account);
   await db.delete(verification);
   await db.delete(user);
