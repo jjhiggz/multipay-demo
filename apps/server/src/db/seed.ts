@@ -78,8 +78,6 @@ const main = async () => {
     name: "Raj I. Beds",
     password: "password123",
   });
-
-  console.log("\nSeeding complete.");
 };
 
 main().catch((err) => {
