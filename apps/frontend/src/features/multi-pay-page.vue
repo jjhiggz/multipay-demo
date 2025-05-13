@@ -23,19 +23,10 @@
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
-            <Dropdown
-              v-model="sendingCurrency"
-              :options="currencyOptions"
-              variant="outline"
-              class="w-full"
-              menuClass="max-h-60 overflow-y-auto"
-            >
-              <template #option="{ option }">
-                <div>
-                  <b>{{ option.value }}</b> {{ option.label.replace(/\s*\(.+\)$/, '') }}
-                </div>
-              </template>
-            </Dropdown>
+            <CurrencyDropdown
+              :selected="sendingCurrency"
+              @selected="(val) => (sendingCurrency = val)"
+            />
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Transfer amount currency</label>
@@ -54,17 +45,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import logoUrl from '../assets/logo.svg'
 import CalendarDropdown from '../components/CalendarDropdown.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
-import Dropdown from '../components/Dropdown.vue'
-import { VALID_CURRENCY_CODES } from '../constants/from-api/currency.constants'
+import CurrencyDropdown from '../components/CurrencyDropdown.vue'
 
 const sendDate = ref<Date | null>(new Date())
-const sendingCurrency = ref('USD')
-
-const currencyOptions = computed(() =>
-  VALID_CURRENCY_CODES.map((c) => ({ label: `${c.name} (${c.code})`, value: c.code })),
-)
+const sendingCurrency = ref<string | { label: string; value: string } | undefined>('USD')
 </script>
