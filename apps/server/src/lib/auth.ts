@@ -15,11 +15,21 @@ export const auth = betterAuth({
     session: {
       create: {
         before: async (session) => {
-          const organization = await getActiveOrganization(session.userId);
+          const organization = await getActiveOrganization(
+            session.userId
+          ).catch(() => null);
+          if (organization) {
+            return {
+              data: {
+                ...session,
+                activeOrganizationId: organization.id,
+              },
+            };
+          }
+
           return {
             data: {
               ...session,
-              activeOrganizationId: organization.id,
             },
           };
         },
