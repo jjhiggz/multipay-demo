@@ -148,11 +148,14 @@ const updateMenuWidth = () => {
 
 const toggle = async () => {
   if (props.disabled) return
-  open.value = !open.value
   if (open.value) {
-    await nextTick()
-    updateMenuWidth()
+    open.value = false
+    emit('search-closed')
+    return
   }
+  open.value = true
+  await nextTick()
+  updateMenuWidth()
 }
 
 const select = (value: OptionType) => {
