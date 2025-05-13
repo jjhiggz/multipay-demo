@@ -23,9 +23,13 @@
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
-            <select class="px-3 py-2 border rounded w-full">
-              <option>US Dollar (USD)</option>
-            </select>
+            <Dropdown
+              v-model="sendingCurrency"
+              :options="currencyOptions"
+              variant="outline"
+              class="w-96"
+              menuClass="max-h-60 overflow-y-auto"
+            />
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Transfer amount currency</label>
@@ -44,10 +48,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import logoUrl from '../assets/logo.svg'
 import CalendarDropdown from '../components/CalendarDropdown.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
+import Dropdown from '../components/Dropdown.vue'
+import { VALID_CURRENCY_CODES } from '../constants/from-api/currency.constants'
 
 const sendDate = ref<Date | null>(new Date())
+const sendingCurrency = ref('USD')
+
+const currencyOptions = computed(() =>
+  VALID_CURRENCY_CODES.map((c) => ({ label: `${c.name} (${c.code})`, value: c.code })),
+)
 </script>
