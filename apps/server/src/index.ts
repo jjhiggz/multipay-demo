@@ -6,6 +6,8 @@ import { auth } from "./lib/auth";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { db } from "./db";
+import { organization } from "./db/schema/auth-schema";
 
 const app = new Hono();
 
@@ -21,23 +23,10 @@ app.use(
 );
 
 app.on(["POST", "GET"], "/api/auth/**", async (c) => {
-  const headers = c.req.raw.headers;
-  const body = c.body;
-
-  const org = await auth.api.getFullOrganization({
-    headers: c.req.raw.headers,
+  const orgs = await auth.api.listOrganizations().catch(() => null);
+  console.log({
+    orgs,
   });
-  const user = await auth.api.getSession({
-    headers,
-  });
-
-  console.log(org, user);
-
-  // await auth.api.setActiveOrganization({
-  //   headers: c.req.raw.headers,
-  //   body: {
-  //   }
-  // });
   return auth.handler(c.req.raw);
 });
 

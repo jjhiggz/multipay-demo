@@ -9,6 +9,7 @@ import {
   invitation,
   member,
 } from "./schema/auth-schema";
+import { eq } from "drizzle-orm";
 
 const resetDatabase = async () => {
   await db.delete(session);
@@ -38,7 +39,13 @@ const createUser = async ({
         password,
       },
     })
-    .then((userData) => userData)
+    .then(async (userData) => {
+      await db
+        .update(user)
+        .set({ emailVerified: true })
+        .where(eq(user.id, userData.user.id));
+      return userData;
+    })
     .catch((error) => {
       console.error("Failed to create user:", {
         email,
@@ -48,6 +55,58 @@ const createUser = async ({
       throw error;
     });
 };
+
+export async function createOrganization({
+  name,
+  slug,
+  logo,
+  metadata,
+}: {
+  name: string;
+  slug: string;
+  logo?: string;
+  metadata?: string;
+}) {
+  // Check if org already exists
+  const existing = await db
+    .select()
+    .from(organization)
+    .where(eq(organization.slug, slug));
+  if (existing.length > 0) return existing[0];
+
+  const now = new Date();
+  const [org] = await db
+    .insert(organization)
+    .values({
+      id: crypto.randomUUID(),
+      name,
+      slug,
+      logo,
+      metadata,
+      createdAt: now,
+    })
+    .returning();
+  return org;
+}
+
+export async function addUserToOrganization({
+  userId,
+  organizationId,
+  role,
+}: {
+  userId: string;
+  organizationId: string;
+  role: string; // "owner" | "admin" | "member"
+}) {
+  const now = new Date();
+  return db.insert(member).values({
+    id: crypto.randomUUID(),
+    userId,
+    organizationId,
+    role,
+    createdAt: now,
+  });
+}
 
 const main = async () => {
   await resetDatabase();
@@ -77,6 +136,17 @@ const main = async () => {
     email: "raj@ibeds.com",
     name: "Raj I. Beds",
     password: "password123",
+  });
+
+  const americanChairs = await createOrganization({
+    name: "AmericanChairs",
+    slug: "american-chairs",
+  });
+
+  await addUserToOrganization({
+    userId: jonAmerica.user.id,
+    organizationId: americanChairs.id,
+    role: "owner",
   });
 };
 
