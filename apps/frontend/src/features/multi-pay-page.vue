@@ -29,6 +29,10 @@
             />
           </div>
           <div>
+            <label class="block mb-1 text-gray-500 text-xs">Recipient</label>
+            <RecipientDropdown />
+          </div>
+          <div>
             <label class="block mb-1 text-gray-500 text-xs">Transfer amount currency</label>
             <select class="px-3 py-2 border rounded w-full">
               <option>Recipient's currency (USD)</option>
@@ -49,8 +53,9 @@ import { ref } from 'vue'
 import logoUrl from '../assets/logo.svg'
 import CalendarDropdown from '../components/CalendarDropdown.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
-import CurrencyDropdown, { type CurrencyDropdownOption } from '../components/CurrencyDropdown.vue'
+import CurrencyDropdown from '../components/CurrencyDropdown.vue'
+import RecipientDropdown from '../components/RecipientDropdown.vue'
 
 const sendDate = ref<Date | null>(new Date())
-const sendingCurrency = ref<CurrencyDropdownOption | null>(null)
+const sendingCurrency = ref(null)
 </script>
