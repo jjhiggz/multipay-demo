@@ -49,8 +49,8 @@ import { ref } from 'vue'
 import logoUrl from '../assets/logo.svg'
 import CalendarDropdown from '../components/CalendarDropdown.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
-import CurrencyDropdown from '../components/CurrencyDropdown.vue'
+import CurrencyDropdown, { type CurrencyDropdownOption } from '../components/CurrencyDropdown.vue'
 
 const sendDate = ref<Date | null>(new Date())
-const sendingCurrency = ref<string | { label: string; value: string } | undefined>('USD')
+const sendingCurrency = ref<CurrencyDropdownOption | null>(null)
 </script>

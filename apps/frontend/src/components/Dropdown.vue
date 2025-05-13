@@ -60,9 +60,9 @@
           :key="option.value"
           :class="itemClassComputed(option)"
           role="option"
-          :aria-selected="option.value === modelValue"
-          @click="select(option.value)"
-          @keydown.enter.prevent="select(option.value)"
+          :aria-selected="option.value === modelValue?.value"
+          @click="select(option)"
+          @keydown.enter.prevent="select(option)"
           tabindex="0"
         >
           <slot name="option" :option="option">
@@ -74,18 +74,26 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup generic="T extends { label: string; value: string | number }">
+/**
+ * Generic Dropdown component.
+ *
+ * @template T - Option type, must have at least { label: string; value: string | number }
+ * Usage: <Dropdown<OptionType> ... />
+ */
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { dropdownVariants, triggerVariants, menuVariants, itemVariants } from './dropdownVariants'
 
-interface Option {
+export interface BaseDropdownOption {
   label: string
   value: string | number
 }
 
+type OptionType = T extends BaseDropdownOption ? T : BaseDropdownOption
+
 const props = defineProps<{
-  modelValue: string | number | null
-  options: Option[]
+  modelValue: OptionType | null
+  options: OptionType[]
   variant?: string
   class?: string
   menuClass?: string
@@ -93,7 +101,10 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const emit = defineEmits(['update:modelValue', 'search'])
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: OptionType): void
+  (e: 'search', value: string): void
+}>()
 
 const open = ref(false)
 const rootRef = ref<HTMLElement | null>(null)
@@ -103,15 +114,17 @@ const menuWidth = ref<string | null>(null)
 const searchValue = ref('')
 
 const selectedLabel = computed(() => {
-  const found = props.options.find((opt) => opt.value === props.modelValue)
+  const found = props.options.find(
+    (opt) => opt.value === (props.modelValue?.value ?? props.modelValue),
+  )
   return found ? found.label : 'Select...'
 })
 
 const rootClass = computed(() => [dropdownVariants(props.variant), props.class])
 const triggerClass = computed(() => [triggerVariants(props.variant)])
 const menuClassComputed = computed(() => [menuVariants(props.variant), props.menuClass])
-const itemClassComputed = (option: Option) => [
-  itemVariants(props.variant, option.value === props.modelValue),
+const itemClassComputed = (option: OptionType) => [
+  itemVariants(props.variant, option.value === (props.modelValue?.value ?? props.modelValue)),
   props.itemClass,
 ]
 
@@ -132,7 +145,7 @@ const toggle = async () => {
   }
 }
 
-const select = (value: string | number) => {
+const select = (value: OptionType) => {
   emit('update:modelValue', value)
   open.value = false
 }
