@@ -20,6 +20,7 @@
     "db:migrate": "bun run --filter server db:migrate",
     "db:seed": "bun run --filter server db:seed",
     "db:local": "bun run --filter server db:local",
+    "copy-constants": "bun copy-constants.ts",
     "lint": "bun run --filter '*' lint"
   },
   "packageManager": "bun@1.2.13",
