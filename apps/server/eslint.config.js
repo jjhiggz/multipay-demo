@@ -3,7 +3,6 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import { defineConfig } from "eslint/config";
 
-let a = 0;
 /** @type {import("eslint").Linter.FlatConfig} */
 const privateImports = {
   meta: {
@@ -41,7 +40,6 @@ const privateImports = {
 
           return true;
         })();
-        console.log({ isSibling, importPath });
 
         const badSpecifiers = node.specifiers.filter((specifier) => {
           return specifier.imported?.name.startsWith("_") && !isSibling;
