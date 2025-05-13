@@ -32,6 +32,29 @@
         role="listbox"
         tabindex="-1"
       >
+        <li class="top-0 z-10 sticky bg-white px-2 pt-2 pb-1">
+          <div class="relative flex items-center">
+            <span class="left-2 absolute text-gray-400">
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-linecap="round" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              class="py-1 pr-2 pl-7 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-100 w-full text-sm"
+              placeholder="Search..."
+              v-model="searchValue"
+              @input="onSearch"
+            />
+          </div>
+        </li>
         <li
           v-for="option in options"
           :key="option.value"
@@ -70,13 +93,14 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'search'])
 
 const open = ref(false)
 const rootRef = ref<HTMLElement | null>(null)
 const menuRef = ref<HTMLElement | null>(null)
 const triggerRef = ref<HTMLElement | null>(null)
 const menuWidth = ref<string | null>(null)
+const searchValue = ref('')
 
 const selectedLabel = computed(() => {
   const found = props.options.find((opt) => opt.value === props.modelValue)
@@ -117,6 +141,10 @@ const onClickOutside = (e: MouseEvent) => {
   if (rootRef.value && !rootRef.value.contains(e.target as Node)) {
     open.value = false
   }
+}
+
+const onSearch = () => {
+  emit('search', searchValue.value)
 }
 
 watch(open, (val) => {
