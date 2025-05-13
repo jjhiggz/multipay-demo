@@ -20,8 +20,24 @@ app.use(
   })
 );
 
-app.on(["POST", "GET"], "/api/auth/**", (c) => {
-  console.log(c);
+app.on(["POST", "GET"], "/api/auth/**", async (c) => {
+  const headers = c.req.raw.headers;
+  const body = c.body;
+
+  const org = await auth.api.getFullOrganization({
+    headers: c.req.raw.headers,
+  });
+  const user = await auth.api.getSession({
+    headers,
+  });
+
+  console.log(org, user);
+
+  // await auth.api.setActiveOrganization({
+  //   headers: c.req.raw.headers,
+  //   body: {
+  //   }
+  // });
   return auth.handler(c.req.raw);
 });
 
