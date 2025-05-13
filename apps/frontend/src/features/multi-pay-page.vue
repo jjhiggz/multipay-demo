@@ -39,6 +39,7 @@
         <!-- Recipients Table Placeholder -->
         <div class="mt-8">
           <!-- Table will go here -->
+          <DropdownMenuDemo />
         </div>
       </div>
     </main>
@@ -52,6 +53,7 @@ import CalendarDropdown from '../components/CalendarDropdown.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
 import CurrencyDropdown, { type CurrencyDropdownOption } from '../components/CurrencyDropdown.vue'
 import RecipientDropdown from '../components/RecipientDropdown.vue'
+import DropdownMenuDemo from '../components/DropdownMenu/DropdownMenuDemo.vue'
 
 const sendDate = ref<Date | null>(new Date())
 const sendingCurrency = ref<CurrencyDropdownOption | null>(null)
