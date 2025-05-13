@@ -28,15 +28,15 @@
       </button>
     </slot>
     <transition name="fade">
-      <ul
+      <div
         v-if="open"
-        :class="menuClassComputed"
+        :class="[menuClassComputed, 'max-h-60 flex flex-col']"
         :style="menuStyle"
         ref="menuRef"
         role="listbox"
         tabindex="-1"
       >
-        <li class="top-0 z-10 sticky bg-white px-2 pt-2 pb-1">
+        <div class="top-0 z-10 sticky flex-shrink-0 bg-white px-2 pt-2 pb-1">
           <div class="relative flex items-center">
             <span class="left-2 absolute text-gray-400">
               <svg
@@ -58,22 +58,32 @@
               @input="onSearch"
             />
           </div>
-        </li>
-        <li
-          v-for="option in options"
-          :key="option.value"
-          :class="itemClassComputed(option)"
-          role="option"
-          :aria-selected="option.value === modelValue?.value"
-          @click="select(option)"
-          @keydown.enter.prevent="select(option)"
-          tabindex="0"
+        </div>
+        <div class="flex-1 overflow-y-auto custom-scrollbar">
+          <ul>
+            <li
+              v-for="option in options"
+              :key="option.value"
+              :class="itemClassComputed(option)"
+              role="option"
+              :aria-selected="option.value === modelValue?.value"
+              @click="select(option)"
+              @keydown.enter.prevent="select(option)"
+              tabindex="0"
+            >
+              <slot name="option" :option="option">
+                {{ option.label }}
+              </slot>
+            </li>
+          </ul>
+        </div>
+        <div
+          v-if="$slots.footer"
+          class="bottom-0 z-10 sticky flex-shrink-0 bg-white px-2 py-2 border-gray-100 border-t"
         >
-          <slot name="option" :option="option">
-            {{ option.label }}
-          </slot>
-        </li>
-      </ul>
+          <slot name="footer" />
+        </div>
+      </div>
     </transition>
   </div>
 </template>
@@ -89,6 +99,7 @@
  *   - display: Custom render for the trigger content (next to chevron). Receives { option } (the selected option).
  *   - option: Custom render for each dropdown option. Receives { option }.
  *   - trigger: Full custom trigger (overrides chevron and all content).
+ *   - footer: Custom footer always visible at the bottom of the dropdown menu.
  */
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { dropdownVariants, triggerVariants, menuVariants, itemVariants } from './dropdownVariants'
@@ -208,5 +219,34 @@ onBeforeUnmount(() => {
 }
 .rotate-180 {
   transform: rotate(180deg);
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-gutter: stable overlay;
+  --scrollbar-opacity: 0;
+  transition: --scrollbar-opacity 0.3s;
+}
+.custom-scrollbar:hover,
+.custom-scrollbar:focus,
+.custom-scrollbar:active,
+.custom-scrollbar:scrolling {
+  --scrollbar-opacity: 1;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  opacity: var(--scrollbar-opacity);
+  transition: opacity 0.3s;
+}
+.custom-scrollbar:hover::-webkit-scrollbar-thumb,
+.custom-scrollbar:focus::-webkit-scrollbar-thumb,
+.custom-scrollbar:active::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  opacity: 1;
 }
 </style>
