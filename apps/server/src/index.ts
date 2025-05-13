@@ -6,8 +6,6 @@ import { auth } from "./lib/auth";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import { db } from "./db";
-import { organization } from "./db/schema/auth-schema";
 
 const app = new Hono();
 

@@ -22,7 +22,7 @@ export const appRouter = {
         password: z.string().min(1),
       })
     )
-    .handler(async ({ input, context }) => {
+    .handler(async ({ input }) => {
       console.log("hithithit");
       // Call Better Auth's sign-in API
       return await auth.api.signInEmail({
