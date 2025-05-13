@@ -7,8 +7,16 @@
     menuClass="max-h-60 overflow-y-auto"
     @update:modelValue="onSelect"
   >
+    <template #display="{ option }">
+      <template v-if="option">
+        <Flag :currency-code="option.currencyCode" class="mr-2" />
+        <span>{{ option.label }}</span>
+      </template>
+      <template v-else> Select recipient... </template>
+    </template>
     <template #option="{ option }">
       <div class="flex items-center gap-2">
+        <Flag :currency-code="option.currencyCode" />
         <span class="font-medium">{{ option.label }}</span>
         <span class="text-gray-400 text-xs">({{ option.value }})</span>
       </div>
@@ -34,10 +42,12 @@ import Dropdown, { type BaseDropdownOption } from './Dropdown.vue'
 import { orpcVueQuery } from '../services/orpcClient'
 import { authClient } from '../services/authClient'
 import { useQuery } from '@tanstack/vue-query'
+import Flag from './Flag.vue'
+import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 
 interface RecipientOption extends BaseDropdownOption {
   recipientId: number
-  currencyCode: string
+  currencyCode: CurrencyCode
   bankCountryCode: string
   bankName: string
   accountNumber: string
@@ -59,15 +69,17 @@ const { data: recipientsData, isPending: isLoading, error } = useQuery(options)
 
 const recipientOptions = computed<RecipientOption[]>(() => {
   if (!recipientsData.value?.recipients) return []
-  return recipientsData.value.recipients.map((r) => ({
-    label: r.recipient.recipientDisplayName,
-    value: r.recipient.recipientId,
-    recipientId: r.recipient.recipientId,
-    currencyCode: r.recipient.currencyCode,
-    bankCountryCode: r.recipient.bankCountryCode,
-    bankName: r.recipient.bankName,
-    accountNumber: r.recipient.accountNumber,
-  }))
+  return recipientsData.value.recipients.map((r) => {
+    return {
+      label: r.recipient.recipientDisplayName,
+      value: r.recipient.recipientId,
+      recipientId: r.recipient.recipientId,
+      currencyCode: r.recipient.currencyCode as CurrencyCode,
+      bankCountryCode: r.recipient.bankCountryCode,
+      bankName: r.recipient.bankName,
+      accountNumber: r.recipient.accountNumber,
+    }
+  })
 })
 
 function onSelect(option: RecipientOption) {
