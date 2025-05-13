@@ -1,6 +1,9 @@
 import { protectedProcedure, publicProcedure } from "../lib/orpc";
 import { auth } from "../lib/auth";
 import { z } from "zod";
+import { db } from "../db";
+import { recipient } from "../db/schema/auth-schema";
+import { eq } from "drizzle-orm";
 
 export const appRouter = {
   healthCheck: publicProcedure.handler(() => {
@@ -11,9 +14,6 @@ export const appRouter = {
       message: "This is private",
       user: context.session?.user,
     };
-  }),
-  getCurrentUser: publicProcedure.handler(({ context }) => {
-    return context.session?.user ?? null;
   }),
   signIn: publicProcedure
     .input(
@@ -31,6 +31,34 @@ export const appRouter = {
           password: input.password,
         },
       });
+    }),
+  recipients: publicProcedure
+    .input(z.object({ organizationId: z.string() }))
+    .handler(async ({ input }) => {
+      const rows = await db
+        .select()
+        .from(recipient)
+        .where(eq(recipient.organizationId, input.organizationId));
+      return {
+        recipients: rows.map((r) => ({
+          recipient: {
+            recipientId: r.recipientId,
+            recipientDisplayName: r.recipientDisplayName,
+            currencyCode: r.currencyCode,
+            bankCountryCode: r.bankCountryCode,
+            bankName: r.bankName,
+            accountNumber: r.accountNumber,
+          },
+          fields: [
+            { name: "recipientId", value: String(r.recipientId) },
+            { name: "recipientDisplayName", value: r.recipientDisplayName },
+            { name: "currencyCode", value: r.currencyCode },
+            { name: "bankCountryCode", value: r.bankCountryCode },
+            { name: "bankName", value: r.bankName },
+            { name: "accountNumber", value: r.accountNumber },
+          ],
+        })),
+      };
     }),
 };
 export type AppRouter = typeof appRouter;

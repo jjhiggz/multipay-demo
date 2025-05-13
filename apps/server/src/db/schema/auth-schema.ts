@@ -89,3 +89,15 @@ export const invitation = sqliteTable("invitation", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 });
+
+export const recipient = sqliteTable("recipient", {
+  recipientId: integer("recipient_id").primaryKey({ autoIncrement: true }),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  recipientDisplayName: text("recipient_display_name").notNull(),
+  currencyCode: text("currency_code").notNull(),
+  bankCountryCode: text("bank_country_code").notNull(),
+  bankName: text("bank_name").notNull(),
+  accountNumber: text("account_number").notNull(),
+});
