@@ -10,7 +10,11 @@
         :aria-expanded="open"
         ref="triggerRef"
       >
-        <span class="flex-1 text-left">{{ selectedLabel }}</span>
+        <span class="flex flex-1 items-center gap-2 text-left">
+          <slot name="display" :option="props.modelValue">
+            {{ selectedLabel }}
+          </slot>
+        </span>
         <svg
           class="ml-2 w-4 h-4 transition-transform duration-200"
           :class="{ 'rotate-180': open }"
@@ -80,6 +84,11 @@
  *
  * @template T - Option type, must have at least { label: string; value: string | number }
  * Usage: <Dropdown<OptionType> ... />
+ *
+ * Slots:
+ *   - display: Custom render for the trigger content (next to chevron). Receives { option } (the selected option).
+ *   - option: Custom render for each dropdown option. Receives { option }.
+ *   - trigger: Full custom trigger (overrides chevron and all content).
  */
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { dropdownVariants, triggerVariants, menuVariants, itemVariants } from './dropdownVariants'
@@ -104,6 +113,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: OptionType): void
   (e: 'search', value: string): void
+  (e: 'search-closed'): void
 }>()
 
 const open = ref(false)
@@ -148,11 +158,13 @@ const toggle = async () => {
 const select = (value: OptionType) => {
   emit('update:modelValue', value)
   open.value = false
+  emit('search-closed')
 }
 
 const onClickOutside = (e: MouseEvent) => {
   if (rootRef.value && !rootRef.value.contains(e.target as Node)) {
     open.value = false
+    emit('search-closed')
   }
 }
 

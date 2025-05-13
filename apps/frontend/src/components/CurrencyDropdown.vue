@@ -7,7 +7,15 @@
     menuClass="max-h-60 overflow-y-auto"
     @update:modelValue="onSelect"
     @search="onSearch"
+    @search-closed="searchClosed"
   >
+    <template #display="{ option }">
+      <template v-if="option">
+        <Flag :currency-code="option.value" class="mr-2" />
+        <b>{{ option.value }}</b>
+      </template>
+      <template v-else> Select... </template>
+    </template>
     <template #option="{ option }">
       <div class="flex items-center gap-2">
         <Flag :currency-code="option.value" />
@@ -56,5 +64,10 @@ const onSearch = (val: string) => {
 const onSelect = (option: CurrencyDropdownOption) => {
   const found = allOptions.value.find((o) => o.value === option.value)
   if (found) emit('selected', found)
+}
+
+const searchClosed = () => {
+  console.log('hithithit')
+  search.value = ''
 }
 </script>
