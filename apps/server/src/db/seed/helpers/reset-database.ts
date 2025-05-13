@@ -4,12 +4,14 @@ import {
   invitation,
   member,
   organization,
+  recipient,
   session,
   user,
   verification,
 } from "@/db/schema/auth-schema";
 
 export const _resetDatabase = async () => {
+  await db.delete(recipient);
   await db.delete(session);
   await db.delete(member);
   await db.delete(organization);

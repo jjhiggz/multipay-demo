@@ -1,17 +1,14 @@
 import { db } from "@/db";
 import { recipient } from "@/db/schema/auth-schema";
-
-export type NewRecipient = {
-  recipientDisplayName: string;
-  currencyCode: string;
-  bankCountryCode: string;
-  bankName: string;
-  accountNumber: string;
-};
+import type { s } from "@/zod-schemas";
+import type { z } from "zod";
 
 export async function _createRecipientsForOrganization(
   organizationId: string,
-  recipients: NewRecipient[]
+  recipients: Omit<
+    z.infer<(typeof s)["recipient"]["insert"]>,
+    "organizationId"
+  >[]
 ) {
   if (!recipients.length) return [];
   const rows = recipients.map((r) => ({

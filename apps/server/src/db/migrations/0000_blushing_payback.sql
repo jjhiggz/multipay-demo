@@ -47,6 +47,17 @@ CREATE TABLE `organization` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `organization_slug_unique` ON `organization` (`slug`);--> statement-breakpoint
+CREATE TABLE `recipient` (
+	`recipient_id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`organization_id` text NOT NULL,
+	`recipient_display_name` text NOT NULL,
+	`currency_code` text NOT NULL,
+	`bank_country_code` text NOT NULL,
+	`bank_name` text NOT NULL,
+	`account_number` text NOT NULL,
+	FOREIGN KEY (`organization_id`) REFERENCES `organization`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `session` (
 	`id` text PRIMARY KEY NOT NULL,
 	`expires_at` integer NOT NULL,

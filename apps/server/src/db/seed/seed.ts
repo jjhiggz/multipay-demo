@@ -22,6 +22,14 @@ const main = async () => {
     organizationId: americanChairs.id,
     role: "owner",
   });
+
+  await seedHelpers.createRecipientsForOrganization(
+    americanChairs.id,
+    seedHelpers.getRecipientData({
+      allowedCurrencies: ["USD", "CAD", "GBP"],
+      count: 300,
+    })
+  );
 };
 
 main().catch((err) => {
