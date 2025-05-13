@@ -21,6 +21,7 @@ export const session = sqliteTable("session", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id),
+  activeOrganizationId: text("active_organization_id"),
 });
 
 export const account = sqliteTable("account", {
@@ -67,4 +68,40 @@ export const transaction = sqliteTable("transaction", {
   status: text("status").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+});
+
+export const organization = sqliteTable("organization", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull(),
+  logo: text("logo"),
+  metadata: text("metadata"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+export const member = sqliteTable("member", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id),
+  role: text("role").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+export const invitation = sqliteTable("invitation", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull(),
+  inviterId: text("inviter_id")
+    .notNull()
+    .references(() => user.id),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id),
+  role: text("role").notNull(),
+  status: text("status").notNull(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });

@@ -6,36 +6,12 @@
         <!-- Logo using imported SVG -->
         <img :src="logoUrl" alt="Logo" class="w-10 h-10" />
       </div>
-      <div class="flex items-center gap-3">
-        <div class="flex items-center bg-white shadow-sm px-4 py-2 rounded-xl">
-          <div class="flex justify-center items-center bg-gray-100 mr-4 rounded-lg w-12 h-12">
-            <!-- User icon SVG -->
-            <svg
-              class="w-7 h-7 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-2.21 3.582-4 8-4s8 1.79 8 4" />
-            </svg>
-          </div>
-          <div class="flex flex-col justify-center">
-            <span class="font-semibold text-gray-900 text-lg leading-tight">Baldo Pizzas</span>
-            <span class="text-gray-500 text-base leading-tight">Nico Baldovino</span>
-          </div>
-          <svg
-            class="ml-4 w-6 h-6 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
+      <ProfileDropdown
+        :is-loading="isSessionLoading"
+        :error="sessionError"
+        :session-data="sessionData"
+        :active-organization-state="activeOrganizationState"
+      />
     </header>
 
     <!-- Main Content -->
@@ -76,6 +52,13 @@
 import { ref } from 'vue'
 import logoUrl from '../assets/logo.svg'
 import CalendarDropdown from '@/components/CalendarDropdown.vue'
+import { authClient } from '@/services/authClient'
+import { useAuthSession } from '@/composables/useAuthSession'
+import ProfileDropdown from '@/components/ProfileDropdown.vue'
 
 const sendDate = ref<Date | null>(new Date()) // Initialize with today's date
+
+const { data: sessionData, isLoading: isSessionLoading, error: sessionError } = useAuthSession()
+
+const activeOrganizationState = authClient.useActiveOrganization
 </script>

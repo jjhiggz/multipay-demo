@@ -76,9 +76,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useCurrentUser, GET_CURRENT_USER_QUERY_KEY } from '../composables/useAuth'
-import { useQueryClient } from '@tanstack/vue-query'
+import { useRouter } from 'vue-router'
 import { authClient } from '../services/authClient'
 
 const email = ref('')
@@ -86,30 +84,19 @@ const password = ref('')
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const router = useRouter()
-const route = useRoute()
-const queryClient = useQueryClient()
-const { isAuthenticated, refetchCurrentUser } = useCurrentUser()
 
 const handleLogin = async () => {
   isLoading.value = true
   error.value = null
   try {
-    const { data, error: authError } = await authClient.signIn.email({
+    const { error: authError } = await authClient.signIn.email({
       email: email.value,
       password: password.value,
     })
     if (authError) {
       throw new Error(authError.message || 'Login failed')
     }
-    // Refetch user after login
-    await queryClient.invalidateQueries({ queryKey: GET_CURRENT_USER_QUERY_KEY })
-    await refetchCurrentUser()
-    if (isAuthenticated.value) {
-      const redirectPath = (route.query.redirect as string) || '/dashboard'
-      router.push(redirectPath)
-    } else {
-      error.value = 'Login succeeded but failed to retrieve user details.'
-    }
+    router.push({ name: 'dashboard' })
   } catch (err: any) {
     error.value = err.message || 'Login failed'
   } finally {
