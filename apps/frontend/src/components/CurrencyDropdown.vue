@@ -67,7 +67,6 @@ const onSelect = (option: CurrencyDropdownOption) => {
 }
 
 const searchClosed = () => {
-  console.log('hithithit')
   search.value = ''
 }
 </script>

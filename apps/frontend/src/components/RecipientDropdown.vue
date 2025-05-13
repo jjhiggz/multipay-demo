@@ -1,6 +1,6 @@
 <template>
   <Dropdown
-    :options="recipients"
+    :options="recipientOptions"
     :model-value="selected"
     variant="outline"
     class="w-full"
@@ -14,23 +14,51 @@
       </div>
     </template>
   </Dropdown>
+  <div v-if="isLoading" class="mt-1 text-gray-400 text-xs">Loading recipients...</div>
+  <div v-if="error" class="mt-1 text-red-500 text-xs">Error loading recipients</div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Dropdown, { type BaseDropdownOption } from './Dropdown.vue'
+import { orpcVueQuery } from '../services/orpcClient'
+import { authClient } from '../services/authClient'
+import { useQuery } from '@tanstack/vue-query'
 
 interface RecipientOption extends BaseDropdownOption {
-  // Add more fields as needed
+  recipientId: number
+  currencyCode: string
+  bankCountryCode: string
+  bankName: string
+  accountNumber: string
 }
 
-const recipients = [
-  { label: 'Alice Johnson', value: 'alice@example.com' },
-  { label: 'Bob Smith', value: 'bob@example.com' },
-  { label: 'Charlie Lee', value: 'charlie@example.com' },
-]
-
 const selected = ref<RecipientOption | null>(null)
+
+const activeOrg = authClient.useActiveOrganization()
+const organizationId = computed(() => activeOrg.value?.data?.id ?? '')
+const options = computed(() =>
+  orpcVueQuery.recipients.queryOptions({
+    input: {
+      organizationId: organizationId,
+    },
+  }),
+)
+
+const { data: recipientsData, isPending: isLoading, error } = useQuery(options)
+
+const recipientOptions = computed<RecipientOption[]>(() => {
+  if (!recipientsData.value?.recipients) return []
+  return recipientsData.value.recipients.map((r) => ({
+    label: r.recipient.recipientDisplayName,
+    value: r.recipient.recipientId,
+    recipientId: r.recipient.recipientId,
+    currencyCode: r.recipient.currencyCode,
+    bankCountryCode: r.recipient.bankCountryCode,
+    bankName: r.recipient.bankName,
+    accountNumber: r.recipient.accountNumber,
+  }))
+})
 
 function onSelect(option: RecipientOption) {
   selected.value = option

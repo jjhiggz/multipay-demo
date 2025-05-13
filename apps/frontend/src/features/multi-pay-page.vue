@@ -23,10 +23,7 @@
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
-            <CurrencyDropdown
-              :selected="sendingCurrency"
-              @selected="(val) => (sendingCurrency = val)"
-            />
+            <CurrencyDropdown :selected="sendingCurrency" @selected="onCurrencySelected" />
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Recipient</label>
@@ -53,9 +50,10 @@ import { ref } from 'vue'
 import logoUrl from '../assets/logo.svg'
 import CalendarDropdown from '../components/CalendarDropdown.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
-import CurrencyDropdown from '../components/CurrencyDropdown.vue'
+import CurrencyDropdown, { type CurrencyDropdownOption } from '../components/CurrencyDropdown.vue'
 import RecipientDropdown from '../components/RecipientDropdown.vue'
 
 const sendDate = ref<Date | null>(new Date())
-const sendingCurrency = ref(null)
+const sendingCurrency = ref<CurrencyDropdownOption | null>(null)
+const onCurrencySelected = (val: CurrencyDropdownOption | null) => (sendingCurrency.value = val)
 </script>
