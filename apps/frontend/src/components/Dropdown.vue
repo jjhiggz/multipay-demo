@@ -1,5 +1,5 @@
 <template>
-  <div :class="rootClass" ref="rootRef">
+  <div :class="rootClass" ref="rootRef" @keydown="onKeydown" tabindex="0">
     <slot name="trigger">
       <button
         :class="triggerClass + ' flex items-center justify-between w-full'"
@@ -173,6 +173,16 @@ const onClickOutside = (e: MouseEvent) => {
 
 const onSearch = () => {
   emit('search', searchValue.value)
+}
+
+const onKeydown = (e: KeyboardEvent) => {
+  if (!open.value) return
+  if (e.key === 'Escape') {
+    open.value = false
+    emit('search-closed')
+    e.stopPropagation()
+    e.preventDefault()
+  }
 }
 
 watch(open, (val) => {
