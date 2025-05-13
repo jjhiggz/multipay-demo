@@ -27,9 +27,15 @@
               v-model="sendingCurrency"
               :options="currencyOptions"
               variant="outline"
-              class="w-96"
+              class="w-full"
               menuClass="max-h-60 overflow-y-auto"
-            />
+            >
+              <template #option="{ option }">
+                <div>
+                  <b>{{ option.value }}</b> {{ option.label.replace(/\s*\(.+\)$/, '') }}
+                </div>
+              </template>
+            </Dropdown>
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Transfer amount currency</label>
