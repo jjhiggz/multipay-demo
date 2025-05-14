@@ -13,7 +13,7 @@
 
     <!-- Desktop Table Layout -->
     <div v-if="recipients.length > 0" class="hidden md:block">
-      <div class="max-h-64 overflow-y-scroll">
+      <BetterScrollDiv class="max-h-64 overflow-y-scroll">
         <table class="bg-white border border-gray-200 rounded-lg min-w-full">
           <thead class="top-0 sticky bg-white">
             <tr class="h-12">
@@ -46,7 +46,7 @@
             </tr>
           </tbody>
         </table>
-      </div>
+      </BetterScrollDiv>
       <div class="flex justify-end mt-4">
         <button
           @click="addRecipient"
@@ -126,6 +126,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
+import BetterScrollDiv from './BetterScrollDiv.vue'
 
 type Recipient = {
   id: number
