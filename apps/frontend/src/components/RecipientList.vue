@@ -18,7 +18,7 @@
           <thead class="top-0 sticky bg-white">
             <tr class="h-12">
               <th
-                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+                class="bg-blue-50 px-4 py-2 border-b border-blue-200 rounded-tl-lg font-semibold text-blue-900 text-left"
               >
                 Recipient
               </th>
@@ -38,7 +38,7 @@
                 Reference
               </th>
               <th
-                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+                class="bg-blue-50 px-4 py-2 border-b border-blue-200 rounded-tr-lg font-semibold text-blue-900 text-left"
               >
                 Actions
               </th>
