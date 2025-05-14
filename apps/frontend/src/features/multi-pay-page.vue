@@ -23,7 +23,11 @@
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
-            <CurrencyDropdown :selected="sendingCurrency" @selected="onCurrencySelected" />
+            <CurrencyDropdown
+              :selected="sendingCurrency"
+              @selected="onCurrencySelected"
+              class="w-24 sm:w-full"
+            />
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Recipient</label>

@@ -3,23 +3,25 @@
     :options="filteredOptions"
     :model-value="selectedValue"
     variant="outline"
-    class="w-full"
-    menuClass="max-h-60 overflow-y-auto"
+    :class="rootClass || 'w-full'"
+    :menuClass="menuClass || 'max-h-60 overflow-y-auto'"
     @update:modelValue="onSelect"
     @search="onSearch"
     @search-closed="searchClosed"
   >
     <template #display="{ option }">
-      <template v-if="option">
-        <Flag :currency-code="option.value" class="mr-2" />
-        <b>{{ option.value }}</b>
-      </template>
-      <template v-else> Select... </template>
+      <div :class="displayClass">
+        <template v-if="option">
+          <Flag :currency-code="option.value" class="mr-2" />
+          <b>{{ option.value }}</b>
+        </template>
+        <template v-else> Select... </template>
+      </div>
     </template>
     <template #option="{ option }">
       <div class="flex items-center gap-2">
         <Flag :currency-code="option.value" />
-        {{ option.label }}
+        {{ option.value }}
       </div>
     </template>
   </Dropdown>
@@ -35,7 +37,12 @@ export interface CurrencyDropdownOption extends BaseDropdownOption {
   value: CurrencyCode
 }
 
-const props = defineProps<{ selected: CurrencyDropdownOption | null }>()
+const props = defineProps<{
+  selected: CurrencyDropdownOption | null
+  rootClass?: string
+  menuClass?: string
+  displayClass?: string
+}>()
 const emit = defineEmits<(e: 'selected', value: CurrencyDropdownOption) => void>()
 
 const search = ref('')
