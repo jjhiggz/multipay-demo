@@ -26,7 +26,7 @@
             <CurrencyDropdown
               :selected="sendingCurrency"
               @selected="onCurrencySelected"
-              class="w-24 sm:w-full"
+              class="w-28 sm:w-full"
             />
           </div>
           <div>
