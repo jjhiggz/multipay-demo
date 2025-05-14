@@ -56,6 +56,8 @@
           </div>
         </div>
       </div>
+      <!-- Select Recipients List -->
+      <SelectRecipientsList />
       <!-- Recipients Table Placeholder -->
       <div class="mt-8">
         <!-- Table will go here -->
@@ -76,6 +78,7 @@ import ToggleButton from '@/components/ToggleButton.vue'
 import Flag from '@/components/Flag.vue'
 import { useProfile } from '@/hooks/useProfile'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
+import SelectRecipientsList from '@/components/SelectRecipientsList.vue'
 
 const { data: profileData } = useProfile()
 
