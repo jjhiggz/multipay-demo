@@ -17,7 +17,7 @@
               <CurrencyDropdown
                 :selected="sendingCurrency"
                 @selected="onSendingCurrencySelected"
-                class="w-28 sm:w-32 md:w-44"
+                class="w-28 sm:w-44 md:w-44"
               />
             </div>
             <div class="">
@@ -57,12 +57,10 @@
         </div>
       </div>
       <!-- Select Recipients List -->
-      <SelectRecipientsList />
-      <!-- Recipients Table Placeholder -->
-      <div class="mt-8">
-        <!-- Table will go here -->
-        <DropdownMenuDemo />
+      <div class="mt-2">
+        <RecipientList />
       </div>
+      <!-- Recipients Table Placeholder -->
     </div>
   </IsolatedPageLayout>
 </template>
@@ -71,14 +69,12 @@
 import { computed, ref, watchEffect } from 'vue'
 import IsolatedPageLayout from '@/layouts/IsolatedPageLayout.vue'
 import CalendarDropdown from '../components/CalendarDropdown.vue'
-import ProfileDropdown from '@/components/ProfileDropdown.vue'
 import CurrencyDropdown, { type CurrencyDropdownOption } from '../components/CurrencyDropdown.vue'
-import RecipientDropdown from '../components/RecipientDropdown.vue'
 import ToggleButton from '@/components/ToggleButton.vue'
 import Flag from '@/components/Flag.vue'
 import { useProfile } from '@/hooks/useProfile'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import SelectRecipientsList from '@/components/SelectRecipientsList.vue'
+import RecipientList from '@/components/RecipientList.vue'
 
 const { data: profileData } = useProfile()
 
