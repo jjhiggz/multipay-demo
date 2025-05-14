@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export const tag =
   (message: string) =>
   <T>(input: T) => {
@@ -32,3 +34,12 @@ export const logWarn =
     console.warn(`[WARN] ${message}:`, input);
     return input;
   };
+
+export const handleZodFailure = (e: Error) => {
+  if (e instanceof z.ZodError) {
+    const flattend = JSON.stringify(e.flatten());
+    console.error(flattend);
+    throw new Error(flattend);
+  }
+  throw e;
+};

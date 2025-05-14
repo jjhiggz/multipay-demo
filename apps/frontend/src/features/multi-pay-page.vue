@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import IsolatedPageLayout from '@/layouts/IsolatedPageLayout.vue'
 import CalendarDropdown from '../components/CalendarDropdown.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
@@ -71,6 +71,10 @@ import CurrencyDropdown, { type CurrencyDropdownOption } from '../components/Cur
 import RecipientDropdown from '../components/RecipientDropdown.vue'
 import ToggleButton from '@/components/ToggleButton.vue'
 import Flag from '@/components/Flag.vue'
+import { useProfile } from '@/hooks/useProfile'
+import type { CurrencyCode } from '@/constants/from-api/currency.constants'
+
+const { data: profileData } = useProfile()
 
 const distributeCurrencyBy = ref<'send-currency' | 'recieving-currency'>('send-currency')
 const toggleDistributeCurrencyBy = () => {
@@ -84,6 +88,25 @@ const selectedCurrency = computed(() =>
 const sendDate = ref<Date | null>(new Date())
 const sendingCurrency = ref<CurrencyDropdownOption | null>(null)
 const recievingCurrency = ref<CurrencyDropdownOption | null>(null)
+
+watchEffect(() => {
+  if (profileData.value?.profile) {
+    const { expectedTradeCurrency, expectedPayoutCurrency } = profileData.value.profile
+    console.log('Profile data:', {
+      expectedTradeCurrency,
+      expectedPayoutCurrency,
+    })
+    sendingCurrency.value = {
+      value: expectedTradeCurrency as CurrencyCode,
+      label: expectedTradeCurrency as string,
+    }
+    recievingCurrency.value = {
+      value: expectedPayoutCurrency as CurrencyCode,
+      label: expectedPayoutCurrency as string,
+    }
+  }
+})
+
 const onSendingCurrencySelected = (val: CurrencyDropdownOption | null) =>
   (sendingCurrency.value = val)
 const onRecievingCurrencySelected = (val: CurrencyDropdownOption | null) =>

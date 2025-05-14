@@ -12,7 +12,7 @@ export async function _createProfile(
   partialProfile: Partial<z.input<(typeof s)["profile"]["insert"]>> = {}
 ) {
   // Provide sensible defaults for all fields
-  const defaults: typeof profile.$inferInsert = {
+  const defaults: z.infer<(typeof s)["profile"]["insert"]> = {
     profileId: faker.number.int({ min: 1000000, max: 9999999 }),
     clientId: faker.number.int({ min: 1000000, max: 9999999 }),
     clientNumber: faker.string.alphanumeric({ length: 14, casing: "upper" }),
@@ -90,7 +90,7 @@ export async function _createProfile(
       "ViewTransDetail",
     ]),
     expectedTradeCurrency: "USD",
-    expectedPayoutCurrency: "",
+    expectedPayoutCurrency: "USD",
     expectedAnnualTradingVolume: 50000,
     regionalAccountingCurrency: "USD",
     expectedVolumeInRegionalAccountingCurrency: 0,

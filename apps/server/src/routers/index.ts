@@ -5,11 +5,12 @@ import { db } from "../db";
 import { recipient, profile } from "../db/schema/auth-schema";
 import { eq } from "drizzle-orm";
 import {
-  profileToXeProfile,
-  xeProfileSchema,
+  xeProfileResponseSchema,
+  mapToXeProfileResponse,
 } from "../serializers/profile-to-xe-profile";
 import { s } from "@/zod-schemas";
-import { tag } from "@/utils/tag";
+import { handleZodFailure } from "@/utils/promise-handlers";
+import { SyncPromise } from "@/utils/sync-promise";
 
 export const appRouter = {
   healthCheck: publicProcedure.handler(() => {
@@ -89,21 +90,28 @@ export const appRouter = {
       };
     }),
   xeProfile: publicProcedure
-    .input(z.object({ profileId: z.number() }))
-    .output(xeProfileSchema)
+    .input(z.object({ email: z.string().email() }))
+    .output(xeProfileResponseSchema)
     .handler(async ({ input }) => {
-      const row = db
-        .select()
-        .from(profile)
-        .where(eq(profile.profileId, input.profileId))
-        .get();
+      console.log("hithithit");
+      let row;
+      try {
+        row = db
+          .select()
+          .from(profile)
+          .where(eq(profile.email, input.email))
+          .get();
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
 
-      const serialized = await Promise.resolve(row)
+      const serialized = await SyncPromise.resolve(row)
         .then(s.profile.select.parse)
-        .then(tag("parsed row"))
-        .then(profileToXeProfile)
-        .then(tag("searialized"))
-        .then(xeProfileSchema.parse);
+        .then(mapToXeProfileResponse)
+        .then(xeProfileResponseSchema.parse)
+        .catch(handleZodFailure)
+        .unwrap();
 
       return serialized;
     }),

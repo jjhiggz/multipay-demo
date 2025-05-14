@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { s } from "@/zod-schemas";
 
-export const xeProfileSchema = z.object({
+export const xeProfileResponseSchema = z.object({
   profile: z.object({
     profileId: z.number(),
     onlineCredentialId: z.number(),
@@ -129,52 +129,133 @@ export const xeProfileSchema = z.object({
   }),
 });
 
-export type XeProfile = z.infer<typeof xeProfileSchema>;
+export type XeProfile = z.infer<typeof xeProfileResponseSchema>;
 
-export const profileToXeProfile = (
+export const mapToXeProfileResponse = (
   rawProfile: z.infer<typeof s.profile.select>
-) => {
+): XeProfile => {
   return {
+    profile: {
+      profileId: rawProfile.profileId,
+      onlineCredentialId: rawProfile.onlineCredentialId,
+      clientId: rawProfile.clientId,
+      clientNumber: rawProfile.clientNumber,
+      accountType: rawProfile.accountType,
+      accountStatus: rawProfile.accountStatus,
+      accountKycStatus: rawProfile.accountKycStatus,
+      accountRestricted: rawProfile.accountRestricted,
+      businessUnitId: rawProfile.businessUnitId,
+      region: rawProfile.region,
+      brandRegionId: rawProfile.brandRegionId,
+      trmBusinessUnitId: rawProfile.trmBusinessUnitId,
+      fullName: {
+        firstName: rawProfile.fullNameFirstName,
+        lastName: rawProfile.fullNameLastName,
+      },
+      accountName: rawProfile.accountName,
+      freeFormatAddress: {
+        addressLine1: rawProfile.freeFormatAddressLine1,
+        place: rawProfile.freeFormatAddressPlace,
+        county: rawProfile.freeFormatAddressCounty,
+        postalCode: rawProfile.freeFormatAddressPostalCode,
+      },
+      addressLastModified: rawProfile.addressLastModified,
+      country: rawProfile.country,
+      email: rawProfile.email,
+      emailLastModified: rawProfile.emailLastModified,
+      mobileNumber: {
+        mobilePrefix: rawProfile.mobileNumberPrefix,
+        mobilePhone: rawProfile.mobileNumberPhone,
+      },
+      dateOfBirth: rawProfile.dateOfBirth,
+      termsAndConditions: {
+        acceptedDate: rawProfile.termsAndConditionsAcceptedDate,
+        isValid: rawProfile.termsAndConditionsIsValid,
+      },
+      preferredLanguage: rawProfile.preferredLanguage,
+      kycRefreshDueDate: rawProfile.kycRefreshDueDate,
+      kycRefreshStatus: rawProfile.kycRefreshStatus,
+      createdDate: rawProfile.createdDate,
+      platform: rawProfile.platform,
+      documentStatus: rawProfile.documentStatus,
+      features: {
+        rpaEnabled: rawProfile.featuresRpaEnabled,
+        viewBalance: rawProfile.featuresViewBalance,
+        useBalance: rawProfile.featuresUseBalance,
+        marketOrder: rawProfile.featuresMarketOrder,
+        quickTransactionsEnabled: rawProfile.featuresQuickTransactionsEnabled,
+      },
+      sameCurrencySupported: rawProfile.sameCurrencySupported,
+      canProvideRecipientLater: rawProfile.canProvideRecipientLater,
+      balancesEnabled: rawProfile.balancesEnabled,
+      transactionViewEnabled: rawProfile.transactionViewEnabled,
+      canSetupInputterAuthoriserUserRoles:
+        rawProfile.canSetupInputterAuthoriserUserRoles,
+      userRole: {
+        name: rawProfile.userRoleName,
+        privileges: Array.isArray(rawProfile.userRolePrivileges)
+          ? rawProfile.userRolePrivileges
+          : JSON.parse(rawProfile.userRolePrivileges || "[]"),
+      },
+      expectedTradeCurrency: rawProfile.expectedTradeCurrency,
+      expectedPayoutCurrency: rawProfile.expectedPayoutCurrency,
+      expectedAnnualTradingVolume: rawProfile.expectedAnnualTradingVolume,
+      regionalAccountingCurrency: rawProfile.regionalAccountingCurrency,
+      expectedVolumeInRegionalAccountingCurrency:
+        rawProfile.expectedVolumeInRegionalAccountingCurrency,
+      expectedFrequency: rawProfile.expectedFrequency,
+      onlineDirectDebitEnabled: rawProfile.onlineDirectDebitEnabled,
+      canUseOnlineDealing: rawProfile.canUseOnlineDealing,
+      unitcode: rawProfile.unitcode,
+      brandId: rawProfile.brandId,
+      lastTradedDate: rawProfile.lastTradedDate,
+      maxScheduledPaymentDays: rawProfile.maxScheduledPaymentDays,
+      onlineCredentialStatus: rawProfile.onlineCredentialStatus,
+      modifyRolesEnabled: rawProfile.modifyRolesEnabled,
+    },
+    id: 0,
     firstName: rawProfile.fullNameFirstName,
     lastName: rawProfile.fullNameLastName,
-    email: rawProfile.email,
+    address: rawProfile.freeFormatAddressLine1,
+    city: rawProfile.freeFormatAddressPlace,
     postalCode: rawProfile.freeFormatAddressPostalCode,
     country: rawProfile.country,
     homePhone: {
-      isValid: true,
+      isValid: false,
     },
     mobilePhone: {
-      countryCode: parseInt(rawProfile.mobileNumberPrefix.replace("+", "")),
-      number: rawProfile.mobileNumberPhone,
-      phoneNumberNoAreaCode: rawProfile.mobileNumberPhone,
-      phoneNumberFormatted: `${rawProfile.mobileNumberPrefix}${rawProfile.mobileNumberPhone}`,
-      isValid: true,
+      countryCode:
+        parseInt((rawProfile.mobileNumberPrefix || "").replace("+", "")) || 0,
+      number: `${rawProfile.mobileNumberPrefix || ""}${rawProfile.mobileNumberPhone || ""}`,
+      phoneNumberNoAreaCode: rawProfile.mobileNumberPhone || "",
+      phoneNumberFormatted: `${rawProfile.mobileNumberPrefix || ""} ${rawProfile.mobileNumberPhone || ""}`,
+      isValid: false,
     },
     twoFANumber: {
-      isValid: true,
+      isValid: false,
     },
     dateOfBirth: rawProfile.dateOfBirth,
     securityQuestions: [],
-    willReceiveEmailMarketing: false,
+    willReceiveEmailMarketing: true,
     willReceiveSmsMarketing: false,
     willReceiveSmsNotifications: false,
     disabled: false,
-    hasTaxId: true,
+    hasTaxId: false,
     identification: {
-      customerId: rawProfile.clientId,
+      customerId: 0,
       manualApprovalFound: false,
       idVerificationRequired: false,
     },
     status: {
       profileActionsRequired: [],
-      canTransact: rawProfile.accountStatus === "Active",
-      kycFailed: rawProfile.accountKycStatus !== "Approved",
+      canTransact: false,
+      kycFailed: false,
     },
     willReceivePhoneMarketing: false,
     willReceivePostalMarketing: false,
     preferredLanguage: rawProfile.preferredLanguage,
-    isKycRefreshRequired: rawProfile.kycRefreshStatus !== "Valid",
-    fxWebCorpMigrated: true,
+    isKycRefreshRequired: false,
+    fxWebCorpMigrated: false,
     extraFields: {
       addressLine1: rawProfile.freeFormatAddressLine1,
       addressLine2: null,
