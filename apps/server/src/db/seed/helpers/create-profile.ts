@@ -1,0 +1,115 @@
+import { db } from "@/db";
+import { profile } from "../../schema/auth-schema";
+import { faker } from "@faker-js/faker";
+import type { s } from "@/zod-schemas";
+import type { z } from "zod";
+
+/**
+ * Creates a profile for a user. Pass in a user object (must have email) and a partial profile object to override defaults.
+ */
+export async function _createProfile(
+  user: { email: string },
+  partialProfile: Partial<z.input<(typeof s)["profile"]["insert"]>> = {}
+) {
+  // Provide sensible defaults for all fields
+  const defaults: typeof profile.$inferInsert = {
+    profileId: faker.number.int({ min: 1000000, max: 9999999 }),
+    clientId: faker.number.int({ min: 1000000, max: 9999999 }),
+    clientNumber: faker.string.alphanumeric({ length: 14, casing: "upper" }),
+    onlineCredentialId: faker.number.int({ min: 1000000, max: 9999999 }),
+    businessUnitId: faker.number.int({ min: 10000, max: 99999 }),
+    brandRegionId: faker.number.int({ min: 10, max: 99 }),
+    trmBusinessUnitId: faker.number.int({ min: 10, max: 99 }),
+    brandId: faker.number.int({ min: 1, max: 99 }),
+    userEmail: user.email,
+    email: user.email,
+    accountStatus: "Active",
+    accountType: "Corporate",
+    accountKycStatus: "Approved",
+    accountRestricted: false,
+    region: "US",
+    fullNameFirstName: "Test",
+    fullNameLastName: "Corp",
+    accountName: "Test Corp",
+    freeFormatAddressLine1: "123 Main St",
+    freeFormatAddressPlace: "City",
+    freeFormatAddressCounty: "County",
+    freeFormatAddressPostalCode: "00000",
+    addressLastModified: new Date().toISOString(),
+    country: "US",
+    emailLastModified: new Date().toISOString(),
+    mobileNumberPrefix: "+1",
+    mobileNumberPhone: "0000000000",
+    dateOfBirth: "1980-01-01",
+    termsAndConditionsAcceptedDate: new Date().toISOString(),
+    termsAndConditionsIsValid: true,
+    preferredLanguage: "en",
+    kycRefreshDueDate: new Date().toISOString(),
+    kycRefreshStatus: "Valid",
+    createdDate: new Date().toISOString(),
+    platform: "Galileo",
+    documentStatus: "DocumentsAreRequired",
+    featuresRpaEnabled: false,
+    featuresViewBalance: true,
+    featuresUseBalance: true,
+    featuresMarketOrder: true,
+    featuresQuickTransactionsEnabled: true,
+    sameCurrencySupported: true,
+    canProvideRecipientLater: true,
+    balancesEnabled: true,
+    transactionViewEnabled: true,
+    canSetupInputterAuthoriserUserRoles: true,
+    userRoleName: "Admin - with Dealing rights",
+    userRolePrivileges: JSON.stringify([
+      "AddBene",
+      "AlterOrder",
+      "AuthoriseOtherUsersPayment",
+      "AuthoriseOwnPayment",
+      "CancelScheduledPaymentTrades",
+      "CreateBalanceConversionTrades",
+      "CreateBalanceFundingTrades",
+      "CreateBalanceWithdrawalTrades",
+      "CreateScheduledPaymentTrades",
+      "CreateUser",
+      "DeleteBene",
+      "DeleteUser",
+      "Disburse",
+      "DiscussAccount",
+      "EditBene",
+      "ModifyUserRoles",
+      "SubmitPaymentForAuthorisation",
+      "TradeCcy",
+      "UpdateUser",
+      "ViewBalanceTrades",
+      "ViewBeneHistory",
+      "ViewBenes",
+      "ViewCcyAccounts",
+      "ViewOrder",
+      "ViewPendingPayments",
+      "ViewScheduledPaymentTrades",
+      "ViewTransDetail",
+    ]),
+    expectedTradeCurrency: "USD",
+    expectedPayoutCurrency: "",
+    expectedAnnualTradingVolume: 50000,
+    regionalAccountingCurrency: "USD",
+    expectedVolumeInRegionalAccountingCurrency: 0,
+    expectedFrequency: "",
+    onlineDirectDebitEnabled: true,
+    canUseOnlineDealing: true,
+    unitcode: "C",
+    lastTradedDate: new Date().toISOString(),
+    maxScheduledPaymentDays: 700,
+    onlineCredentialStatus: "Active",
+    modifyRolesEnabled: true,
+    // Add more defaults as needed
+  };
+  const values = {
+    ...defaults,
+    ...partialProfile,
+    userEmail: user.email,
+    email: user.email,
+  };
+  const result = await db.insert(profile).values(values);
+  return result;
+}

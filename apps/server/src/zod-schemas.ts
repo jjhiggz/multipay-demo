@@ -8,6 +8,7 @@ import {
   member,
   invitation,
   recipient,
+  profile,
 } from "./db/schema/auth-schema";
 import {
   VALID_CURRENCY_CODES,
@@ -63,6 +64,18 @@ export const s = {
         }),
       bankCountryCode: (schema) => schema.length(2),
       accountNumber: (schema) => schema.min(1),
+    }),
+  },
+  profile: {
+    insert: createInsertSchema(profile, {
+      expectedTradeCurrency: currencyCode,
+      regionalAccountingCurrency: currencyCode,
+      expectedPayoutCurrency: currencyCode,
+    }),
+    select: createSelectSchema(profile, {
+      expectedTradeCurrency: currencyCode,
+      regionalAccountingCurrency: currencyCode,
+      expectedPayoutCurrency: currencyCode,
     }),
   },
   currencyCode,

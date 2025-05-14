@@ -1,7 +1,12 @@
 import { seedHelpers } from "./helpers/seed-helpers";
 
-const { resetDatabase, addUserToOrganization, createOrganization, createUser } =
-  seedHelpers;
+const {
+  resetDatabase,
+  addUserToOrganization,
+  createOrganization,
+  createUser,
+  createProfile,
+} = seedHelpers;
 const main = async () => {
   await resetDatabase();
 
@@ -22,6 +27,17 @@ const main = async () => {
     organizationId: americanChairs.id,
     role: "owner",
   });
+
+  // Create a profile for jon@achairs.com
+  await createProfile(
+    { email: jonAmerica.user.email },
+    {
+      sameCurrencySupported: true,
+      expectedTradeCurrency: "USD",
+      expectedPayoutCurrency: "USD",
+      regionalAccountingCurrency: "USD",
+    }
+  );
 
   await seedHelpers.createRecipientsForOrganization(
     americanChairs.id,
