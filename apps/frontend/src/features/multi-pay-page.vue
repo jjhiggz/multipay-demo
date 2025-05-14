@@ -19,7 +19,7 @@
         <div class="gap-4 grid grid-cols-1 md:grid-cols-4 mb-8">
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Send on</label>
-            <CalendarDropdown v-model="sendDate" />
+            <CalendarDropdown v-model="sendDate" class="w-28 sm:w-full" />
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>

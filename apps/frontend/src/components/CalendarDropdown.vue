@@ -1,5 +1,5 @@
 <template>
-  <div class="relative">
+  <div class="relative" :class="rootClass" ref="rootRef">
     <button
       @click="toggleDropdown"
       type="button"
@@ -18,7 +18,7 @@
     >
       <div
         v-if="isOpen"
-        class="z-10 absolute bg-white ring-opacity-5 shadow-lg mt-1 py-1 rounded-md focus:outline-none ring-1 ring-black w-full max-h-60 overflow-auto sm:text-sm text-base"
+        class="z-10 absolute bg-white ring-opacity-5 shadow-lg mt-1 py-1 rounded-md focus:outline-none ring-1 ring-black w-full min-w-60 max-h-60 overflow-auto sm:text-sm text-base"
       >
         <!-- Calendar Header -->
         <div class="flex justify-between items-center px-4 py-2">
@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watchEffect, onMounted, onBeforeUnmount } from 'vue'
 import { Icon } from '@iconify/vue'
 import {
   startOfMonth,
@@ -88,20 +88,27 @@ import {
   isSameDay,
 } from 'date-fns'
 
-const props = defineProps<{ modelValue: Date | null }>()
+const props = defineProps<{ modelValue: Date | null; rootClass?: string }>()
 const emit = defineEmits(['update:modelValue'])
 
 const isOpen = ref(false)
 const currentDate = ref(props.modelValue || new Date()) // Start view from selected date or today
+const rootRef = ref<HTMLElement | null>(null)
+const rootWidth = ref(0)
 
 const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-// --- Computed Properties ---
-const monthYearLabel = computed(() => format(currentDate.value, 'MMMM yyyy'))
+// --- Responsive Date Format ---
+const dateFormat = computed(() => {
+  // You can adjust the threshold as needed (e.g., 160px)
+  return rootWidth.value < 160 ? 'MMM d' : 'MMMM d, yyyy'
+})
 
 const formattedSelectedDate = computed(() => {
-  return props.modelValue ? format(props.modelValue, 'MMMM d, yyyy') : 'Select a date'
+  return props.modelValue ? format(props.modelValue, dateFormat.value) : 'Select a date'
 })
+
+const monthYearLabel = computed(() => format(currentDate.value, 'MMMM yyyy'))
 
 const daysInMonth = computed(() => {
   const start = startOfWeek(startOfMonth(currentDate.value))
@@ -131,4 +138,23 @@ const selectDate = (date: Date) => {
   emit('update:modelValue', date)
   isOpen.value = false // Close dropdown after selection
 }
+
+// --- Watch root width for responsive formatting ---
+let resizeObserver: ResizeObserver | null = null
+onMounted(() => {
+  if (rootRef.value) {
+    rootWidth.value = rootRef.value.offsetWidth
+    resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        rootWidth.value = entry.contentRect.width
+      }
+    })
+    resizeObserver.observe(rootRef.value)
+  }
+})
+onBeforeUnmount(() => {
+  if (resizeObserver && rootRef.value) {
+    resizeObserver.unobserve(rootRef.value)
+  }
+})
 </script>
