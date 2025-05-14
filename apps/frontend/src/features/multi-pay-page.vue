@@ -4,31 +4,30 @@
       <div class="flex justify-between items-center mb-8">
         <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
       </div>
-      <div class="gap-4 grid grid-cols-1 md:grid-cols-4 mb-8">
-        <div>
-          <label class="block mb-1 text-gray-500 text-xs">Send on</label>
-          <CalendarDropdown v-model="sendDate" class="w-28 sm:w-full" />
+      <div class="flex flex-col gap-2">
+        <div class="flex flex-row gap-2">
+          <div>
+            <label class="block mb-1 text-gray-500 text-xs">Send on</label>
+            <CalendarDropdown v-model="sendDate" class="w-28 sm:w-52" />
+          </div>
+          <div>
+            <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
+            <CurrencyDropdown
+              :selected="sendingCurrency"
+              @selected="onSendingCurrencySelected"
+              class="w-28 sm:w-52"
+            />
+          </div>
+          <div>
+            <label class="block mb-1 text-gray-500 text-xs">Recieving currency</label>
+            <CurrencyDropdown
+              :selected="recievingCurrency"
+              @selected="onRecievingCurrencySelected"
+              class="w-28 sm:w-52"
+            />
+          </div>
         </div>
-        <div>
-          <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
-          <CurrencyDropdown
-            :selected="sendingCurrency"
-            @selected="onSendingCurrencySelected"
-            class="w-28 sm:w-full"
-          />
-        </div>
-        <div>
-          <label class="block mb-1 text-gray-500 text-xs">Recieving currency</label>
-          <CurrencyDropdown
-            :selected="recievingCurrency"
-            @selected="onRecievingCurrencySelected"
-            class="w-28 sm:w-full"
-          />
-        </div>
-        <div>
-          <label class="block mb-1 text-gray-500 text-xs">Recipient</label>
-          <RecipientDropdown />
-        </div>
+
         <div class="flex items-center gap-2">
           <ToggleButton
             :disabled="!selectedCurrency.value"
