@@ -1,48 +1,45 @@
 <template>
-  <div class="bg-white shadow mt-6 p-6 rounded-lg w-full max-w-5xl">
-    <div class="flex md:flex-row flex-col md:justify-between md:items-center gap-6">
-      <!-- Summary Items -->
-      <div class="flex md:flex-row flex-col flex-1 md:items-center md:gap-12">
-        <div class="flex flex-col mb-4 md:mb-0">
-          <span class="mb-1 text-gray-600 text-xs md:text-sm">Total to send</span>
-          <span class="font-bold text-lg md:text-xl">{{ totalToSend }}</span>
-        </div>
-        <div class="flex flex-col mb-4 md:mb-0">
-          <span class="mb-1 text-gray-600 text-xs md:text-sm">Exchange rate</span>
-          <span class="font-bold text-lg md:text-xl">{{ exchangeRate }}</span>
-        </div>
-        <div class="flex flex-col mb-4 md:mb-0">
-          <span class="mb-1 text-gray-600 text-xs md:text-sm">Recipients will receive</span>
-          <span class="font-bold text-lg md:text-xl">{{ recipientsWillReceive }}</span>
-        </div>
-        <div class="flex flex-col">
-          <span class="mb-1 text-gray-600 text-xs md:text-sm">Total to pay</span>
-          <span class="font-bold text-lg md:text-xl">{{ totalToPay }}</span>
-          <span class="mt-1 text-gray-400 text-xs md:text-sm">Includes fee: {{ fee }}</span>
-        </div>
+  <div class="bg-white shadow-sm mt-6 p-4 border border-gray-200 rounded-xl w-full max-w-5xl">
+    <div class="items-center gap-y-2 md:gap-x-6 md:gap-y-0 grid grid-cols-2 md:grid-cols-5">
+      <div class="flex flex-col col-span-1">
+        <span class="text-gray-500 text-xs">Total to send</span>
+        <span class="mt-0.5 text-gray-900 text-base">{{ totalToSend }}</span>
       </div>
-      <!-- Continue Button -->
-      <button
-        class="flex justify-center items-center self-center gap-2 bg-black hover:bg-gray-900 py-4 rounded-lg w-full md:w-72 font-medium text-white text-lg transition"
-        style="min-width: 200px"
-        @click="$emit('continue')"
-      >
-        Continue
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="ml-2 w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+      <div class="flex flex-col col-span-1">
+        <span class="text-gray-500 text-xs">Exchange rate</span>
+        <span class="mt-0.5 text-gray-900 text-base">{{ exchangeRate }}</span>
+      </div>
+      <div class="flex flex-col col-span-1">
+        <span class="text-gray-500 text-xs">Recipients will receive</span>
+        <span class="mt-0.5 text-gray-900 text-base">{{ recipientsWillReceive }}</span>
+      </div>
+      <div class="flex flex-col col-span-1">
+        <span class="text-gray-500 text-xs">Total to pay</span>
+        <span class="mt-0.5 text-gray-900 text-base">{{ totalToPay }}</span>
+        <span class="mt-0.5 text-gray-400 text-xs">Includes fee: {{ fee }}</span>
+      </div>
+      <div class="flex md:justify-end col-span-2 md:col-span-1 mt-2 md:mt-0">
+        <button
+          class="flex justify-center items-center gap-2 bg-black hover:bg-gray-900 px-5 py-2 rounded-md w-full md:w-auto font-medium text-white text-sm transition"
+          @click="$emit('continue')"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M17 8l4 4m0 0l-4 4m4-4H3"
-          />
-        </svg>
-      </button>
+          Continue
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="ml-1 w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 8l4 4m0 0l-4 4m4-4H3"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 </template>
