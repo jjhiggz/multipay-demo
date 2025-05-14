@@ -3,6 +3,7 @@
     <div class="flex justify-start items-center mb-2 w-full">
       <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
     </div>
+
     <div class="bg-white shadow p-8 rounded-lg w-full max-w-5xl">
       <div class="flex flex-col gap-2">
         <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
@@ -61,6 +62,52 @@
         <RecipientList />
       </div>
       <!-- Recipients Table Placeholder -->
+    </div>
+    <!-- Summary Card -->
+    <div class="bg-white shadow mt-6 p-6 rounded-lg w-full max-w-5xl">
+      <div class="flex md:flex-row flex-col md:justify-between md:items-center gap-6">
+        <!-- Summary Items -->
+        <div class="flex md:flex-row flex-col flex-1 md:items-center md:gap-12">
+          <div class="flex flex-col mb-4 md:mb-0">
+            <span class="mb-1 text-gray-600 text-base">Total to send</span>
+            <span class="font-bold text-2xl">$1,500.00 USD</span>
+          </div>
+          <div class="flex flex-col mb-4 md:mb-0">
+            <span class="mb-1 text-gray-600 text-base">Exchange rate</span>
+            <span class="font-bold text-2xl">1 USD = 0.92 GBP</span>
+          </div>
+          <div class="flex flex-col mb-4 md:mb-0">
+            <span class="mb-1 text-gray-600 text-base">Recipients will receive</span>
+            <span class="font-bold text-2xl">£1,380.00 GBP</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="mb-1 text-gray-600 text-base">Total to pay</span>
+            <span class="font-bold text-2xl">$1,515.00 USD</span>
+            <span class="mt-1 text-gray-400 text-sm">Includes fee: $15.00 USD</span>
+          </div>
+        </div>
+        <!-- Continue Button -->
+        <button
+          class="flex justify-center items-center self-center gap-2 bg-black hover:bg-gray-900 py-4 rounded-lg w-full md:w-72 font-medium text-white text-lg transition"
+          style="min-width: 200px"
+        >
+          Continue
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="ml-2 w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M17 8l4 4m0 0l-4 4m4-4H3"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
   </IsolatedPageLayout>
 </template>
