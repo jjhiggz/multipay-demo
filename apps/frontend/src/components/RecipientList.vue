@@ -13,38 +13,40 @@
 
     <!-- Desktop Table Layout -->
     <div v-if="recipients.length > 0" class="hidden md:block">
-      <table class="bg-white border border-gray-200 rounded-lg min-w-full">
-        <thead>
-          <tr>
-            <th class="px-4 py-2 text-left">Recipient</th>
-            <th class="px-4 py-2 text-left">Amount</th>
-            <th class="px-4 py-2 text-left">Reason</th>
-            <th class="px-4 py-2 text-left">Reference</th>
-            <th class="px-4 py-2 text-left">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="recipient in recipients" :key="recipient.id" class="border-t">
-            <td class="px-4 py-2">
-              <div class="flex items-center">
-                <span>{{ recipient.name }}</span>
-              </div>
-            </td>
-            <td class="px-4 py-2">{{ recipient.amount }} USD</td>
-            <td class="px-4 py-2">{{ recipient.reason }}</td>
-            <td class="px-4 py-2 text-gray-400">Optional reference</td>
-            <td class="px-4 py-2">
-              <button
-                class="text-red-500 hover:text-red-700"
-                @click="removeRecipient(recipient.id)"
-                title="Remove Recipient"
-              >
-                <Icon :icon="'carbon:trash-can'" class="w-5 h-5" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="max-h-64 overflow-y-scroll">
+        <table class="bg-white border border-gray-200 rounded-lg min-w-full">
+          <thead class="top-0 sticky bg-white">
+            <tr class="h-12">
+              <th class="px-4 h-12 text-left">Recipient</th>
+              <th class="px-4 h-12 text-left">Amount</th>
+              <th class="px-4 h-12 text-left">Reason</th>
+              <th class="px-4 h-12 text-left">Reference</th>
+              <th class="px-4 h-12 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="recipient in recipients" :key="recipient.id" class="border-t h-12">
+              <td class="px-4 h-12">
+                <div class="flex items-center">
+                  <span>{{ recipient.name }}</span>
+                </div>
+              </td>
+              <td class="px-4 h-12">{{ recipient.amount }} USD</td>
+              <td class="px-4 h-12">{{ recipient.reason }}</td>
+              <td class="px-4 h-12 text-gray-400">Optional reference</td>
+              <td class="px-4 h-12">
+                <button
+                  class="text-red-500 hover:text-red-700"
+                  @click="removeRecipient(recipient.id)"
+                  title="Remove Recipient"
+                >
+                  <Icon :icon="'carbon:trash-can'" class="w-5 h-5" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="flex justify-end mt-4">
         <button
           @click="addRecipient"
