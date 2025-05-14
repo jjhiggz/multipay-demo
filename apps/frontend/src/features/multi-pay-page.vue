@@ -1,30 +1,33 @@
 <template>
   <IsolatedPageLayout>
+    <div class="flex justify-start items-center mb-2 w-full">
+      <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
+    </div>
     <div class="bg-white shadow p-8 rounded-lg w-full max-w-5xl">
-      <div class="flex justify-between items-center mb-8">
-        <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
-      </div>
       <div class="flex flex-col gap-2">
-        <div class="flex flex-row gap-2">
-          <div>
+        <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
+        <div class="flex sm:flex-row flex-col gap-2">
+          <div class="w-full sm:w-auto">
             <label class="block mb-1 text-gray-500 text-xs">Send on</label>
-            <CalendarDropdown v-model="sendDate" class="w-28 sm:w-52" />
+            <CalendarDropdown v-model="sendDate" class="w-28 sm:w-48 md:w-52" />
           </div>
-          <div>
-            <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
-            <CurrencyDropdown
-              :selected="sendingCurrency"
-              @selected="onSendingCurrencySelected"
-              class="w-28 sm:w-52"
-            />
-          </div>
-          <div>
-            <label class="block mb-1 text-gray-500 text-xs">Recieving currency</label>
-            <CurrencyDropdown
-              :selected="recievingCurrency"
-              @selected="onRecievingCurrencySelected"
-              class="w-28 sm:w-52"
-            />
+          <div class="flex flex-row justify-start sm:justify-end gap-2 w-full">
+            <div class="">
+              <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
+              <CurrencyDropdown
+                :selected="sendingCurrency"
+                @selected="onSendingCurrencySelected"
+                class="w-28 sm:w-52 md:w-44"
+              />
+            </div>
+            <div class="">
+              <label class="block mb-1 text-gray-500 text-xs">Recieving currency</label>
+              <CurrencyDropdown
+                :selected="recievingCurrency"
+                @selected="onRecievingCurrencySelected"
+                class="w-28 sm:w-52 md:w-44"
+              />
+            </div>
           </div>
         </div>
 
