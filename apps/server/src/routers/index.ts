@@ -2,8 +2,14 @@ import { protectedProcedure, publicProcedure } from "../lib/orpc";
 import { auth } from "../lib/auth";
 import { z } from "zod";
 import { db } from "../db";
-import { recipient } from "../db/schema/auth-schema";
+import { recipient, profile } from "../db/schema/auth-schema";
 import { eq } from "drizzle-orm";
+import {
+  profileToXeProfile,
+  xeProfileSchema,
+} from "../serializers/profile-to-xe-profile";
+import { s } from "@/zod-schemas";
+import { tag } from "@/utils/tag";
 
 export const appRouter = {
   healthCheck: publicProcedure.handler(() => {
@@ -81,6 +87,25 @@ export const appRouter = {
           ],
         })),
       };
+    }),
+  xeProfile: publicProcedure
+    .input(z.object({ profileId: z.number() }))
+    .output(xeProfileSchema)
+    .handler(async ({ input }) => {
+      const row = db
+        .select()
+        .from(profile)
+        .where(eq(profile.profileId, input.profileId))
+        .get();
+
+      const serialized = await Promise.resolve(row)
+        .then(s.profile.select.parse)
+        .then(tag("parsed row"))
+        .then(profileToXeProfile)
+        .then(tag("searialized"))
+        .then(xeProfileSchema.parse);
+
+      return serialized;
     }),
 };
 export type AppRouter = typeof appRouter;
