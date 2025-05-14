@@ -4,7 +4,7 @@
       <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
     </div>
 
-    <div class="bg-white shadow p-8 rounded-lg w-full max-w-5xl">
+    <div class="bg-white shadow p-8 pb-52 md:pb-0 rounded-lg w-full max-w-5xl">
       <div class="flex flex-col gap-2">
         <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
         <div class="flex sm:flex-row flex-col gap-2">

@@ -1,5 +1,13 @@
 <template>
-  <div class="bg-white shadow-sm mt-6 p-4 border border-gray-200 rounded-xl w-full max-w-5xl">
+  <div
+    :class="[
+      'bg-white border border-gray-200 shadow-lg p-4 rounded-t-xl w-full',
+      'mt-6',
+      'fixed bottom-0 left-0 right-0 z-30 md:static md:rounded-xl md:shadow-sm md:mt-6 md:max-w-5xl md:mx-0',
+      'mx-auto',
+    ]"
+    style="max-width: 100vw"
+  >
     <div class="items-center gap-y-2 md:gap-x-6 md:gap-y-0 grid grid-cols-2 md:grid-cols-5">
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Total to send</span>
