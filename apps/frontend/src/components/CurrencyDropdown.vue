@@ -10,10 +10,10 @@
     @search-closed="searchClosed"
   >
     <template #display="{ option }">
-      <div :class="displayClass">
+      <div :class="[displayClass, 'flex']">
         <template v-if="option">
           <Flag :currency-code="option.value" class="mr-2" />
-          <b>{{ option.value }}</b>
+          {{ option.value }}
         </template>
         <template v-else> Select... </template>
       </div>

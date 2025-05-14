@@ -25,13 +25,28 @@
             <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
             <CurrencyDropdown
               :selected="sendingCurrency"
-              @selected="onCurrencySelected"
+              @selected="onSendingCurrencySelected"
+              class="w-28 sm:w-full"
+            />
+          </div>
+          <div>
+            <label class="block mb-1 text-gray-500 text-xs">Recieving currency</label>
+            <CurrencyDropdown
+              :selected="recievingCurrency"
+              @selected="onRecievingCurrencySelected"
               class="w-28 sm:w-full"
             />
           </div>
           <div>
             <label class="block mb-1 text-gray-500 text-xs">Recipient</label>
             <RecipientDropdown />
+          </div>
+          <div class="flex items-center gap-2">
+            <ToggleButton
+              :model-value="mode === 'send-currency'"
+              @update:model-value="toggleSendCurrency"
+            />
+            <p>{{ toggleMessage }}</p>
           </div>
         </div>
         <!-- Recipients Table Placeholder -->
@@ -45,14 +60,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import logoUrl from '../assets/logo.svg'
 import CalendarDropdown from '../components/CalendarDropdown.vue'
 import ProfileDropdown from '@/components/ProfileDropdown.vue'
 import CurrencyDropdown, { type CurrencyDropdownOption } from '../components/CurrencyDropdown.vue'
 import RecipientDropdown from '../components/RecipientDropdown.vue'
+import ToggleButton from '@/components/ToggleButton.vue'
+
+const mode = ref<'send-currency' | 'recieving-currency'>('send-currency')
+const toggleSendCurrency = () => {
+  mode.value = mode.value === 'send-currency' ? 'recieving-currency' : 'send-currency'
+}
+const toggleMessage = computed(() =>
+  mode.value === 'send-currency'
+    ? 'Distribute via send currency'
+    : 'Distribute via recieve currency',
+)
 
 const sendDate = ref<Date | null>(new Date())
 const sendingCurrency = ref<CurrencyDropdownOption | null>(null)
-const onCurrencySelected = (val: CurrencyDropdownOption | null) => (sendingCurrency.value = val)
+const recievingCurrency = ref<CurrencyDropdownOption | null>(null)
+const onSendingCurrencySelected = (val: CurrencyDropdownOption | null) =>
+  (sendingCurrency.value = val)
+const onRecievingCurrencySelected = (val: CurrencyDropdownOption | null) =>
+  (recievingCurrency.value = val)
 </script>
