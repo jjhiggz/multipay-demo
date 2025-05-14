@@ -3,8 +3,8 @@
     :class="[
       'bg-white border border-gray-200 shadow-lg p-4 rounded-t-xl w-full',
       'mt-6',
-      'fixed bottom-0 left-0 right-0 z-30 md:static md:rounded-xl md:shadow-sm md:mt-6 md:max-w-5xl md:mx-0',
-      'mx-auto',
+      'sticky bottom-0 z-10',
+      'mx-auto md:max-w-5xl',
     ]"
     style="max-width: 100vw"
   >
