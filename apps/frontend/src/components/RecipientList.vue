@@ -13,19 +13,46 @@
 
     <!-- Desktop Table Layout -->
     <div v-if="recipients.length > 0" class="hidden md:block">
-      <BetterScrollDiv class="max-h-64 overflow-y-scroll">
-        <table class="bg-white border border-gray-200 rounded-lg min-w-full">
+      <BetterScrollDiv class="h-64 overflow-y-scroll">
+        <table class="bg-white min-w-full">
           <thead class="top-0 sticky bg-white">
             <tr class="h-12">
-              <th class="px-4 h-12 text-left">Recipient</th>
-              <th class="px-4 h-12 text-left">Amount</th>
-              <th class="px-4 h-12 text-left">Reason</th>
-              <th class="px-4 h-12 text-left">Reference</th>
-              <th class="px-4 h-12 text-left">Actions</th>
+              <th
+                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+              >
+                Recipient
+              </th>
+              <th
+                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+              >
+                Amount
+              </th>
+              <th
+                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+              >
+                Reason
+              </th>
+              <th
+                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+              >
+                Reference
+              </th>
+              <th
+                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+              >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="recipient in recipients" :key="recipient.id" class="border-t h-12">
+            <tr
+              v-for="(recipient, idx) in recipients"
+              :key="recipient.id"
+              :class="[
+                idx === 0 ? 'border-b border-gray-200' : 'border-t border-b border-gray-200',
+                'bg-white',
+              ]"
+            >
               <td class="px-4 h-12">
                 <div class="flex items-center">
                   <span>{{ recipient.name }}</span>
