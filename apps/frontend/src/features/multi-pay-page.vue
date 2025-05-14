@@ -4,8 +4,8 @@
       <div class="flex justify-start items-center mb-2 w-full">
         <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
       </div>
-      <div class="flex-grow bg-white shadow p-8 rounded-lg w-full">
-        <div class="flex flex-col gap-2">
+      <div class="flex flex-col flex-grow gap-8 bg-white shadow p-8 rounded-lg w-full">
+        <div class="flex flex-col gap-6">
           <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
           <div class="flex sm:flex-row flex-col gap-2">
             <div class="w-full sm:w-auto">
@@ -58,7 +58,7 @@
           </div>
         </div>
         <!-- Select Recipients List -->
-        <div class="mt-2">
+        <div class="">
           <RecipientList />
         </div>
         <!-- Recipients Table Placeholder -->
