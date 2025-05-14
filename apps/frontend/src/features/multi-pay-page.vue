@@ -3,7 +3,6 @@
     <div class="bg-white shadow p-8 rounded-lg w-full max-w-5xl">
       <div class="flex justify-between items-center mb-8">
         <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
-        <button class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
       </div>
       <div class="gap-4 grid grid-cols-1 md:grid-cols-4 mb-8">
         <div>
