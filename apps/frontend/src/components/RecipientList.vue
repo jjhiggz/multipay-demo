@@ -137,7 +137,7 @@
           </button>
         </div>
       </div>
-      <div class="flex justify-center mt-4">
+      <div class="flex justify-start mt-4">
         <button
           @click="addRecipient"
           class="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 shadow-sm px-4 py-2 border border-blue-200 rounded font-medium text-blue-700 text-sm transition-colors"
