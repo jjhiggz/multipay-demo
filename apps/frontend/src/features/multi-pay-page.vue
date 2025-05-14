@@ -9,7 +9,7 @@
         <div class="flex sm:flex-row flex-col gap-2">
           <div class="w-full sm:w-auto">
             <label class="block mb-1 text-gray-500 text-xs">Send on</label>
-            <CalendarDropdown v-model="sendDate" class="w-28 sm:w-32 md:w-64" />
+            <CalendarDropdown v-model="sendDate" class="w-28 sm:w-64" />
           </div>
           <div class="flex flex-row justify-start sm:justify-end gap-2 w-full">
             <div class="">
@@ -17,7 +17,7 @@
               <CurrencyDropdown
                 :selected="sendingCurrency"
                 @selected="onSendingCurrencySelected"
-                class="w-28 sm:w-52 md:w-44"
+                class="w-28 sm:w-32 md:w-44"
               />
             </div>
             <div class="">
@@ -25,7 +25,7 @@
               <CurrencyDropdown
                 :selected="recievingCurrency"
                 @selected="onRecievingCurrencySelected"
-                class="w-28 sm:w-52 md:w-44"
+                class="w-28 sm:w-32 md:w-44"
               />
             </div>
           </div>
