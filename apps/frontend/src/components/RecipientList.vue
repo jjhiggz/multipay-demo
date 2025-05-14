@@ -1,7 +1,18 @@
 <template>
   <div>
+    <!-- Show when no recipients -->
+    <div v-if="recipients.length === 0" class="flex flex-col justify-center items-center py-8">
+      <div class="mb-4 text-gray-500">No recipients</div>
+      <button
+        @click="addRecipient"
+        class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white"
+      >
+        Add Recipient
+      </button>
+    </div>
+
     <!-- Desktop Table Layout -->
-    <div class="hidden md:block">
+    <div v-if="recipients.length > 0" class="hidden md:block">
       <table class="bg-white border border-gray-200 rounded-lg min-w-full">
         <thead>
           <tr>
@@ -23,7 +34,10 @@
             <td class="px-4 py-2">{{ recipient.reason }}</td>
             <td class="px-4 py-2 text-gray-400">Optional reference</td>
             <td class="px-4 py-2">
-              <button class="text-red-500 hover:text-red-700">
+              <button
+                class="text-red-500 hover:text-red-700"
+                @click="removeRecipient(recipient.id)"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="w-5 h-5"
@@ -43,10 +57,18 @@
           </tr>
         </tbody>
       </table>
+      <div class="flex justify-center mt-4">
+        <button
+          @click="addRecipient"
+          class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white"
+        >
+          Add Recipient
+        </button>
+      </div>
     </div>
 
     <!-- Mobile Collapsible Card Layout -->
-    <div class="md:hidden flex flex-col gap-4">
+    <div v-if="recipients.length > 0" class="md:hidden flex flex-col gap-4">
       <div
         v-for="recipient in recipients"
         :key="recipient.id"
@@ -77,6 +99,7 @@
           </div>
           <button
             class="flex justify-center items-center gap-2 bg-red-500 mt-2 py-2 rounded w-full text-white"
+            @click="removeRecipient(recipient.id)"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -95,6 +118,14 @@
             Remove Recipient
           </button>
         </div>
+      </div>
+      <div class="flex justify-center mt-4">
+        <button
+          @click="addRecipient"
+          class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white"
+        >
+          Add Recipient
+        </button>
       </div>
     </div>
   </div>
@@ -123,4 +154,18 @@ const toggleOpen = (id: number) =>
   (openIds.value = openIds.value.includes(id)
     ? openIds.value.filter((openId) => openId !== id)
     : [...openIds.value, id])
+
+const addRecipient = () => {
+  const nextId =
+    recipients.value.length > 0 ? Math.max(...recipients.value.map((r) => r.id)) + 1 : 1
+  recipients.value = [
+    ...recipients.value,
+    { id: nextId, name: `Recipient ${nextId}`, amount: 0, reason: '' },
+  ]
+}
+
+const removeRecipient = (id: number) => {
+  recipients.value = recipients.value.filter((r) => r.id !== id)
+  openIds.value = openIds.value.filter((openId) => openId !== id)
+}
 </script>
