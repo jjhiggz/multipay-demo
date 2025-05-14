@@ -43,10 +43,15 @@
           </div>
           <div class="flex items-center gap-2">
             <ToggleButton
-              :model-value="mode === 'send-currency'"
-              @update:model-value="toggleSendCurrency"
+              :model-value="distributeCurrencyBy === 'send-currency'"
+              @update:model-value="toggleDistributeCurrencyBy"
             />
-            <p>{{ toggleMessage }}</p>
+
+            <div class="flex items-center gap-2">
+              <p>Distribute with:</p>
+
+              <Flag :currency-code="selectedCurrency.value?.value" v-if="selectedCurrency.value" />
+            </div>
           </div>
         </div>
         <!-- Recipients Table Placeholder -->
@@ -67,15 +72,15 @@ import ProfileDropdown from '@/components/ProfileDropdown.vue'
 import CurrencyDropdown, { type CurrencyDropdownOption } from '../components/CurrencyDropdown.vue'
 import RecipientDropdown from '../components/RecipientDropdown.vue'
 import ToggleButton from '@/components/ToggleButton.vue'
+import Flag from '@/components/Flag.vue'
 
-const mode = ref<'send-currency' | 'recieving-currency'>('send-currency')
-const toggleSendCurrency = () => {
-  mode.value = mode.value === 'send-currency' ? 'recieving-currency' : 'send-currency'
+const distributeCurrencyBy = ref<'send-currency' | 'recieving-currency'>('send-currency')
+const toggleDistributeCurrencyBy = () => {
+  distributeCurrencyBy.value =
+    distributeCurrencyBy.value === 'send-currency' ? 'recieving-currency' : 'send-currency'
 }
-const toggleMessage = computed(() =>
-  mode.value === 'send-currency'
-    ? 'Distribute via send currency'
-    : 'Distribute via recieve currency',
+const selectedCurrency = computed(() =>
+  distributeCurrencyBy.value === 'recieving-currency' ? recievingCurrency : sendingCurrency,
 )
 
 const sendDate = ref<Date | null>(new Date())
