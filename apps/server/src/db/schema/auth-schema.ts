@@ -102,58 +102,12 @@ export const recipient = sqliteTable("recipient", {
   accountNumber: text("account_number").notNull(),
 });
 
-// --- Nested Object Tables ---
-export const fullName = sqliteTable("full_name", {
-  fullNameId: integer("full_name_id").primaryKey(),
-  firstName: text("first_name"),
-  lastName: text("last_name"),
-});
-
-export const freeFormatAddress = sqliteTable("free_format_address", {
-  freeFormatAddressId: integer("free_format_address_id").primaryKey(),
-  addressLine1: text("address_line1"),
-  place: text("place"),
-  county: text("county"),
-  postalCode: text("postal_code"),
-});
-
-export const mobileNumber = sqliteTable("mobile_number", {
-  mobileNumberId: integer("mobile_number_id").primaryKey(),
-  mobilePrefix: text("mobile_prefix"),
-  mobilePhone: text("mobile_phone"),
-});
-
-export const termsAndConditions = sqliteTable("terms_and_conditions", {
-  termsAndConditionsId: integer("terms_and_conditions_id").primaryKey(),
-  acceptedDate: text("accepted_date"),
-  isValid: integer("is_valid", { mode: "boolean" }),
-});
-
-export const features = sqliteTable("features", {
-  featuresId: integer("features_id").primaryKey(),
-  rpaEnabled: integer("rpa_enabled", { mode: "boolean" }),
-  viewBalance: integer("view_balance", { mode: "boolean" }),
-  useBalance: integer("use_balance", { mode: "boolean" }),
-  marketOrder: integer("market_order", { mode: "boolean" }),
-  quickTransactionsEnabled: integer("quick_transactions_enabled", {
-    mode: "boolean",
-  }),
-});
-
-export const userRole = sqliteTable("user_role", {
-  userRoleId: integer("user_role_id").primaryKey(),
-  name: text("name"),
-});
-
-export const userRolePrivilege = sqliteTable("user_role_privilege", {
-  userRolePrivilegeId: integer("user_role_privilege_id").primaryKey(),
-  userRoleId: integer("user_role_id").references(() => userRole.userRoleId),
-  privilege: text("privilege"),
-});
-
-// --- Main Profile Table ---
+// --- Main Profile Table (flattened) ---
 export const profile = sqliteTable("profile", {
   profileId: integer("profile_id").primaryKey(),
+  userEmail: text("user_email")
+    .notNull()
+    .references(() => user.email),
   onlineCredentialId: integer("online_credential_id"),
   clientId: integer("client_id"),
   clientNumber: text("client_number"),
@@ -165,18 +119,38 @@ export const profile = sqliteTable("profile", {
   region: text("region"),
   brandRegionId: integer("brand_region_id"),
   trmBusinessUnitId: integer("trm_business_unit_id"),
+  fullNameFirstName: text("full_name_first_name"),
+  fullNameLastName: text("full_name_last_name"),
   accountName: text("account_name"),
+  freeFormatAddressLine1: text("free_format_address_line1"),
+  freeFormatAddressPlace: text("free_format_address_place"),
+  freeFormatAddressCounty: text("free_format_address_county"),
+  freeFormatAddressPostalCode: text("free_format_address_postal_code"),
   addressLastModified: text("address_last_modified"),
   country: text("country"),
   email: text("email"),
   emailLastModified: text("email_last_modified"),
+  mobileNumberPrefix: text("mobile_number_prefix"),
+  mobileNumberPhone: text("mobile_number_phone"),
   dateOfBirth: text("date_of_birth"),
+  termsAndConditionsAcceptedDate: text("terms_and_conditions_accepted_date"),
+  termsAndConditionsIsValid: integer("terms_and_conditions_is_valid", {
+    mode: "boolean",
+  }),
   preferredLanguage: text("preferred_language"),
   kycRefreshDueDate: text("kyc_refresh_due_date"),
   kycRefreshStatus: text("kyc_refresh_status"),
   createdDate: text("created_date"),
   platform: text("platform"),
   documentStatus: text("document_status"),
+  featuresRpaEnabled: integer("features_rpa_enabled", { mode: "boolean" }),
+  featuresViewBalance: integer("features_view_balance", { mode: "boolean" }),
+  featuresUseBalance: integer("features_use_balance", { mode: "boolean" }),
+  featuresMarketOrder: integer("features_market_order", { mode: "boolean" }),
+  featuresQuickTransactionsEnabled: integer(
+    "features_quick_transactions_enabled",
+    { mode: "boolean" }
+  ),
   sameCurrencySupported: integer("same_currency_supported", {
     mode: "boolean",
   }),
@@ -191,6 +165,8 @@ export const profile = sqliteTable("profile", {
     "can_setup_inputter_authoriser_user_roles",
     { mode: "boolean" }
   ),
+  userRoleName: text("user_role_name"),
+  userRolePrivileges: text("user_role_privileges"), // store as comma-separated or JSON string
   expectedTradeCurrency: text("expected_trade_currency"),
   expectedPayoutCurrency: text("expected_payout_currency"),
   expectedAnnualTradingVolume: integer("expected_annual_trading_volume"),
@@ -209,17 +185,4 @@ export const profile = sqliteTable("profile", {
   maxScheduledPaymentDays: integer("max_scheduled_payment_days"),
   onlineCredentialStatus: text("online_credential_status"),
   modifyRolesEnabled: integer("modify_roles_enabled", { mode: "boolean" }),
-  // Foreign keys for nested objects
-  fullNameId: integer("full_name_id").references(() => fullName.fullNameId),
-  freeFormatAddressId: integer("free_format_address_id").references(
-    () => freeFormatAddress.freeFormatAddressId
-  ),
-  mobileNumberId: integer("mobile_number_id").references(
-    () => mobileNumber.mobileNumberId
-  ),
-  termsAndConditionsId: integer("terms_and_conditions_id").references(
-    () => termsAndConditions.termsAndConditionsId
-  ),
-  featuresId: integer("features_id").references(() => features.featuresId),
-  userRoleId: integer("user_role_id").references(() => userRole.userRoleId),
 });
