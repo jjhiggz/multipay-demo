@@ -45,11 +45,12 @@
           </tr>
         </tbody>
       </table>
-      <div class="flex justify-center mt-4">
+      <div class="flex justify-end mt-4">
         <button
           @click="addRecipient"
-          class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white"
+          class="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 shadow-sm px-4 py-2 border border-blue-200 rounded font-medium text-blue-700 text-sm transition-colors"
         >
+          <Icon :icon="'carbon:add'" class="w-4 h-4" />
           Add Recipient
         </button>
       </div>
@@ -110,8 +111,9 @@
       <div class="flex justify-center mt-4">
         <button
           @click="addRecipient"
-          class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white"
+          class="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 shadow-sm px-4 py-2 border border-blue-200 rounded font-medium text-blue-700 text-sm transition-colors"
         >
+          <Icon :icon="'carbon:add'" class="w-4 h-4" />
           Add Recipient
         </button>
       </div>
