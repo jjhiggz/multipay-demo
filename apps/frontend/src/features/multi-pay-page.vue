@@ -43,11 +43,20 @@
           </div>
           <div class="flex items-center gap-2">
             <ToggleButton
+              :disabled="!selectedCurrency.value"
               :model-value="distributeCurrencyBy === 'send-currency'"
               @update:model-value="toggleDistributeCurrencyBy"
             />
 
-            <div class="flex items-center gap-2">
+            <div
+              :class="[
+                `flex items-center gap-2`,
+                {
+                  'opacity-50 text-gray-600': !selectedCurrency.value,
+                  'text-gray-700': selectedCurrency.value,
+                },
+              ]"
+            >
               <p>Distribute with:</p>
 
               <Flag :currency-code="selectedCurrency.value?.value" v-if="selectedCurrency.value" />
