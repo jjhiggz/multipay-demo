@@ -14,7 +14,7 @@
           ? 'bg-blue-200'
           : 'bg-gray-200'
         : modelValue
-          ? 'bg-blue-600'
+          ? 'bg-blue-400'
           : 'bg-gray-300',
       disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
     ]"

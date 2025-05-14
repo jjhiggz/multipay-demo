@@ -26,7 +26,7 @@
               autocomplete="email"
               required
               v-model="email"
-              class="block focus:z-10 relative px-3 py-2 border border-gray-300 focus:border-indigo-500 rounded-none rounded-t-md focus:outline-none focus:ring-indigo-500 w-full text-gray-900 sm:text-sm appearance-none placeholder-gray-500"
+              class="block focus:z-10 relative px-3 py-2 border border-gray-300 focus:border-blue-500 rounded-none rounded-t-md focus:outline-none focus:ring-blue-500 w-full text-gray-900 sm:text-sm appearance-none placeholder-gray-500"
               placeholder="Email address"
             />
           </div>
@@ -39,7 +39,7 @@
               autocomplete="current-password"
               required
               v-model="password"
-              class="block focus:z-10 relative px-3 py-2 border border-gray-300 focus:border-indigo-500 rounded-none rounded-b-md focus:outline-none focus:ring-indigo-500 w-full text-gray-900 sm:text-sm appearance-none placeholder-gray-500"
+              class="block focus:z-10 relative px-3 py-2 border border-gray-300 focus:border-blue-500 rounded-none rounded-b-md focus:outline-none focus:ring-blue-500 w-full text-gray-900 sm:text-sm appearance-none placeholder-gray-500"
               placeholder="Password"
             />
           </div>
@@ -49,11 +49,11 @@
           <button
             type="submit"
             :disabled="isLoading"
-            class="group relative flex justify-center bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 px-4 py-2 border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 w-full font-medium text-white text-sm"
+            class="group relative flex justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-4 py-2 border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full font-medium text-white text-sm"
           >
             <span class="left-0 absolute inset-y-0 flex items-center pl-3">
               <svg
-                class="w-5 h-5 text-indigo-500 group-hover:text-indigo-400"
+                class="w-5 h-5 text-blue-500 group-hover:text-blue-400"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"

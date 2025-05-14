@@ -3,7 +3,7 @@
     <button
       @click="toggleDropdown"
       type="button"
-      class="relative bg-white shadow-sm py-2 pr-10 pl-3 rounded-md focus:outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-indigo-600 ring-inset w-full text-gray-900 sm:text-sm text-left sm:leading-6 cursor-default"
+      class="relative bg-white shadow-sm py-2 pr-10 pl-3 rounded-md focus:outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-blue-300 ring-inset w-full text-gray-900 sm:text-sm text-left sm:leading-6 cursor-default"
     >
       <span class="block truncate">{{ formattedSelectedDate }}</span>
       <span class="right-0 absolute inset-y-0 flex items-center pr-2 pointer-events-none">
@@ -48,14 +48,15 @@
         <div class="gap-1 grid grid-cols-7 px-4 py-1">
           <div v-for="day in daysInMonth" :key="day.date.toISOString()">
             <button
+              v-if="modelValue"
               @click="selectDate(day.date)"
               type="button"
               :class="[
                 'w-full text-center rounded py-1',
                 day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400',
-                isSameDay(day.date, modelValue) ? 'bg-indigo-600 text-white font-semibold' : '',
+                isSameDay(day.date, modelValue) ? 'bg-blue-500 text-white font-semibold' : '',
                 !isSameDay(day.date, modelValue) && day.isToday
-                  ? 'text-indigo-600 font-semibold'
+                  ? 'text-blue-600 font-semibold'
                   : '',
                 !isSameDay(day.date, modelValue) && day.isCurrentMonth ? 'hover:bg-gray-100' : '',
                 !day.isCurrentMonth ? 'cursor-not-allowed opacity-50' : '',

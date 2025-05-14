@@ -14,7 +14,7 @@
         </p>
         <router-link
           :to="{ name: 'dashboard-multi-pay' }"
-          class="inline-block bg-indigo-600 hover:bg-indigo-700 px-6 py-3 rounded-lg font-semibold text-white transition-colors duration-300"
+          class="inline-block bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-semibold text-white transition-colors duration-300"
         >
           Go to Multi-Pay
         </router-link>

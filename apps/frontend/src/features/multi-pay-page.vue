@@ -50,16 +50,19 @@
 
             <div
               :class="[
-                `flex items-center gap-2`,
+                'flex items-center gap-2',
                 {
                   'opacity-50 text-gray-600': !selectedCurrency.value,
                   'text-gray-700': selectedCurrency.value,
                 },
               ]"
             >
-              <p>Distribute with:</p>
-
-              <Flag :currency-code="selectedCurrency.value?.value" v-if="selectedCurrency.value" />
+              <div v-if="selectedCurrency.value" class="flex items-center gap-2">
+                <p class="whitespace-nowrap">Distribute with:</p>
+                <Flag :currency-code="selectedCurrency.value.value" />
+                <b class="whitespace-nowrap">{{ selectedCurrency.value.value }}</b>
+              </div>
+              <p v-else class="whitespace-nowrap">Select Currency</p>
             </div>
           </div>
         </div>
