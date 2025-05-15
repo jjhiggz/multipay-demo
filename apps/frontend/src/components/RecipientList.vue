@@ -15,7 +15,7 @@
     <div v-if="recipients.length > 0" class="hidden md:block">
       <BetterScrollDiv class="h-64 overflow-y-scroll">
         <table class="bg-white min-w-full">
-          <thead class="top-0 sticky bg-white">
+          <thead class="top-0 z-[60] sticky bg-white">
             <tr class="h-12">
               <th
                 class="bg-blue-50 px-4 py-2 border-b border-blue-200 rounded-tl-lg font-semibold text-blue-900 text-left"
@@ -54,11 +54,12 @@
               v-for="(recipient, idx) in recipients"
               :key="recipient.id"
               :class="[
+                'h-14',
                 idx === 0 ? 'border-b border-gray-200' : 'border-t border-b border-gray-200',
                 'bg-white',
               ]"
             >
-              <td class="px-4 h-12">
+              <td class="px-4">
                 <span v-if="isMultipayRecipientComplete(recipient)">
                   <Icon :icon="'carbon:checkmark-filled'" class="w-5 h-5 text-green-500" />
                 </span>
@@ -66,17 +67,15 @@
                   <Icon :icon="'carbon:close-filled'" class="w-5 h-5 text-red-500" />
                 </span>
               </td>
-              <td class="px-4 h-12">
-                <div class="flex items-center">
-                  <span>{{ recipient.name || '—' }}</span>
-                </div>
+              <td class="px-4">
+                <RecipientDropdown />
               </td>
-              <td class="px-4 h-12">
+              <td class="px-4">
                 {{ recipient.amount !== null ? recipient.amount + ' USD' : '—' }}
               </td>
-              <td class="px-4 h-12">{{ recipient.reason || '—' }}</td>
-              <td class="px-4 h-12 text-gray-400">Optional reference</td>
-              <td class="px-4 h-12">
+              <td class="px-4">{{ recipient.reason || '—' }}</td>
+              <td class="px-4 text-gray-400">Optional reference</td>
+              <td class="px-4">
                 <button
                   class="text-red-500 hover:text-red-700"
                   @click="removeRecipient(recipient.id)"
@@ -179,6 +178,7 @@
 import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import BetterScrollDiv from './BetterScrollDiv.vue'
+import RecipientDropdown from './RecipientDropdown.vue'
 
 type MultiPayRecipient = {
   id: number
