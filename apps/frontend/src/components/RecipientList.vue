@@ -20,6 +20,11 @@
               <th
                 class="bg-blue-50 px-4 py-2 border-b border-blue-200 rounded-tl-lg font-semibold text-blue-900 text-left"
               >
+                <!-- Status Icon Column -->
+              </th>
+              <th
+                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+              >
                 Recipient
               </th>
               <th
@@ -54,12 +59,22 @@
               ]"
             >
               <td class="px-4 h-12">
+                <span v-if="isMultipayRecipientComplete(recipient)">
+                  <Icon :icon="'carbon:checkmark-filled'" class="w-5 h-5 text-green-500" />
+                </span>
+                <span v-else>
+                  <Icon :icon="'carbon:close-filled'" class="w-5 h-5 text-red-500" />
+                </span>
+              </td>
+              <td class="px-4 h-12">
                 <div class="flex items-center">
-                  <span>{{ recipient.name }}</span>
+                  <span>{{ recipient.name || '—' }}</span>
                 </div>
               </td>
-              <td class="px-4 h-12">{{ recipient.amount }} USD</td>
-              <td class="px-4 h-12">{{ recipient.reason }}</td>
+              <td class="px-4 h-12">
+                {{ recipient.amount !== null ? recipient.amount + ' USD' : '—' }}
+              </td>
+              <td class="px-4 h-12">{{ recipient.reason || '—' }}</td>
               <td class="px-4 h-12 text-gray-400">Optional reference</td>
               <td class="px-4 h-12">
                 <button
@@ -96,9 +111,19 @@
           class="flex justify-between items-center px-4 py-3 focus:outline-none w-full"
           @click="toggleOpen(recipient.id)"
         >
-          <span class="font-semibold">{{ recipient.name }}</span>
+          <div class="flex flex-1 items-center gap-2">
+            <span v-if="isMultipayRecipientComplete(recipient)">
+              <Icon :icon="'carbon:checkmark-filled'" class="w-5 h-5 text-green-500" />
+            </span>
+            <span v-else>
+              <Icon :icon="'carbon:close-filled'" class="mr-2 w-5 h-5 text-red-500" />
+            </span>
+            <span class="font-semibold">{{ recipient.name || '—' }}</span>
+          </div>
           <div class="flex">
-            <span class="font-semibold">{{ recipient.amount }} USD</span>
+            <span class="font-semibold">{{
+              recipient.amount !== null ? recipient.amount + ' USD' : '—'
+            }}</span>
             <Icon
               :icon="'carbon:chevron-down'"
               :class="{ 'transform rotate-180': openIds.includes(recipient.id) }"
@@ -109,7 +134,7 @@
         <div v-if="openIds.includes(recipient.id)" class="px-4 pb-4">
           <div class="mb-2">
             <label class="block font-medium text-gray-700 text-sm">Reason</label>
-            <div class="mt-1">{{ recipient.reason }}</div>
+            <div class="mt-1">{{ recipient.reason || '—' }}</div>
           </div>
           <div class="mb-2">
             <label class="block font-medium text-gray-700 text-sm">Reference (Optional)</label>
@@ -155,20 +180,23 @@ import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import BetterScrollDiv from './BetterScrollDiv.vue'
 
-type Recipient = {
+type MultiPayRecipient = {
   id: number
   name: string
-  amount: number
+  amount: number | null
   reason: string
 }
 
-const recipients = ref<Recipient[]>([
-  { id: 1, name: 'John Doe', amount: 100, reason: 'Payment' },
-  { id: 2, name: 'Jane Smith', amount: 200, reason: 'Payment' },
-  { id: 3, name: 'Robert Johnson', amount: 300, reason: 'Payment' },
+const recipients = ref<MultiPayRecipient[]>([
+  { id: 1, name: 'John Doe', amount: 100, reason: 'Payment' }, // valid
+  { id: 2, name: '', amount: null, reason: '' }, // invalid
+  { id: 3, name: 'Robert Johnson', amount: 300, reason: 'Payment' }, // valid
 ])
 
 const openIds = ref<number[]>([])
+
+const isMultipayRecipientComplete = (recipient: MultiPayRecipient) =>
+  recipient.name.trim() !== '' && recipient.amount !== null && recipient.reason.trim() !== ''
 
 const toggleOpen = (id: number) =>
   (openIds.value = openIds.value.includes(id)
@@ -178,10 +206,7 @@ const toggleOpen = (id: number) =>
 const addRecipient = () => {
   const nextId =
     recipients.value.length > 0 ? Math.max(...recipients.value.map((r) => r.id)) + 1 : 1
-  recipients.value = [
-    ...recipients.value,
-    { id: nextId, name: `Recipient ${nextId}`, amount: 0, reason: '' },
-  ]
+  recipients.value = [...recipients.value, { id: nextId, name: '', amount: null, reason: '' }]
 }
 
 const removeRecipient = (id: number) => {
