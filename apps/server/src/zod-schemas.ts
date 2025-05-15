@@ -21,6 +21,17 @@ const currencyCode = z.enum(
 
 // User schemas
 export const s = {
+  currency: {
+    fullCurrency: z.object({
+      amountPrecision: z.number(),
+      isoCode: z.string(),
+      name: z.string(),
+      canBuy: z.boolean(),
+      canSell: z.boolean(),
+      sameCurrencySupported: z.boolean(),
+      marketOrderEnabled: z.boolean(),
+    }),
+  },
   user: {
     insert: createInsertSchema(user),
     select: createSelectSchema(user),

@@ -22,11 +22,13 @@ First, install the dependencies:
 ```bash
 bun install
 ```
+
 ## Database Setup
 
 This project uses SQLite with Drizzle ORM.
 
 1. Start the local SQLite database:
+
 ```bash
 cd apps/server && bun db:local
 ```
@@ -34,10 +36,10 @@ cd apps/server && bun db:local
 2. Update your `.env` file in the `apps/server` directory with the appropriate connection details if needed.
 
 3. Apply the schema to your database:
+
 ```bash
 bun db:push
 ```
-
 
 Then, run the development server:
 
@@ -48,8 +50,6 @@ bun dev
 Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
 
 The API is running at [http://localhost:3000](http://localhost:3000).
-
-
 
 ## Project Structure
 
@@ -70,3 +70,14 @@ my-better-t-app/
 - `bun db:push`: Push schema changes to database
 - `bun db:studio`: Open database studio UI
 - `cd apps/server && bun db:local`: Start the local SQLite database
+
+IF I have a Sell/Send Currency locked in:
+my recipients can have any buy Currencies
+We don't make money off same currency transactions
+
+Recipients have to be in the same COUNTRY and the Same CUrrency
+Fixed CCY is; "Is the source of truth the send or recieve currency"
+
+Recipients Bank Accounts need to be in the Buy Crurency
+
+Settlement Method & Delivery method both have to be locked in as BankAccount

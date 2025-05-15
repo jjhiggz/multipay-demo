@@ -1,4 +1,7 @@
+import { VALID_CURRENCY_CODES } from "@/constants/currency.constants";
 import { seedHelpers } from "./helpers/seed-helpers";
+import { db } from "..";
+import { currency } from "../schema/auth-schema";
 
 const {
   resetDatabase,
@@ -9,24 +12,82 @@ const {
 } = seedHelpers;
 const main = async () => {
   await resetDatabase();
+  // Insert all currencies from VALID_CURRENCY_CODES
+  await db
+    .insert(currency)
+    .values(
+      VALID_CURRENCY_CODES.map(({ code, name }) => ({
+        isoCode: code,
+        name: name,
+      }))
+    )
+    .onConflictDoNothing();
 
   // Create users
   const jonAmerica = await createUser({
     email: "jon@achairs.com",
     name: "Jon America Chairs",
     password: "password123",
+    currencies: [
+      ["USD", {}],
+      ["CAD", {}],
+    ],
   });
 
   const canadianUser = await createUser({
     email: "canada@achairs.com",
     name: "Canada Chairs",
     password: "password123",
+    currencies: [
+      [
+        "CAD",
+        {
+          amountPrecision: 2,
+          canBuy: true,
+          canSell: true,
+          sameCurrencySupported: true,
+          marketOrderEnabled: true,
+        },
+      ],
+      [
+        "USD",
+        {
+          amountPrecision: 2,
+          canBuy: false,
+          canSell: true,
+          sameCurrencySupported: false,
+          marketOrderEnabled: false,
+        },
+      ],
+    ],
   });
 
   const indiaUser = await createUser({
     email: "india@achairs.com",
     name: "India Chairs",
     password: "password123",
+    currencies: [
+      [
+        "INR",
+        {
+          amountPrecision: 2,
+          canBuy: true,
+          canSell: true,
+          sameCurrencySupported: true,
+          marketOrderEnabled: true,
+        },
+      ],
+      [
+        "USD",
+        {
+          amountPrecision: 2,
+          canBuy: true,
+          canSell: false,
+          sameCurrencySupported: false,
+          marketOrderEnabled: false,
+        },
+      ],
+    ],
   });
 
   const americanChairs = await createOrganization({

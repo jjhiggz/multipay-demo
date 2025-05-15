@@ -206,3 +206,28 @@ export const profile = sqliteTable("profile", {
     mode: "boolean",
   }).notNull(),
 });
+
+// --- Currency Table ---
+export const currency = sqliteTable("currency", {
+  isoCode: text("iso_code").primaryKey(),
+  name: text("name").notNull(),
+});
+
+// --- UserToCurrencies Join Table ---
+export const userToCurrencies = sqliteTable("user_to_currencies", {
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  currencyIsoCode: text("currency_iso_code")
+    .notNull()
+    .references(() => currency.isoCode, { onDelete: "cascade" }),
+  amountPrecision: integer("amount_precision").notNull(),
+  canBuy: integer("can_buy", { mode: "boolean" }).notNull(),
+  canSell: integer("can_sell", { mode: "boolean" }).notNull(),
+  sameCurrencySupported: integer("same_currency_supported", {
+    mode: "boolean",
+  }).notNull(),
+  marketOrderEnabled: integer("market_order_enabled", {
+    mode: "boolean",
+  }).notNull(),
+});
