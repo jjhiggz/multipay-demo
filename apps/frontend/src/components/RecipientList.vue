@@ -13,7 +13,7 @@
 
     <!-- Desktop Table Layout -->
     <div v-if="recipients.length > 0" class="hidden md:block">
-      <BetterScrollDiv class="h-64 overflow-y-scroll">
+      <BetterScrollDiv class="h-96 overflow-y-scroll">
         <table class="bg-white min-w-full">
           <thead class="top-0 z-[60] sticky bg-white">
             <tr class="h-12">

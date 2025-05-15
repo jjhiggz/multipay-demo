@@ -17,8 +17,7 @@
     <template #option="{ option }">
       <div class="flex items-center gap-2">
         <Flag :currency-code="option.currencyCode" />
-        <span class="font-medium">{{ option.label }}</span>
-        <span class="text-gray-400 text-xs">({{ option.value }})</span>
+        <span class="">{{ option.label }}</span>
       </div>
     </template>
     <template #footer>
