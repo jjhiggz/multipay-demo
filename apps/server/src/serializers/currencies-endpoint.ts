@@ -14,11 +14,9 @@ export const xeCurrencyEndpointResultSchema = z.array(
   })
 );
 
-export function serializeCurrenciesEndpoint({
-  userToCurrencies,
-}: {
-  userToCurrencies: z.infer<(typeof s)["userToCurrencies"]["insert"]>[];
-}): z.infer<typeof xeCurrencyEndpointResultSchema> {
+export function serializeCurrenciesEndpoint(
+  userToCurrencies: z.infer<(typeof s)["userToCurrencies"]["insert"]>[]
+): z.infer<typeof xeCurrencyEndpointResultSchema> {
   return userToCurrencies.map((userCurrency) => {
     const currencyInfo = VALID_CURRENCY_CODES.find(
       (c) => c.code === userCurrency.currencyIsoCode

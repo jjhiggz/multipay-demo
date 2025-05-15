@@ -2,7 +2,7 @@ import { protectedProcedure, publicProcedure } from "../lib/orpc";
 import { auth } from "../lib/auth";
 import { z } from "zod";
 import { db } from "../db";
-import { recipient, profile } from "../db/schema/auth-schema";
+import { recipient, profile, userToCurrencies } from "../db/schema/auth-schema";
 import { eq } from "drizzle-orm";
 import {
   xeProfileResponseSchema,
@@ -11,6 +11,10 @@ import {
 import { s } from "@/zod-schemas";
 import { handleZodFailure } from "@/utils/promise-handlers";
 import { SyncPromise } from "@/utils/sync-promise";
+import {
+  serializeCurrenciesEndpoint,
+  xeCurrencyEndpointResultSchema,
+} from "../serializers/currencies-endpoint";
 
 export const appRouter = {
   healthCheck: publicProcedure.handler(() => {
@@ -114,6 +118,20 @@ export const appRouter = {
         .unwrap();
 
       return serialized;
+    }),
+  currencies: protectedProcedure
+    .output(xeCurrencyEndpointResultSchema)
+    .handler(async ({ context }) => {
+      const userId = context.session?.user?.id;
+      if (!userId) throw new Error("Not authenticated");
+      return SyncPromise.resolve(
+        await db
+          .select()
+          .from(userToCurrencies)
+          .where(eq(userToCurrencies.userId, userId))
+      )
+        .then(z.array(s.userToCurrencies.select).parse)
+        .then(serializeCurrenciesEndpoint);
     }),
 };
 export type AppRouter = typeof appRouter;
