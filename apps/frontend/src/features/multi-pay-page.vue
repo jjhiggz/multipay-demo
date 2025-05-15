@@ -3,7 +3,6 @@
     <div class="flex flex-col flex-1 mx-auto w-full max-w-5xl min-h-0">
       <div class="flex justify-start items-center mb-2 w-full">
         <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
-        <Fuck />
       </div>
       <div class="flex flex-col flex-grow gap-8 bg-white shadow p-8 rounded-lg w-full">
         <div class="flex flex-col gap-6">
@@ -87,7 +86,6 @@ import { useProfile } from '@/hooks/useProfile'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 import RecipientList from '@/components/RecipientList.vue'
 import SummaryCard from '@/components/SummaryCard.vue'
-import Fuck from '@/components/Fuck.vue'
 
 const { data: profileData } = useProfile()
 
