@@ -125,19 +125,21 @@ export const appRouter = {
       );
       const userId = context.session?.user?.id;
       if (!userId) throw new Error("Not authenticated");
-      return SyncPromise.resolve(
-        await db
-          .select()
-          .from(userToCurrencies)
-          .where(eq(userToCurrencies.userId, userId))
-      )
-        .then(logInfo("1"))
-        .then(z.array(s.userToCurrencies.select).parse)
-        .then(logInfo("2"))
-        .then(serializeCurrenciesEndpoint)
-        .then(logInfo("3"))
-        .catch(handleZodFailure)
-        .unwrap();
+      return (
+        SyncPromise.resolve(
+          await db
+            .select()
+            .from(userToCurrencies)
+            .where(eq(userToCurrencies.userId, userId))
+        )
+          // .then(logInfo("1"))
+          .then(z.array(s.userToCurrencies.select).parse)
+          // .then(logInfo("2"))
+          .then(serializeCurrenciesEndpoint)
+          // .then(logInfo("3"))
+          .catch(handleZodFailure)
+          .unwrap()
+      );
     }),
 };
 export type AppRouter = typeof appRouter;
