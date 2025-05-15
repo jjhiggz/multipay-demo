@@ -68,7 +68,7 @@
                 </span>
               </td>
               <td class="px-4">
-                <RecipientDropdown />
+                <RecipientSearch />
               </td>
               <td class="px-4">
                 {{ recipient.amount !== null ? recipient.amount + ' USD' : '—' }}
@@ -179,6 +179,7 @@ import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import BetterScrollDiv from './BetterScrollDiv.vue'
 import RecipientDropdown from './RecipientDropdown.vue'
+import RecipientSearch from './RecipientSearch.vue'
 
 type MultiPayRecipient = {
   id: number
