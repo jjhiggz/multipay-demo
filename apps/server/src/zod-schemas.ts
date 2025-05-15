@@ -9,6 +9,8 @@ import {
   invitation,
   recipient,
   profile,
+  currency,
+  userToCurrencies,
 } from "./db/schema/auth-schema";
 import {
   VALID_CURRENCY_CODES,
@@ -22,14 +24,19 @@ const currencyCode = z.enum(
 // User schemas
 export const s = {
   currency: {
-    fullCurrency: z.object({
-      amountPrecision: z.number(),
-      isoCode: z.string(),
-      name: z.string(),
-      canBuy: z.boolean(),
-      canSell: z.boolean(),
-      sameCurrencySupported: z.boolean(),
-      marketOrderEnabled: z.boolean(),
+    insert: createInsertSchema(currency, {
+      isoCode: currencyCode,
+    }),
+    select: createSelectSchema(currency, {
+      isoCode: currencyCode,
+    }),
+  },
+  userToCurrencies: {
+    insert: createInsertSchema(userToCurrencies, {
+      currencyIsoCode: currencyCode,
+    }),
+    select: createSelectSchema(userToCurrencies, {
+      currencyIsoCode: currencyCode,
     }),
   },
   user: {
