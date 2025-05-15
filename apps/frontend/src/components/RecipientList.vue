@@ -71,7 +71,15 @@
                 <RecipientSearch />
               </td>
               <td class="px-4">
-                {{ recipient.amount !== null ? recipient.amount + ' USD' : '—' }}
+                <AmountInput
+                  class="w-28"
+                  :model-value="recipient.amount"
+                  :currency-code="recipient.currencyCode"
+                  :disabled="false"
+                  @update:model-value="
+                    updateRecipient(recipient.id, { amount: parseFloat($event) })
+                  "
+                />
               </td>
               <td class="px-4">{{ recipient.reason || '—' }}</td>
               <td class="px-4 text-gray-400">Optional reference</td>
@@ -139,11 +147,9 @@
           </div>
           <div class="mb-2">
             <label class="block font-medium text-gray-700 text-sm">Amount</label>
-            <input
-              type="number"
-              class="mt-1 px-3 py-2 border border-gray-300 rounded w-full"
-              :value="recipient.amount"
-              @input="(e) => handleAmountInput(e, recipient.id)"
+            <AmountInput
+              :model-value="recipient.amount"
+              @update:modelValue="updateRecipient(recipient.id, { amount: parseFloat($event) })"
               placeholder="Enter amount"
             />
           </div>
@@ -196,6 +202,7 @@ import { Icon } from '@iconify/vue'
 import BetterScrollDiv from './BetterScrollDiv.vue'
 import RecipientDropdown from './RecipientDropdown.vue'
 import RecipientSearch from './RecipientSearch.vue'
+import AmountInput from './AmountInput.vue'
 
 type MultiPayRecipient = {
   id: number
