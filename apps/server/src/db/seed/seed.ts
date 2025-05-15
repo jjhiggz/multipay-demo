@@ -31,6 +31,16 @@ const main = async () => {
     currencies: [
       ["USD", {}],
       ["CAD", {}],
+      ["EUR", {}],
+      ["GBP", {}],
+      ["JPY", {}],
+      ["AUD", {}],
+      ["CHF", {}],
+      ["CNY", {}],
+      ["INR", {}],
+      ["BRL", {}],
+      ["MXN", {}],
+      ["SGD", {}],
     ],
   });
 

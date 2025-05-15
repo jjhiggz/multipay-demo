@@ -21,10 +21,6 @@ app.use(
 );
 
 app.on(["POST", "GET"], "/api/auth/**", async (c) => {
-  const orgs = await auth.api.listOrganizations().catch(() => null);
-  console.log({
-    orgs,
-  });
   return auth.handler(c.req.raw);
 });
 

@@ -30,8 +30,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import Dropdown, { type BaseDropdownOption } from './Dropdown.vue'
-import { VALID_CURRENCY_CODES, type CurrencyCode } from '../constants/from-api/currency.constants'
+import { type CurrencyCode } from '../constants/from-api/currency.constants'
 import Flag from './Flag.vue'
+import { useCurrencies } from '../composables/useCurrencies'
 
 export interface CurrencyDropdownOption extends BaseDropdownOption {
   value: CurrencyCode
@@ -47,8 +48,10 @@ const emit = defineEmits<(e: 'selected', value: CurrencyDropdownOption) => void>
 
 const search = ref('')
 
+const { currencies, isLoading } = useCurrencies()
+
 const allOptions = computed<CurrencyDropdownOption[]>(() =>
-  VALID_CURRENCY_CODES.map((c) => ({ label: c.name, value: c.code })),
+  (currencies.value || []).map((c) => ({ label: c.name, value: c.isoCode as CurrencyCode })),
 )
 
 const filteredOptions = computed(() => {

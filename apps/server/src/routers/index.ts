@@ -9,7 +9,7 @@ import {
   mapToXeProfileResponse,
 } from "../serializers/profile-to-xe-profile";
 import { s } from "@/zod-schemas";
-import { handleZodFailure } from "@/utils/promise-handlers";
+import { handleZodFailure, logInfo } from "@/utils/promise-handlers";
 import { SyncPromise } from "@/utils/sync-promise";
 import {
   serializeCurrenciesEndpoint,
@@ -34,7 +34,6 @@ export const appRouter = {
       })
     )
     .handler(async ({ input }) => {
-      console.log("hithithit");
       // Call Better Auth's sign-in API
       return await auth.api.signInEmail({
         body: {
@@ -97,7 +96,6 @@ export const appRouter = {
     .input(z.object({ email: z.string().email() }))
     .output(xeProfileResponseSchema)
     .handler(async ({ input }) => {
-      console.log("hithithit");
       let row;
       try {
         row = db
@@ -122,6 +120,9 @@ export const appRouter = {
   currencies: protectedProcedure
     .output(xeCurrencyEndpointResultSchema)
     .handler(async ({ context }) => {
+      console.log(
+        "currenciasdoifjapsoidfjaosidjfoasidjfoasijdfoiasjdfoiasdjfes"
+      );
       const userId = context.session?.user?.id;
       if (!userId) throw new Error("Not authenticated");
       return SyncPromise.resolve(
@@ -130,8 +131,13 @@ export const appRouter = {
           .from(userToCurrencies)
           .where(eq(userToCurrencies.userId, userId))
       )
+        .then(logInfo("1"))
         .then(z.array(s.userToCurrencies.select).parse)
-        .then(serializeCurrenciesEndpoint);
+        .then(logInfo("2"))
+        .then(serializeCurrenciesEndpoint)
+        .then(logInfo("3"))
+        .catch(handleZodFailure)
+        .unwrap();
     }),
 };
 export type AppRouter = typeof appRouter;
