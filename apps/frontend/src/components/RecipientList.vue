@@ -14,43 +14,43 @@
     <!-- Desktop Table Layout -->
     <div v-if="recipients.length > 0" class="hidden md:block">
       <BetterScrollDiv class="h-96 overflow-y-scroll">
-        <table class="bg-white min-w-full">
-          <thead class="top-0 z-[30] sticky bg-white">
-            <tr class="bg-gray-900 h-12">
-              <th
+        <Table class="bg-white min-w-full">
+          <TableHeader class="top-0 sticky bg-white">
+            <TableRow class="bg-gray-900 h-12">
+              <TableHead
                 class="bg-gray-900 px-4 py-2 border-gray-800 border-b rounded-tl-lg font-semibold text-white text-left"
               >
                 <!-- Status Icon Column -->
-              </th>
-              <th
+              </TableHead>
+              <TableHead
                 class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
               >
                 Recipient
-              </th>
-              <th
+              </TableHead>
+              <TableHead
                 class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
               >
                 Amount
-              </th>
-              <th
+              </TableHead>
+              <TableHead
                 class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
               >
                 Reason
-              </th>
-              <th
+              </TableHead>
+              <TableHead
                 class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
               >
                 Reference
-              </th>
-              <th
+              </TableHead>
+              <TableHead
                 class="bg-gray-900 px-4 py-2 border-gray-800 border-b rounded-tr-lg font-semibold text-white text-left"
               >
                 Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow
               v-for="(recipient, idx) in recipients"
               :key="recipient.id"
               :class="[
@@ -59,7 +59,7 @@
                 'bg-white',
               ]"
             >
-              <td class="px-4">
+              <TableCell class="px-4">
                 <span v-if="isMultipayRecipientComplete(recipient)">
                   <Icon
                     :icon="'carbon:dot-mark'"
@@ -74,10 +74,9 @@
                     :title="'Please complete this recipient'"
                   />
                 </span>
-              </td>
-              <td class="px-4">
+              </TableCell>
+              <TableCell class="px-4">
                 <RecipientSearch
-                  menu-class="z-10"
                   :menu-teleport-target="myRef"
                   @update:modelValue="
                     (option) =>
@@ -87,8 +86,8 @@
                       })
                   "
                 />
-              </td>
-              <td class="px-4">
+              </TableCell>
+              <TableCell class="px-4">
                 <AmountInput
                   class="w-36"
                   :model-value="recipient.amount"
@@ -98,10 +97,10 @@
                     updateRecipient(recipient.id, { amount: parseFloat($event) })
                   "
                 />
-              </td>
-              <td class="px-4">{{ recipient.reason || '—' }}</td>
-              <td class="px-4 text-gray-400">Optional reference</td>
-              <td class="px-4">
+              </TableCell>
+              <TableCell class="px-4">{{ recipient.reason || '—' }}</TableCell>
+              <TableCell class="px-4 text-gray-400">Optional reference</TableCell>
+              <TableCell class="px-4">
                 <button
                   class="text-red-500 hover:text-red-700"
                   @click="removeRecipient(recipient.id)"
@@ -109,10 +108,10 @@
                 >
                   <Icon :icon="'carbon:trash-can'" class="w-5 h-5" />
                 </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
         <div id="dropdown-portal-root"></div>
       </BetterScrollDiv>
       <div class="flex justify-end mt-4">
@@ -238,6 +237,14 @@ import BetterScrollDiv from './BetterScrollDiv.vue'
 import RecipientSearch from './RecipientSearch.vue'
 import AmountInput from './AmountInput.vue'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
 
 type MultiPayRecipient = {
   id: number
