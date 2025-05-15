@@ -6,7 +6,6 @@
     >
       <Flag :currency-code="selected.currencyCode" />
       <span class="font-medium">{{ selected.label }}</span>
-      <span class="text-gray-400 text-xs">({{ selected.value }})</span>
       <button
         class="ml-auto text-blue-500 hover:text-blue-700"
         @click="startEditing"
