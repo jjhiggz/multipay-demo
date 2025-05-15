@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="rootRef">
     <div
       v-if="selected && !editing"
       class="flex items-center gap-2 bg-white px-3 py-2 border rounded w-full"
@@ -9,7 +9,7 @@
       <span class="text-gray-400 text-xs">({{ selected.value }})</span>
       <button
         class="ml-auto text-blue-500 hover:text-blue-700"
-        @click="editing = true"
+        @click="startEditing"
         title="Edit recipient"
       >
         <Icon icon="carbon:edit" class="w-4 h-4" />
@@ -17,6 +17,7 @@
     </div>
     <div v-else>
       <SearchInput
+        ref="searchInputRef"
         :model-value="selected"
         :options="recipientOptions"
         :placeholder="'Search recipient...'"
@@ -24,6 +25,7 @@
         @update:modelValue="onSelect"
         @search="onSearch"
         :input-class="'w-full'"
+        @keydown.native="onInputKeydown"
       >
         <template #option="{ option }">
           <div class="flex items-center gap-2">
@@ -40,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
 import SearchInput from './SearchInput.vue'
 import { orpcVueQuery } from '../services/orpcClient'
 import { authClient } from '../services/authClient'
@@ -60,7 +62,10 @@ interface RecipientOption {
 }
 
 const selected = ref<RecipientOption | null>(null)
+const backupSelected = ref<RecipientOption | null>(null)
 const editing = ref(false)
+const rootRef = ref<HTMLElement | null>(null)
+const searchInputRef = ref<any>(null)
 
 const activeOrg = authClient.useActiveOrganization()
 const organizationId = computed(() => activeOrg.value?.data?.id ?? '')
@@ -97,6 +102,19 @@ const recipientOptions = computed(() => {
   )
 })
 
+function startEditing() {
+  backupSelected.value = selected.value
+  editing.value = true
+  nextTick(() => {
+    // Focus the input and move cursor to end
+    const input = rootRef.value?.querySelector('input') as HTMLInputElement | null
+    if (input) {
+      input.focus()
+      input.setSelectionRange(input.value.length, input.value.length)
+    }
+  })
+}
+
 function onSelect(option: RecipientOption) {
   selected.value = option
   editing.value = false
@@ -107,4 +125,38 @@ function onSelect(option: RecipientOption) {
 function onSearch(term: string) {
   searchTerm.value = term
 }
+
+function onInputKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    handleEditCancel()
+  }
+}
+
+function handleEditCancel() {
+  revertSelection()
+  // If you want to emit an event or do additional cleanup on cancel, do it here
+}
+
+function revertSelection() {
+  selected.value = backupSelected.value
+  editing.value = false
+}
+
+function onClickOutside(e: MouseEvent) {
+  if (editing.value && rootRef.value && !rootRef.value.contains(e.target as Node)) {
+    handleEditCancel()
+  }
+}
+
+watch(editing, (val) => {
+  if (val) {
+    window.addEventListener('mousedown', onClickOutside)
+  } else {
+    window.removeEventListener('mousedown', onClickOutside)
+  }
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('mousedown', onClickOutside)
+})
 </script>
