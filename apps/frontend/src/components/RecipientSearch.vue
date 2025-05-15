@@ -15,35 +15,53 @@
       </button>
     </div>
     <div v-else>
-      <SearchInput
-        ref="searchInputRef"
-        :model-value="selected"
-        :options="recipientOptions"
-        :placeholder="'Search recipient...'"
-        :loading="isLoading"
-        @update:modelValue="onSelect"
-        @search="onSearch"
-        :input-class="'w-full'"
-        :menu-class="props.menuClass"
-        @keydown.native="onInputKeydown"
-      >
-        <template #option="{ option }">
-          <div class="flex items-center gap-2">
-            <Flag :currency-code="option.currencyCode" />
-            <span class="font-medium">{{ option.label }}</span>
-            <span class="text-gray-400 text-xs">({{ option.value }})</span>
-          </div>
-        </template>
-      </SearchInput>
-      <div v-if="isLoading" class="mt-1 text-gray-400 text-xs">Loading recipients...</div>
-      <div v-if="error" class="mt-1 text-red-500 text-xs">Error loading recipients</div>
+      <Combobox v-model="selectedId" @update:modelValue="onSelect" class="w-full">
+        <ComboboxAnchor class="w-full">
+          <ComboboxInput
+            class="w-full"
+            :placeholder="'Search recipient...'"
+            :value="searchTerm"
+            @input="onSearch($event.target.value)"
+            @keydown="onInputKeydown"
+            :disabled="isLoading"
+          />
+        </ComboboxAnchor>
+        <ComboboxList :class="props.menuClass">
+          <ComboboxViewport>
+            <ComboboxEmpty v-if="!recipientOptions.length && !isLoading">
+              No recipients found
+            </ComboboxEmpty>
+            <ComboboxItem
+              v-for="option in recipientOptions"
+              :key="option.recipientId"
+              :value="option.recipientId"
+            >
+              <div class="flex items-center gap-2">
+                <Flag :currency-code="option.currencyCode" />
+                <span class="font-medium">{{ option.label }}</span>
+                <span class="text-gray-400 text-xs">({{ option.value }})</span>
+              </div>
+            </ComboboxItem>
+          </ComboboxViewport>
+        </ComboboxList>
+        <div v-if="isLoading" class="mt-1 px-2 text-gray-400 text-xs">Loading recipients...</div>
+        <div v-if="error" class="mt-1 px-2 text-red-500 text-xs">Error loading recipients</div>
+      </Combobox>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
-import SearchInput from './SearchInput.vue'
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxList,
+  ComboboxItem,
+  ComboboxEmpty,
+  ComboboxAnchor,
+  ComboboxViewport,
+} from '@/components/ui/combobox'
 import { orpcVueQuery } from '../services/orpcClient'
 import { authClient } from '../services/authClient'
 import { useQuery } from '@tanstack/vue-query'
@@ -65,11 +83,13 @@ const props = defineProps<{
   menuClass?: string
 }>()
 
+const emit = defineEmits(['update:modelValue'])
+
+const selectedId = ref<string | null>(null)
 const selected = ref<RecipientOption | null>(null)
 const backupSelected = ref<RecipientOption | null>(null)
 const editing = ref(false)
 const rootRef = ref<HTMLElement | null>(null)
-const searchInputRef = ref<any>(null)
 
 const activeOrg = authClient.useActiveOrganization()
 const organizationId = computed(() => activeOrg.value?.data?.id ?? '')
@@ -89,7 +109,7 @@ const allOptions = computed<RecipientOption[]>(() => {
     return {
       label: r.recipient.recipientDisplayName,
       value: r.recipient.recipientId,
-      recipientId: r.recipient.recipientId,
+      recipientId: String(r.recipient.recipientId),
       currencyCode: r.recipient.currencyCode as CurrencyCode,
       bankCountryCode: r.recipient.bankCountryCode,
       bankName: r.recipient.bankName,
@@ -119,11 +139,9 @@ function startEditing() {
   })
 }
 
-function onSelect(option: RecipientOption) {
-  selected.value = option
+function onSelect(id: string | null) {
+  selectedId.value = id
   editing.value = false
-  // emit for parent usage if needed
-  // emit('update:modelValue', option)
 }
 
 function onSearch(term: string) {
@@ -138,7 +156,6 @@ function onInputKeydown(e: KeyboardEvent) {
 
 function handleEditCancel() {
   revertSelection()
-  // If you want to emit an event or do additional cleanup on cancel, do it here
 }
 
 function revertSelection() {
@@ -158,6 +175,12 @@ watch(editing, (val) => {
   } else {
     window.removeEventListener('mousedown', onClickOutside)
   }
+})
+
+watch(selectedId, (id) => {
+  const found = allOptions.value.find((opt) => String(opt.recipientId) === id) || null
+  selected.value = found
+  if (found) emit('update:modelValue', found)
 })
 
 onBeforeUnmount(() => {
