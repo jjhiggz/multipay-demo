@@ -16,34 +16,34 @@
       <BetterScrollDiv class="h-96 overflow-y-scroll">
         <table class="bg-white min-w-full">
           <thead class="top-0 z-[60] sticky bg-white">
-            <tr class="h-12">
+            <tr class="bg-gray-900 h-12">
               <th
-                class="bg-blue-50 px-4 py-2 border-b border-blue-200 rounded-tl-lg font-semibold text-blue-900 text-left"
+                class="bg-gray-900 px-4 py-2 border-gray-800 border-b rounded-tl-lg font-semibold text-white text-left"
               >
                 <!-- Status Icon Column -->
               </th>
               <th
-                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+                class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
               >
                 Recipient
               </th>
               <th
-                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+                class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
               >
                 Amount
               </th>
               <th
-                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+                class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
               >
                 Reason
               </th>
               <th
-                class="bg-blue-50 px-4 py-2 border-b border-blue-200 font-semibold text-blue-900 text-left"
+                class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
               >
                 Reference
               </th>
               <th
-                class="bg-blue-50 px-4 py-2 border-b border-blue-200 rounded-tr-lg font-semibold text-blue-900 text-left"
+                class="bg-gray-900 px-4 py-2 border-gray-800 border-b rounded-tr-lg font-semibold text-white text-left"
               >
                 Actions
               </th>
@@ -61,14 +61,30 @@
             >
               <td class="px-4">
                 <span v-if="isMultipayRecipientComplete(recipient)">
-                  <Icon :icon="'carbon:checkmark-filled'" class="w-5 h-5 text-green-500" />
+                  <Icon
+                    :icon="'carbon:dot-mark'"
+                    class="w-5 h-5 text-blue-400"
+                    :title="'Recipient complete'"
+                  />
                 </span>
                 <span v-else>
-                  <Icon :icon="'carbon:close-filled'" class="w-5 h-5 text-red-500" />
+                  <Icon
+                    :icon="'carbon:dot-mark'"
+                    class="w-5 h-5 text-gray-300"
+                    :title="'Please complete this recipient'"
+                  />
                 </span>
               </td>
               <td class="px-4">
-                <RecipientSearch />
+                <RecipientSearch
+                  @update:modelValue="
+                    (option) =>
+                      updateRecipient(recipient.id, {
+                        name: option.label,
+                        currencyCode: option.currencyCode,
+                      })
+                  "
+                />
               </td>
               <td class="px-4">
                 <AmountInput
@@ -120,10 +136,18 @@
         >
           <div class="flex flex-1 items-center gap-2">
             <span v-if="isMultipayRecipientComplete(recipient)">
-              <Icon :icon="'carbon:checkmark-filled'" class="w-5 h-5 text-green-500" />
+              <Icon
+                :icon="'carbon:dot-mark'"
+                class="w-5 h-5 text-blue-400"
+                :title="'Recipient complete'"
+              />
             </span>
             <span v-else>
-              <Icon :icon="'carbon:close-filled'" class="mr-2 w-5 h-5 text-red-500" />
+              <Icon
+                :icon="'carbon:dot-mark'"
+                class="mr-2 w-5 h-5 text-gray-300"
+                :title="'Please complete this recipient'"
+              />
             </span>
             <span class="font-semibold">{{ recipient.name || '—' }}</span>
           </div>
@@ -142,14 +166,21 @@
           <div class="mb-2">
             <label class="block font-medium text-gray-700 text-sm">Recipient</label>
             <RecipientSearch
-              @update:modelValue="(option) => updateRecipient(recipient.id, { name: option.label })"
+              @update:modelValue="
+                (option) =>
+                  updateRecipient(recipient.id, {
+                    name: option.label,
+                    currencyCode: option.currencyCode,
+                  })
+              "
             />
           </div>
           <div class="mb-2">
             <label class="block font-medium text-gray-700 text-sm">Amount</label>
             <AmountInput
               :model-value="recipient.amount"
-              @update:modelValue="updateRecipient(recipient.id, { amount: parseFloat($event) })"
+              :currency-code="recipient.currencyCode"
+              @update:model-value="updateRecipient(recipient.id, { amount: parseFloat($event) })"
               placeholder="Enter amount"
             />
           </div>
@@ -203,18 +234,20 @@ import BetterScrollDiv from './BetterScrollDiv.vue'
 import RecipientDropdown from './RecipientDropdown.vue'
 import RecipientSearch from './RecipientSearch.vue'
 import AmountInput from './AmountInput.vue'
+import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 
 type MultiPayRecipient = {
   id: number
   name: string
   amount: number | null
   reason: string
+  currencyCode: CurrencyCode
 }
 
 const recipients = ref<MultiPayRecipient[]>([
-  { id: 1, name: 'John Doe', amount: 100, reason: 'Payment' }, // valid
-  { id: 2, name: '', amount: null, reason: '' }, // invalid
-  { id: 3, name: 'Robert Johnson', amount: 300, reason: 'Payment' }, // valid
+  { id: 1, name: 'John Doe', amount: 100, reason: 'Payment', currencyCode: 'USD' }, // valid
+  { id: 2, name: '', amount: null, reason: '', currencyCode: 'USD' }, // invalid
+  { id: 3, name: 'Robert Johnson', amount: 300, reason: 'Payment', currencyCode: 'USD' }, // valid
 ])
 
 const openIds = ref<number[]>([])
@@ -230,7 +263,10 @@ const toggleOpen = (id: number) =>
 const addRecipient = () => {
   const nextId =
     recipients.value.length > 0 ? Math.max(...recipients.value.map((r) => r.id)) + 1 : 1
-  recipients.value = [...recipients.value, { id: nextId, name: '', amount: null, reason: '' }]
+  recipients.value = [
+    ...recipients.value,
+    { id: nextId, name: '', amount: null, reason: '', currencyCode: 'USD' },
+  ]
 }
 
 const removeRecipient = (id: number) => {
@@ -249,3 +285,10 @@ const handleAmountInput = (e: Event, id: number) => {
   }
 }
 </script>
+
+<style scoped>
+.incomplete-recipient {
+  background-color: #f0f6ff !important;
+  border-color: #b6d4fe !important;
+}
+</style>
