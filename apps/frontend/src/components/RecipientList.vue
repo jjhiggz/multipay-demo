@@ -78,6 +78,7 @@
               <td class="px-4">
                 <RecipientSearch
                   menu-class="z-10"
+                  :menu-teleport-target="myRef"
                   @update:modelValue="
                     (option) =>
                       updateRecipient(recipient.id, {
@@ -112,6 +113,7 @@
             </tr>
           </tbody>
         </table>
+        <div id="dropdown-portal-root"></div>
       </BetterScrollDiv>
       <div class="flex justify-end mt-4">
         <button
@@ -167,6 +169,7 @@
           <div class="mb-2">
             <label class="block font-medium text-gray-700 text-sm">Recipient</label>
             <RecipientSearch
+              :menu-teleport-target="myRef"
               @update:modelValue="
                 (option) =>
                   updateRecipient(recipient.id, {
@@ -284,6 +287,8 @@ const handleAmountInput = (e: Event, id: number) => {
     updateRecipient(id, { amount: Number(target.value) })
   }
 }
+
+const myRef = ref(null)
 </script>
 
 <style scoped>

@@ -12,38 +12,36 @@
       autocomplete="off"
     />
     <transition name="fade">
-      <teleport to="body" v-if="open && filteredOptions.length > 0">
-        <BetterScrollDiv
-          :class="[
-            'max-h-60 flex flex-col bg-white rounded shadow-lg border border-gray-200 overflow-y-scroll z-0',
-            menuClass,
-          ]"
-          :style="menuTeleportStyle"
-          ref="menuRef"
-          role="listbox"
-        >
-          <ul>
-            <li
-              v-for="(option, idx) in filteredOptions"
-              :key="option.value"
-              :class="[
-                'px-4 py-2 cursor-pointer select-none',
-                idx === activeIndex ? 'bg-blue-50 text-blue-900' : '',
-                option.value === modelValue?.value ? 'font-bold' : '',
-                itemClass,
-              ]"
-              @mousedown.prevent="select(option)"
-              role="option"
-              :aria-selected="option.value === modelValue?.value"
-            >
-              <slot name="option" :option="option">
-                {{ option.label }}
-              </slot>
-            </li>
-          </ul>
-          <div v-if="loading" class="px-4 py-2 text-gray-400 text-sm">Loading...</div>
-        </BetterScrollDiv>
-      </teleport>
+      <BetterScrollDiv
+        v-if="open && filteredOptions.length > 0"
+        :class="[
+          'absolute left-0 mt-1 w-full z-50 bg-white rounded shadow-lg border border-gray-200 overflow-y-scroll',
+          menuClass,
+        ]"
+        ref="menuRef"
+        role="listbox"
+      >
+        <ul>
+          <li
+            v-for="(option, idx) in filteredOptions"
+            :key="option.value"
+            :class="[
+              'px-4 py-2 cursor-pointer select-none',
+              idx === activeIndex ? 'bg-blue-50 text-blue-900' : '',
+              option.value === modelValue?.value ? 'font-bold' : '',
+              itemClass,
+            ]"
+            @mousedown.prevent="select(option)"
+            role="option"
+            :aria-selected="option.value === modelValue?.value"
+          >
+            <slot name="option" :option="option">
+              {{ option.label }}
+            </slot>
+          </li>
+        </ul>
+        <div v-if="loading" class="px-4 py-2 text-gray-400 text-sm">Loading...</div>
+      </BetterScrollDiv>
     </transition>
   </div>
 </template>
@@ -75,7 +73,6 @@ const rootRef = ref<HTMLElement | null>(null)
 const inputRef = ref<HTMLInputElement | null>(null)
 const menuRef = ref<HTMLElement | null>(null)
 const activeIndex = ref(-1)
-const menuTeleportStyle = ref<Record<string, string>>({})
 
 const filteredOptions = computed(() => {
   if (!inputValue.value) return props.options
@@ -131,34 +128,11 @@ const onClickOutside = (e: MouseEvent) => {
   }
 }
 
-function updateMenuTeleportStyle() {
-  if (inputRef.value) {
-    const rect = inputRef.value.getBoundingClientRect()
-    menuTeleportStyle.value = {
-      position: 'absolute',
-      left: rect.left + 'px',
-      top: rect.bottom + 'px',
-      width: rect.width + 'px',
-      minWidth: rect.width + 'px',
-      maxWidth: rect.width + 'px',
-      zIndex: '9999',
-    }
-  }
-}
-
-watch(open, (val) => {
-  if (val) {
-    nextTick(() => updateMenuTeleportStyle())
-  }
-})
-
 onMounted(() => {
-  window.addEventListener('resize', updateMenuTeleportStyle)
-  window.addEventListener('scroll', updateMenuTeleportStyle, true)
+  // No need to add event listeners for menu positioning
 })
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateMenuTeleportStyle)
-  window.removeEventListener('scroll', updateMenuTeleportStyle, true)
+  // No need to remove event listeners
 })
 </script>
 
