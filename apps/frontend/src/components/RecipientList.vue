@@ -132,6 +132,22 @@
         </button>
         <div v-if="openIds.includes(recipient.id)" class="px-4 pb-4">
           <div class="mb-2">
+            <label class="block font-medium text-gray-700 text-sm">Recipient</label>
+            <RecipientSearch
+              @update:modelValue="(option) => updateRecipient(recipient.id, { name: option.label })"
+            />
+          </div>
+          <div class="mb-2">
+            <label class="block font-medium text-gray-700 text-sm">Amount</label>
+            <input
+              type="number"
+              class="mt-1 px-3 py-2 border border-gray-300 rounded w-full"
+              :value="recipient.amount"
+              @input="(e) => handleAmountInput(e, recipient.id)"
+              placeholder="Enter amount"
+            />
+          </div>
+          <div class="mb-2">
             <label class="block font-medium text-gray-700 text-sm">Reason</label>
             <div class="mt-1">{{ recipient.reason || '—' }}</div>
           </div>
@@ -213,5 +229,16 @@ const addRecipient = () => {
 const removeRecipient = (id: number) => {
   recipients.value = recipients.value.filter((r) => r.id !== id)
   openIds.value = openIds.value.filter((openId) => openId !== id)
+}
+
+const updateRecipient = (id: number, newData: Partial<MultiPayRecipient>) => {
+  recipients.value = recipients.value.map((r) => (r.id === id ? { ...r, ...newData } : r))
+}
+
+const handleAmountInput = (e: Event, id: number) => {
+  const target = e.target as HTMLInputElement | null
+  if (target && target.value !== undefined) {
+    updateRecipient(id, { amount: Number(target.value) })
+  }
 }
 </script>
