@@ -72,7 +72,7 @@
               </td>
               <td class="px-4">
                 <AmountInput
-                  class="w-28"
+                  class="w-36"
                   :model-value="recipient.amount"
                   :currency-code="recipient.currencyCode"
                   :disabled="false"
