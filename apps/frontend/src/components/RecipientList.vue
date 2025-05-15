@@ -15,7 +15,7 @@
     <div v-if="recipients.length > 0" class="hidden md:block">
       <BetterScrollDiv class="h-96 overflow-y-scroll">
         <table class="bg-white min-w-full">
-          <thead class="top-0 z-[60] sticky bg-white">
+          <thead class="top-0 z-[30] sticky bg-white">
             <tr class="bg-gray-900 h-12">
               <th
                 class="bg-gray-900 px-4 py-2 border-gray-800 border-b rounded-tl-lg font-semibold text-white text-left"
@@ -77,6 +77,7 @@
               </td>
               <td class="px-4">
                 <RecipientSearch
+                  menu-class="z-10"
                   @update:modelValue="
                     (option) =>
                       updateRecipient(recipient.id, {
@@ -231,7 +232,6 @@
 import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import BetterScrollDiv from './BetterScrollDiv.vue'
-import RecipientDropdown from './RecipientDropdown.vue'
 import RecipientSearch from './RecipientSearch.vue'
 import AmountInput from './AmountInput.vue'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'

@@ -24,6 +24,7 @@
         @update:modelValue="onSelect"
         @search="onSearch"
         :input-class="'w-full'"
+        :menu-class="props.menuClass"
         @keydown.native="onInputKeydown"
       >
         <template #option="{ option }">
@@ -59,6 +60,10 @@ interface RecipientOption {
   bankName: string
   accountNumber: string
 }
+
+const props = defineProps<{
+  menuClass?: string
+}>()
 
 const selected = ref<RecipientOption | null>(null)
 const backupSelected = ref<RecipientOption | null>(null)
