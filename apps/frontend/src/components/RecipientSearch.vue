@@ -2,7 +2,7 @@
   <div ref="rootRef">
     <div
       v-if="selected && !editing"
-      class="flex items-center gap-2 bg-white px-3 py-2 border rounded w-full"
+      class="flex items-center gap-2 bg-white px-3 py-2 border rounded w-[220px] h-12"
     >
       <Flag :currency-code="selected.currencyCode" />
       <span class="font-medium">{{ selected.label }}</span>
@@ -15,10 +15,10 @@
       </button>
     </div>
     <div v-else>
-      <Combobox v-model="selectedId" @update:modelValue="onSelect" class="w-full">
-        <ComboboxAnchor class="w-full">
+      <Combobox v-model="selectedId" @update:modelValue="onSelect" class="w-[220px]">
+        <ComboboxAnchor class="w-[220px]">
           <ComboboxInput
-            class="w-full"
+            class="w-[220px] h-7"
             :placeholder="'Search recipient...'"
             :value="searchTerm"
             @input="onSearch($event.target.value)"
@@ -26,21 +26,30 @@
             :disabled="isLoading"
           />
         </ComboboxAnchor>
-        <ComboboxList :class="props.menuClass">
-          <ComboboxViewport>
-            <ComboboxEmpty v-if="!recipientOptions.length && !isLoading">
-              No recipients found
+        <ComboboxList :class="[props.menuClass, 'w-[220px]']">
+          <ComboboxViewport class="w-[220px]">
+            <ComboboxEmpty
+              v-if="!recipientOptions.length && !isLoading"
+              class="flex flex-col justify-center items-center bg-gray-50 px-4 py-6 text-gray-500"
+            >
+              <Icon icon="carbon:search" class="opacity-50 mb-2 w-8 h-8" />
+              <span class="text-sm">No recipients found</span>
+              <span class="mt-1 text-xs">Try a different search term</span>
             </ComboboxEmpty>
             <ComboboxItem
               v-for="option in recipientOptions"
               :key="option.recipientId"
               :value="option.recipientId"
+              :class="[
+                'flex items-center gap-2 px-3 py-2 cursor-pointer transition rounded w-[220px]',
+                selectedId === option.recipientId
+                  ? 'bg-purple-100 font-semibold'
+                  : 'bg-white hover:bg-gray-50',
+              ]"
             >
-              <div class="flex items-center gap-2">
-                <Flag :currency-code="option.currencyCode" />
-                <span class="font-medium">{{ option.label }}</span>
-                <span class="text-gray-400 text-xs">({{ option.value }})</span>
-              </div>
+              <Flag :currency-code="option.currencyCode" class="shrink-0" />
+              <span class="max-w-[120px] font-medium truncate">{{ option.label }}</span>
+              <span class="text-gray-400 text-xs shrink-0">({{ option.value }})</span>
             </ComboboxItem>
           </ComboboxViewport>
         </ComboboxList>
@@ -71,8 +80,8 @@ import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 
 interface RecipientOption {
   label: string
-  value: string | number
-  recipientId: number
+  value: string
+  recipientId: string
   currencyCode: CurrencyCode
   bankCountryCode: string
   bankName: string
@@ -85,7 +94,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
-const selectedId = ref<string | null>(null)
+const selectedId = ref<string>('')
 const selected = ref<RecipientOption | null>(null)
 const backupSelected = ref<RecipientOption | null>(null)
 const editing = ref(false)
@@ -108,7 +117,7 @@ const allOptions = computed<RecipientOption[]>(() => {
   return recipientsData.value.recipients.map((r) => {
     return {
       label: r.recipient.recipientDisplayName,
-      value: r.recipient.recipientId,
+      value: String(r.recipient.recipientId),
       recipientId: String(r.recipient.recipientId),
       currencyCode: r.recipient.currencyCode as CurrencyCode,
       bankCountryCode: r.recipient.bankCountryCode,
@@ -139,7 +148,7 @@ function startEditing() {
   })
 }
 
-function onSelect(id: string | null) {
+function onSelect(id: string) {
   selectedId.value = id
   editing.value = false
 }
