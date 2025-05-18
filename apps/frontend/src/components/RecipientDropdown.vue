@@ -37,12 +37,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import Dropdown, { type BaseDropdownOption } from './Dropdown.vue'
-import { orpcVueQuery } from '../services/orpcClient'
-import { authClient } from '../services/authClient'
-import { useQuery } from '@tanstack/vue-query'
-import Flag from './Flag.vue'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
+import { authClient } from '@/services/authClient'
+import { orpcVueQuery } from '@/services/orpcClient'
+import { useQuery } from '@tanstack/vue-query'
+import type { BaseDropdownOption } from './Dropdown.vue'
 
 interface RecipientOption extends BaseDropdownOption {
   recipientId: number

@@ -2,7 +2,7 @@
   <Combobox v-model="value" by="value">
     <ComboboxAnchor as-child>
       <ComboboxTrigger as-child>
-        <Button variant="outline" class="justify-between w-[220px]">
+        <Button variant="outline" :class="cn('justify-between w-[220px]', props.class)">
           {{ value?.label ?? 'Select recipient' }}
           <ChevronsUpDown class="opacity-50 ml-2 w-4 h-4 shrink-0" />
         </Button>
@@ -51,6 +51,8 @@ import { authClient } from '../services/authClient'
 import { useQuery } from '@tanstack/vue-query'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 
+const props = defineProps<{ class?: string }>()
+
 const emit = defineEmits(['update:modelValue'])
 
 const activeOrg = authClient.useActiveOrganization()
@@ -70,7 +72,6 @@ const recipients = computed(() => {
   return recipientsData.value.recipients.map((r) => ({
     label: r.recipient.recipientDisplayName,
     value: String(r.recipient.recipientId),
-    currencyCode: r.recipient.currencyCode as CurrencyCode,
     ...r.recipient,
   }))
 })

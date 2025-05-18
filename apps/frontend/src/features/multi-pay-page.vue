@@ -84,8 +84,8 @@ import ToggleButton from '@/components/ToggleButton.vue'
 import Flag from '@/components/Flag.vue'
 import { useProfile } from '@/hooks/useProfile'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import RecipientList from '@/components/RecipientList.vue'
 import SummaryCard from '@/components/SummaryCard.vue'
+import RecipientList from '@/components/RecipientList/RecipientList.vue'
 
 const { data: profileData } = useProfile()
 
