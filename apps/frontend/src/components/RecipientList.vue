@@ -83,7 +83,7 @@
     </div>
 
     <!-- Mobile Collapsible Card Layout -->
-    <div v-if="recipients.length > 0" class="md:hidden space-y-2 p-6 pt-0">
+    <div v-if="recipients.length > 0" class="md:hidden space-y-2 py-6 pt-0">
       <div
         v-for="(recipient, idx) in recipients"
         :key="recipient.id"
