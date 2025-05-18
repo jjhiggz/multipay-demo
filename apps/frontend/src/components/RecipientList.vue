@@ -1,81 +1,38 @@
 <template>
   <div>
     <!-- Show when no recipients -->
-    <div v-if="recipients.length === 0" class="flex flex-col justify-center items-center py-8">
-      <div class="mb-4 text-gray-500">No recipients</div>
-      <button
-        @click="addRecipient"
-        class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-white"
-      >
-        Add Recipient
-      </button>
+    <div v-if="recipients.length === 0">
+      <div>No recipients</div>
+      <button @click="addRecipient">Add Recipient</button>
     </div>
 
     <!-- Desktop Table Layout -->
     <div v-if="recipients.length > 0" class="hidden md:block">
-      <BetterScrollDiv class="h-96 overflow-y-scroll">
-        <Table class="bg-white min-w-full">
-          <TableHeader class="top-0 sticky bg-white">
-            <TableRow class="bg-gray-900 h-12">
-              <TableHead
-                class="bg-gray-900 px-4 py-2 border-gray-800 border-b rounded-tl-lg font-semibold text-white text-left"
-              >
+      <BetterScrollDiv>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
                 <!-- Status Icon Column -->
               </TableHead>
-              <TableHead
-                class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
-              >
-                Recipient
-              </TableHead>
-              <TableHead
-                class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
-              >
-                Amount
-              </TableHead>
-              <TableHead
-                class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
-              >
-                Reason
-              </TableHead>
-              <TableHead
-                class="bg-gray-900 px-4 py-2 border-gray-800 border-b font-semibold text-white text-left"
-              >
-                Reference
-              </TableHead>
-              <TableHead
-                class="bg-gray-900 px-4 py-2 border-gray-800 border-b rounded-tr-lg font-semibold text-white text-left"
-              >
-                Actions
-              </TableHead>
+              <TableHead> Recipient </TableHead>
+              <TableHead> Amount </TableHead>
+              <TableHead> Reason </TableHead>
+              <TableHead> Reference </TableHead>
+              <TableHead> Actions </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow
-              v-for="(recipient, idx) in recipients"
-              :key="recipient.id"
-              :class="[
-                'h-14',
-                idx === 0 ? 'border-b border-gray-200' : 'border-t border-b border-gray-200',
-                'bg-white',
-              ]"
-            >
-              <TableCell class="px-4">
+            <TableRow v-for="(recipient, idx) in recipients" :key="recipient.id">
+              <TableCell>
                 <span v-if="isMultipayRecipientComplete(recipient)">
-                  <Icon
-                    :icon="'carbon:dot-mark'"
-                    class="w-5 h-5 text-blue-400"
-                    :title="'Recipient complete'"
-                  />
+                  <Icon :icon="'carbon:dot-mark'" :title="'Recipient complete'" />
                 </span>
                 <span v-else>
-                  <Icon
-                    :icon="'carbon:dot-mark'"
-                    class="w-5 h-5 text-gray-300"
-                    :title="'Please complete this recipient'"
-                  />
+                  <Icon :icon="'carbon:dot-mark'" :title="'Please complete this recipient'" />
                 </span>
               </TableCell>
-              <TableCell class="px-4">
+              <TableCell>
                 <RecipientSearch
                   :menu-teleport-target="myRef"
                   @update:modelValue="
@@ -87,9 +44,8 @@
                   "
                 />
               </TableCell>
-              <TableCell class="px-4">
+              <TableCell>
                 <AmountInput
-                  class="w-36"
                   :model-value="recipient.amount"
                   :currency-code="recipient.currencyCode"
                   :disabled="false"
@@ -98,15 +54,11 @@
                   "
                 />
               </TableCell>
-              <TableCell class="px-4">{{ recipient.reason || '—' }}</TableCell>
-              <TableCell class="px-4 text-gray-400">Optional reference</TableCell>
-              <TableCell class="px-4">
-                <button
-                  class="text-red-500 hover:text-red-700"
-                  @click="removeRecipient(recipient.id)"
-                  title="Remove Recipient"
-                >
-                  <Icon :icon="'carbon:trash-can'" class="w-5 h-5" />
+              <TableCell>{{ recipient.reason || '—' }}</TableCell>
+              <TableCell>Optional reference</TableCell>
+              <TableCell>
+                <button @click="removeRecipient(recipient.id)" title="Remove Recipient">
+                  <Icon :icon="'carbon:trash-can'" />
                 </button>
               </TableCell>
             </TableRow>
@@ -114,59 +66,38 @@
         </Table>
         <div id="dropdown-portal-root"></div>
       </BetterScrollDiv>
-      <div class="flex justify-end mt-4">
-        <button
-          @click="addRecipient"
-          class="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 shadow-sm px-4 py-2 border border-blue-200 rounded font-medium text-blue-700 text-sm transition-colors"
-        >
-          <Icon :icon="'carbon:add'" class="w-4 h-4" />
+      <div>
+        <button @click="addRecipient">
+          <Icon :icon="'carbon:add'" />
           Add Recipient
         </button>
       </div>
     </div>
 
     <!-- Mobile Collapsible Card Layout -->
-    <div v-if="recipients.length > 0" class="md:hidden flex flex-col gap-4">
-      <div
-        v-for="recipient in recipients"
-        :key="recipient.id"
-        class="bg-white shadow-sm border border-gray-200 rounded-lg"
-      >
-        <button
-          class="flex justify-between items-center px-4 py-3 focus:outline-none w-full"
-          @click="toggleOpen(recipient.id)"
-        >
-          <div class="flex flex-1 items-center gap-2">
+    <div v-if="recipients.length > 0" class="md:hidden">
+      <div v-for="recipient in recipients" :key="recipient.id">
+        <button @click="toggleOpen(recipient.id)">
+          <div>
             <span v-if="isMultipayRecipientComplete(recipient)">
-              <Icon
-                :icon="'carbon:dot-mark'"
-                class="w-5 h-5 text-blue-400"
-                :title="'Recipient complete'"
-              />
+              <Icon :icon="'carbon:dot-mark'" :title="'Recipient complete'" />
             </span>
             <span v-else>
-              <Icon
-                :icon="'carbon:dot-mark'"
-                class="mr-2 w-5 h-5 text-gray-300"
-                :title="'Please complete this recipient'"
-              />
+              <Icon :icon="'carbon:dot-mark'" :title="'Please complete this recipient'" />
             </span>
-            <span class="font-semibold">{{ recipient.name || '—' }}</span>
+            <span>{{ recipient.name || '—' }}</span>
           </div>
-          <div class="flex">
-            <span class="font-semibold">{{
-              recipient.amount !== null ? recipient.amount + ' USD' : '—'
-            }}</span>
+          <div>
+            <span>{{ recipient.amount !== null ? recipient.amount + ' USD' : '—' }}</span>
             <Icon
               :icon="'carbon:chevron-down'"
               :class="{ 'transform rotate-180': openIds.includes(recipient.id) }"
-              class="ml-2 w-5 h-5 transition-transform"
             />
           </div>
         </button>
-        <div v-if="openIds.includes(recipient.id)" class="px-4 pb-4">
-          <div class="mb-2">
-            <label class="block font-medium text-gray-700 text-sm">Recipient</label>
+        <div v-if="openIds.includes(recipient.id)">
+          <div>
+            <label>Recipient</label>
             <RecipientSearch
               :menu-teleport-target="myRef"
               @update:modelValue="
@@ -178,8 +109,8 @@
               "
             />
           </div>
-          <div class="mb-2">
-            <label class="block font-medium text-gray-700 text-sm">Amount</label>
+          <div>
+            <label>Amount</label>
             <AmountInput
               :model-value="recipient.amount"
               :currency-code="recipient.currencyCode"
@@ -187,21 +118,17 @@
               placeholder="Enter amount"
             />
           </div>
-          <div class="mb-2">
-            <label class="block font-medium text-gray-700 text-sm">Reason</label>
-            <div class="mt-1">{{ recipient.reason || '—' }}</div>
+          <div>
+            <label>Reason</label>
+            <div>{{ recipient.reason || '—' }}</div>
           </div>
-          <div class="mb-2">
-            <label class="block font-medium text-gray-700 text-sm">Reference (Optional)</label>
-            <div class="mt-1 text-gray-400">Optional reference</div>
+          <div>
+            <label>Reference (Optional)</label>
+            <div>Optional reference</div>
           </div>
-          <button
-            class="flex justify-center items-center gap-2 bg-red-500 mt-2 py-2 rounded w-full text-white"
-            @click="removeRecipient(recipient.id)"
-          >
+          <button @click="removeRecipient(recipient.id)">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -217,12 +144,9 @@
           </button>
         </div>
       </div>
-      <div class="flex justify-start mt-4">
-        <button
-          @click="addRecipient"
-          class="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 shadow-sm px-4 py-2 border border-blue-200 rounded font-medium text-blue-700 text-sm transition-colors"
-        >
-          <Icon :icon="'carbon:add'" class="w-4 h-4" />
+      <div>
+        <button @click="addRecipient">
+          <Icon :icon="'carbon:add'" />
           Add Recipient
         </button>
       </div>
@@ -297,10 +221,3 @@ const handleAmountInput = (e: Event, id: number) => {
 
 const myRef = ref(null)
 </script>
-
-<style scoped>
-.incomplete-recipient {
-  background-color: #f0f6ff !important;
-  border-color: #b6d4fe !important;
-}
-</style>
