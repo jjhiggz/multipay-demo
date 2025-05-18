@@ -10,7 +10,8 @@
   "iconLibrary": "lucide",
   "style": "new-york",
   "tailwind": {
-    "baseColor": "neutral",
+    "background": "bg-white",
+    "baseColor": "slate",
     "config": "",
     "css": "src/assets/globals.css",
     "cssVariables": true,
