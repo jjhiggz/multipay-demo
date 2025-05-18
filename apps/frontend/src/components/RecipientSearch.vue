@@ -10,16 +10,7 @@
     </ComboboxAnchor>
 
     <ComboboxList class="w-[220px]">
-      <div class="relative items-center w-full max-w-sm">
-        <ComboboxInput
-          v-model="search"
-          class="pl-9 border-0 border-b rounded-none focus-visible:ring-0 h-10"
-          placeholder="Search recipient..."
-        />
-        <span class="absolute inset-y-0 flex justify-center items-center px-3 start-0">
-          <Search class="size-4 text-muted-foreground" />
-        </span>
-      </div>
+      <ComboboxInput v-model="search" class="" placeholder="Search recipient..." />
 
       <ComboboxEmpty> No recipient found. </ComboboxEmpty>
 
@@ -86,8 +77,10 @@ const recipients = computed(() => {
 
 const search = ref('')
 const filteredRecipients = computed(() => {
-  if (!search.value) return recipients.value
-  return recipients.value.filter((r) => r.label.toLowerCase().includes(search.value.toLowerCase()))
+  if (!search.value) return recipients.value.slice(0, 8)
+  return recipients.value
+    .filter((r) => r.label.toLowerCase().includes(search.value.toLowerCase()))
+    .slice(0, 8)
 })
 
 const value = ref<(typeof recipients.value)[0] | null>(null)
