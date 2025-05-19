@@ -59,7 +59,12 @@
         </div>
         <!-- Select Recipients List -->
         <div class="">
-          <RecipientList />
+          <RecipientList
+            :recipients="recipients"
+            @add="addRecipient"
+            @remove="removeRecipient"
+            @update="updateRecipient"
+          />
         </div>
         <!-- Recipients Table Placeholder -->
       </div>
@@ -86,6 +91,7 @@ import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 import SummaryCard from '@/features/Multipay/ui/SummaryCard.vue'
 import CalendarDropdown from '@/features/Multipay/ui/CalendarDropdown.vue'
 import RecipientList from './ui/RecipientList/RecipientList.vue'
+import type { MultiPayRecipient } from './ui/RecipientList/RecipientList.vue'
 
 const { data: profileData } = useProfile()
 
@@ -120,4 +126,33 @@ const onSendingCurrencySelected = (val: CurrencyDropdownOption | null) =>
   (sendingCurrency.value = val)
 const onRecievingCurrencySelected = (val: CurrencyDropdownOption | null) =>
   (recievingCurrency.value = val)
+
+const recipients = ref<MultiPayRecipient[]>([
+  { id: 1, name: 'John Doe', amount: 100, reason: 'Payment', currencyCode: 'USD', reference: '' },
+  { id: 2, name: '', amount: null, reason: '', currencyCode: 'USD', reference: '' },
+  {
+    id: 3,
+    name: 'Robert Johnson',
+    amount: 300,
+    reason: 'Payment',
+    currencyCode: 'USD',
+    reference: '',
+  },
+])
+
+const addRecipient = () => {
+  const nextId = recipients.value.length > 0 ? Math.max(...recipients.value.map((r: MultiPayRecipient) => r.id)) + 1 : 1
+  recipients.value = [
+    ...recipients.value,
+    { id: nextId, name: '', amount: null, reason: '', currencyCode: 'USD' as CurrencyCode, reference: '' },
+  ]
+}
+
+const removeRecipient = (id: number) => {
+  recipients.value = recipients.value.filter((r: MultiPayRecipient) => r.id !== id)
+}
+
+const updateRecipient = (id: number, newData: Partial<MultiPayRecipient>) => {
+  recipients.value = recipients.value.map((r: MultiPayRecipient) => (r.id === id ? { ...r, ...newData } : r))
+}
 </script>
