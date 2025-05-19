@@ -118,18 +118,6 @@ const handleLogout = async () => {
     router.push({ name: 'home' })
   }
 }
-
-// Optional: Log values for debugging
-watchEffect(() => {
-  console.log('ProfileDropdown: sessionState.value:', sessionState.value)
-  console.log('ProfileDropdown: currentUser:', currentUser.value)
-  console.log('ProfileDropdown: activeOrgStateAtom (the ref):', activeOrgStateAtom)
-  console.log('ProfileDropdown: activeOrgStateAtom.value:', activeOrgStateAtom.value)
-  console.log(
-    'ProfileDropdown: activeOrganization (derived from .value.data):',
-    activeOrganization.value,
-  )
-})
 </script>
 
 <style scoped>

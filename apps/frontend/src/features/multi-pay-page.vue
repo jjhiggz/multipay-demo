@@ -105,10 +105,6 @@ const recievingCurrency = ref<CurrencyDropdownOption | null>(null)
 watchEffect(() => {
   if (profileData.value?.profile) {
     const { expectedTradeCurrency, expectedPayoutCurrency } = profileData.value.profile
-    console.log('Profile data:', {
-      expectedTradeCurrency,
-      expectedPayoutCurrency,
-    })
     sendingCurrency.value = {
       value: expectedTradeCurrency as CurrencyCode,
       label: expectedTradeCurrency as string,

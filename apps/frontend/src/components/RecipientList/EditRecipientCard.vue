@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import { defineEmits, defineProps } from 'vue'
+import { defineEmits, defineProps, ref } from 'vue'
 import RecipientSearch from '@/components/RecipientSearch.vue'
 import MoneyInput from '@/components/ui/MoneyInput.vue'
 import { Icon } from '@iconify/vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<{
   id: number
@@ -18,6 +19,8 @@ const emit = defineEmits<{
   (e: 'update', data: Partial<typeof props>): void
   (e: 'remove'): void
 }>()
+
+const triggerRef = ref<HTMLElement | null>(null)
 </script>
 
 <template>
@@ -31,6 +34,7 @@ const emit = defineEmits<{
         >
         <RecipientSearch
           class="w-full"
+          :trigger-ref="triggerRef"
           @update:modelValue="
             (option) =>
               emit('update', {

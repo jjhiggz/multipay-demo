@@ -2,15 +2,19 @@
   <Combobox v-model="value" by="value">
     <ComboboxAnchor as-child>
       <ComboboxTrigger as-child>
-        <Button variant="outline" :class="cn('justify-between w-[220px]', props.class)">
+        <Button
+          :ref="triggerRefToUse"
+          variant="outline"
+          :class="cn('w-full justify-between', props.class)"
+        >
           {{ value?.label ?? 'Select recipient' }}
           <ChevronsUpDown class="opacity-50 ml-2 w-4 h-4 shrink-0" />
         </Button>
       </ComboboxTrigger>
     </ComboboxAnchor>
 
-    <ComboboxList class="w-[220px]">
-      <ComboboxInput v-model="search" class="" placeholder="Search recipient..." />
+    <ComboboxList :class="cn('w-full', props.menuClass)" :style="{ width: menuWidth }">
+      <ComboboxInput v-model="search" class="w-full" placeholder="Search recipient..." />
 
       <ComboboxEmpty> No recipient found. </ComboboxEmpty>
 
@@ -31,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Check, ChevronsUpDown, Search } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import Button from './ui/button/Button.vue'
@@ -51,9 +55,20 @@ import { authClient } from '../services/authClient'
 import { useQuery } from '@tanstack/vue-query'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 
-const props = defineProps<{ class?: string }>()
+const props = defineProps<{ class?: string; menuClass?: string; triggerRef?: any }>()
 
 const emit = defineEmits(['update:modelValue'])
+
+const localTriggerRef = ref<HTMLElement | null>(null)
+const triggerRefToUse = computed(() => props.triggerRef ?? localTriggerRef)
+const menuWidth = ref('auto')
+
+onMounted(() => {
+  if (triggerRefToUse.value?.value) menuWidth.value = `${triggerRefToUse.value.value.offsetWidth}px`
+})
+watch(triggerRefToUse, (el) => {
+  if (el?.value) menuWidth.value = `${el.value.offsetWidth}px`
+})
 
 const activeOrg = authClient.useActiveOrganization()
 const organizationId = computed(() => activeOrg.value?.data?.id ?? '')

@@ -120,9 +120,6 @@ export const appRouter = {
   currencies: protectedProcedure
     .output(xeCurrencyEndpointResultSchema)
     .handler(async ({ context }) => {
-      console.log(
-        "currenciasdoifjapsoidfjaosidjfoasidjfoasijdfoiasjdfoiasdjfes"
-      );
       const userId = context.session?.user?.id;
       if (!userId) throw new Error("Not authenticated");
       return (

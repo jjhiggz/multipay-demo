@@ -6,6 +6,7 @@ import MoneyInput from '@/components/ui/MoneyInput.vue'
 import { Icon } from '@iconify/vue'
 import TableRow from '../ui/table/TableRow.vue'
 import TableCell from '../ui/table/TableCell.vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<{
   id: number

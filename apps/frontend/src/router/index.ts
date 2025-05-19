@@ -46,11 +46,9 @@ router.beforeEach(async (to, from, next) => {
 
   if (requiresAuth && !user) {
     // Redirect unauthenticated users trying to access protected routes to login
-    console.log('Guard: Redirecting to home (requires auth, not authenticated)')
     next({ name: 'home' })
   } else if (requiresGuest && user) {
     // Redirect authenticated users trying to access guest-only routes to dashboard
-    console.log('Guard: Redirecting to dashboard (requires guest, authenticated)')
     next({ name: 'dashboard' })
   } else {
     // Otherwise, allow navigation
