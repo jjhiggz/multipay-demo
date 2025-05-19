@@ -1,5 +1,5 @@
 <template>
-  <IsolatedPageLayout>
+  <IsolatedPageLayout v-if="true">
     <div class="flex flex-col flex-1 mx-auto w-full max-w-5xl min-h-0">
       <div class="flex justify-start items-center mb-2 w-full">
         <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
@@ -72,7 +72,7 @@
         @continue="() => {}"
       />
     </div>
-  </IsolatedPageLayout>
+  </IsolatedPageLayout v-if="false">
 </template>
 
 <script setup lang="ts">

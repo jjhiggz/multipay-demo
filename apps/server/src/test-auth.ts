@@ -7,7 +7,6 @@ async function main() {
       password: "password123",
     },
   });
-  console.log(result);
 }
 
 main().catch((err) => {
