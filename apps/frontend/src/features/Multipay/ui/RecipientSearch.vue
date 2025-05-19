@@ -38,7 +38,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { Check, ChevronsUpDown, Search } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
-import Button from './ui/button/Button.vue'
 import {
   Combobox,
   ComboboxAnchor,
@@ -50,10 +49,10 @@ import {
   ComboboxList,
   ComboboxTrigger,
 } from '@/components/ui/combobox'
-import { orpcVueQuery } from '../services/orpcClient'
-import { authClient } from '../services/authClient'
+import { orpcVueQuery } from '../../../services/orpcClient'
+import { authClient } from '../../../services/authClient'
 import { useQuery } from '@tanstack/vue-query'
-import type { CurrencyCode } from '@/constants/from-api/currency.constants'
+import Button from '@/components/ui/button/Button.vue'
 
 const props = defineProps<{ class?: string; menuClass?: string; triggerRef?: any }>()
 

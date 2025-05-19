@@ -78,14 +78,14 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue'
 import IsolatedPageLayout from '@/layouts/IsolatedPageLayout.vue'
-import CalendarDropdown from '../components/CalendarDropdown.vue'
-import CurrencyDropdown, { type CurrencyDropdownOption } from '../components/CurrencyDropdown.vue'
-import ToggleButton from '@/components/ToggleButton.vue'
+import CurrencyDropdown, { type CurrencyDropdownOption } from '@/features/Multipay/ui/CurrencyDropdown.vue'
+import ToggleButton from '@/features/Multipay/ui/ToggleButton.vue'
 import Flag from '@/components/Flag.vue'
 import { useProfile } from '@/hooks/useProfile'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import SummaryCard from '@/components/SummaryCard.vue'
-import RecipientList from '@/components/RecipientList/RecipientList.vue'
+import SummaryCard from '@/features/Multipay/ui/SummaryCard.vue'
+import CalendarDropdown from '@/features/Multipay/ui/CalendarDropdown.vue'
+import RecipientList from './ui/RecipientList/RecipientList.vue'
 
 const { data: profileData } = useProfile()
 

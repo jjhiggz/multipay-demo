@@ -41,7 +41,7 @@ import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 import { authClient } from '@/services/authClient'
 import { orpcVueQuery } from '@/services/orpcClient'
 import { useQuery } from '@tanstack/vue-query'
-import type { BaseDropdownOption } from './Dropdown.vue'
+import Dropdown, { type BaseDropdownOption } from '@/components/Dropdown.vue'
 
 interface RecipientOption extends BaseDropdownOption {
   recipientId: number

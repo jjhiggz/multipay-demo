@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 import { defineEmits, defineProps, ref } from 'vue'
-import RecipientSearch from '@/components/RecipientSearch.vue'
-import MoneyInput from '@/components/ui/MoneyInput.vue'
+import RecipientSearch from '@/features/Multipay/ui/RecipientSearch.vue'
+import MoneyInput from '@/features/Multipay/ui/MoneyInput.vue'
 import { Icon } from '@iconify/vue'
-import { cn } from '@/lib/utils'
 
 const props = defineProps<{
   id: number

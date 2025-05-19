@@ -61,8 +61,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
-import RecipientSearch from '@/components/RecipientSearch.vue'
-import MoneyInput from '@/components/ui/MoneyInput.vue'
 import EditRecipientRow from './EditRecipientRow.vue'
 import EditRecipientCard from './EditRecipientCard.vue'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'

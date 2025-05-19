@@ -29,10 +29,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import Dropdown, { type BaseDropdownOption } from './Dropdown.vue'
-import { type CurrencyCode } from '../constants/from-api/currency.constants'
-import Flag from './Flag.vue'
-import { useCurrencies } from '../composables/useCurrencies'
+
+import { type CurrencyCode } from '../../../constants/from-api/currency.constants'
+import { useCurrencies } from '../domain/useCurrencies'
+import Flag from '@/components/Flag.vue'
+import Dropdown, { type BaseDropdownOption } from '@/components/Dropdown.vue'
 
 export interface CurrencyDropdownOption extends BaseDropdownOption {
   value: CurrencyCode

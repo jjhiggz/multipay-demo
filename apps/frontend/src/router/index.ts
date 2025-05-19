@@ -26,7 +26,7 @@ const routes = [
       {
         path: 'multi-pay',
         name: 'dashboard-multi-pay',
-        component: () => import('../features/multi-pay-page.vue'),
+        component: () => import('../features/Multipay/multi-pay-page.vue'),
       },
     ],
   },

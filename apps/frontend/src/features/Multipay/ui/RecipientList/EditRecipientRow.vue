@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 import { defineEmits, defineProps } from 'vue'
-import RecipientSearch from '@/components/RecipientSearch.vue'
-import MoneyInput from '@/components/ui/MoneyInput.vue'
+import RecipientSearch from '@/features/Multipay/ui/RecipientSearch.vue'
+import MoneyInput from '@/features/Multipay/ui/MoneyInput.vue'
 import { Icon } from '@iconify/vue'
-import TableRow from '../ui/table/TableRow.vue'
-import TableCell from '../ui/table/TableCell.vue'
-import { cn } from '@/lib/utils'
+import TableRow from '@/components/ui/table/TableRow.vue'
+import TableCell from '@/components/ui/table/TableCell.vue'
 
 const props = defineProps<{
   id: number
