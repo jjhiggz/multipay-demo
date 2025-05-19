@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, type Ref } from 'vue'
 import { Check, ChevronsUpDown, Search } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import {
@@ -53,20 +53,22 @@ import { orpcVueQuery } from '../../../services/orpcClient'
 import { authClient } from '../../../services/authClient'
 import { useQuery } from '@tanstack/vue-query'
 import Button from '@/components/ui/button/Button.vue'
+import { useElementWidth } from '@/composables/useElementWidth'
 
-const props = defineProps<{ class?: string; menuClass?: string; triggerRef?: any }>()
+const props = defineProps<{
+  class?: string
+  menuClass?: string
+  triggerRef?: any
+  dropdownWidthRef?: Ref<HTMLElement | null> | HTMLElement | null
+}>()
 
 const emit = defineEmits(['update:modelValue'])
 
 const localTriggerRef = ref<HTMLElement | null>(null)
 const triggerRefToUse = computed(() => props.triggerRef ?? localTriggerRef)
-const menuWidth = ref('auto')
-
-onMounted(() => {
-  if (triggerRefToUse.value?.value) menuWidth.value = `${triggerRefToUse.value.value.offsetWidth}px`
-})
-watch(triggerRefToUse, (el) => {
-  if (el?.value) menuWidth.value = `${el.value.offsetWidth}px`
+const menuWidth = computed(() => {
+  const width = useElementWidth(props.dropdownWidthRef)
+  return width.value ? `${width.value}px` : 'auto'
 })
 
 const activeOrg = authClient.useActiveOrganization()

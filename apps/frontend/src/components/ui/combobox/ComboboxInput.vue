@@ -34,7 +34,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
       data-slot="command-input"
       :class="
         cn(
-          'placeholder:text-muted-foreground flex w-full rounded-md bg-transparent py-1 text-sm outline-none border-0 disabled:cursor-not-allowed disabled:opacity-50',
+          'placeholder:text-muted-foreground flex w-full rounded-md bg-transparent py-1 text-sm outline-none border-0 disabled:cursor-not-allowed disabled:opacity-50 ',
           props.class,
         )
       "

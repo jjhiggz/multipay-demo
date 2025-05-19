@@ -3,7 +3,7 @@
     <!-- Show when no recipients -->
     <div v-if="props.recipients.length === 0">
       <div>No recipients</div>
-      <button @click="$emit('add')">Add Recipient</button>
+      <Button @click="$emit('add')">Add Recipient</Button>
     </div>
 
     <!-- Desktop Table Layout -->
@@ -31,10 +31,13 @@
         </Table>
       </div>
       <div>
-        <button @click="$emit('add')">
-          <Icon :icon="'carbon:add'" />
+        <Button
+          @click="$emit('add')"
+          class="flex items-center gap-2 bg-blue-300 hover:bg-blue-400 px-4 py-2 rounded-md text-white transition-colors"
+        >
+          <Icon :icon="'carbon:add'" class="w-5 h-5" />
           Add Recipient
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -51,10 +54,13 @@
         class="mb-2"
       />
       <div>
-        <button @click="$emit('add')" class="flex items-center gap-2 mt-2">
-          <Icon :icon="'carbon:add'" />
+        <Button
+          @click="$emit('add')"
+          class="flex items-center gap-2 bg-blue-300 hover:bg-blue-400 px-4 py-2 rounded-md w-full text-white transition-colors"
+        >
+          <Icon :icon="'carbon:add'" class="w-5 h-5" />
           Add Recipient
-        </button>
+        </Button>
       </div>
     </div>
   </div>
@@ -67,6 +73,7 @@ import EditRecipientRow from './EditRecipientRow.vue'
 import EditRecipientCard from './EditRecipientCard.vue'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 import { Table, TableHeader, TableBody, TableRow, TableHead } from '@/components/ui/table'
+import Button from '@/components/ui/button/Button.vue'
 
 export type MultiPayRecipient = {
   id: number

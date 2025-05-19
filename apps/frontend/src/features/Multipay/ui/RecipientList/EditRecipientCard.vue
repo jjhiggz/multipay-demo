@@ -43,6 +43,7 @@ const handleInput = (field: keyof typeof props) => (e: Event) => {
 }
 
 const isOpen = ref(false)
+const recipientSearchContainerRef = ref<HTMLElement | null>(null)
 </script>
 
 <template>
@@ -51,14 +52,17 @@ const isOpen = ref(false)
     @update:open="(val) => emit('update:open', val)"
     class="bg-card shadow-sm mb-3 border border-gray-200 rounded-lg overflow-hidden"
   >
-    <div class="flex justify-between items-center p-4 cursor-pointer">
+    <div
+      class="flex justify-between items-center p-4 cursor-pointer"
+      @click="emit('update:open', !props.open)"
+    >
       <div class="font-medium">{{ props.name || '—' }}</div>
       <div class="flex items-center">
         <div class="mr-2 font-medium">
           {{ formattedAmount }}
         </div>
         <CollapsibleTrigger as-child>
-          <Button variant="ghost" size="icon" class="w-8 h-8">
+          <Button variant="ghost" size="icon" class="w-8 h-8" @click.stop>
             <Icon
               :icon="props.open ? 'carbon:chevron-up' : 'carbon:chevron-down'"
               class="w-4 h-4 text-gray-400"
@@ -68,20 +72,26 @@ const isOpen = ref(false)
       </div>
     </div>
 
-    <CollapsibleContent>
+    <CollapsibleContent
+      class="overflow-hidden"
+      :class="open ? 'animate-accordion-down' : 'animate-accordion-up'"
+    >
       <div class="space-y-3 px-4 pt-0 pb-4">
         <div class="space-y-1">
           <Label class="font-normal text-gray-500">Recipient</Label>
-          <RecipientSearch
-            class="w-full"
-            @update:modelValue="
-              (option) =>
-                emit('update', {
-                  name: option.label,
-                  currencyCode: option.currencyCode,
-                })
-            "
-          />
+          <div ref="recipientSearchContainerRef" class="w-full">
+            <RecipientSearch
+              class="w-full"
+              :dropdownWidthRef="recipientSearchContainerRef"
+              @update:modelValue="
+                (option) =>
+                  emit('update', {
+                    name: option.label,
+                    currencyCode: option.currencyCode,
+                  })
+              "
+            />
+          </div>
         </div>
 
         <div class="space-y-1">
