@@ -62,7 +62,16 @@ const props = defineProps<{
   dropdownWidthRef?: Ref<HTMLElement | null> | HTMLElement | null
 }>()
 
-const emit = defineEmits(['update:modelValue'])
+// Define the type for the emitted value
+export type RecipientSearchOption = {
+  label: string
+  value: string
+  [key: string]: any
+}
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: RecipientSearchOption | null): void
+}>()
 
 const localTriggerRef = ref<HTMLElement | null>(null)
 const triggerRefToUse = computed(() => props.triggerRef ?? localTriggerRef)

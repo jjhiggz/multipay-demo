@@ -24,8 +24,8 @@
               v-for="recipient in props.recipients"
               :key="recipient.id"
               v-bind="recipient"
-              @update="(data) => $emit('update', recipient.id, data)"
-              @remove="() => $emit('remove', recipient.id)"
+              @update="emit('update', recipient.id, $event)"
+              @remove="$emit('remove', recipient.id)"
             />
           </TableBody>
         </Table>
