@@ -64,6 +64,8 @@
             @add="addRecipient"
             @remove="removeRecipient"
             @update="updateRecipient"
+            :open-ids="openIds"
+            @toggle-open="handleOpenChange"
           />
         </div>
         <!-- Recipients Table Placeholder -->
@@ -139,6 +141,16 @@ const recipients = ref<MultiPayRecipient[]>([
     reference: '',
   },
 ])
+
+// --- Collapsible open state ---
+const openIds = ref<number[]>([])
+
+
+const handleOpenChange = (id: number, open: boolean) => {
+  openIds.value = open
+    ? [...openIds.value, id]
+    : openIds.value.filter((openId: number) => openId !== id)
+}
 
 const addRecipient = () => {
   const nextId = recipients.value.length > 0 ? Math.max(...recipients.value.map((r: MultiPayRecipient) => r.id)) + 1 : 1

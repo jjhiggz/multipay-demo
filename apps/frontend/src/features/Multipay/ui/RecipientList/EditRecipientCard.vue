@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import { defineEmits, defineProps, ref } from 'vue'
+import { defineEmits, defineProps, computed, ref } from 'vue'
 import RecipientSearch from '@/features/Multipay/ui/RecipientSearch.vue'
 import MoneyInput from '@/features/Multipay/ui/MoneyInput.vue'
 import { Icon } from '@iconify/vue'
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 const props = defineProps<{
   id: number
@@ -12,84 +16,107 @@ const props = defineProps<{
   amount: number | null
   reason: string
   reference?: string
+  open: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'update', data: Partial<typeof props>): void
   (e: 'remove'): void
+  (e: 'update:open', val: boolean): void
 }>()
 
-const triggerRef = ref<HTMLElement | null>(null)
+const formattedAmount = computed(() => {
+  if (!props.amount || isNaN(props.amount)) return ''
+  return (
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: props.currencyCode,
+    }).format(props.amount) +
+    ' ' +
+    props.currencyCode
+  )
+})
+
+const handleInput = (field: keyof typeof props) => (e: Event) => {
+  const value = (e.target as HTMLInputElement)?.value || ''
+  emit('update', { [field]: value })
+}
+
+const isOpen = ref(false)
 </script>
 
 <template>
-  <div class="bg-card shadow-sm p-4 border rounded-lg overflow-hidden text-card-foreground">
-    <div class="mb-2 font-medium">{{ props.name || '—' }}</div>
-    <div class="space-y-3">
-      <div class="space-y-1">
-        <label
-          class="peer-disabled:opacity-70 font-medium text-muted-foreground text-xs peer-disabled:cursor-not-allowed"
-          >Recipient</label
-        >
-        <RecipientSearch
-          class="w-full"
-          :trigger-ref="triggerRef"
-          @update:modelValue="
-            (option) =>
-              emit('update', {
-                name: option.label,
-                currencyCode: option.currencyCode,
-              })
-          "
-        />
-      </div>
-      <div class="space-y-1">
-        <label
-          class="peer-disabled:opacity-70 font-medium text-muted-foreground text-xs peer-disabled:cursor-not-allowed"
-          >Amount</label
-        >
-        <MoneyInput
-          :model-value="props.amount !== null ? props.amount : '0.00'"
-          :currency="props.currencyCode"
-          :disabled="false"
-          :currency-selectable="false"
-          @update:modelValue="(value) => emit('update', { amount: parseFloat(String(value)) })"
-          class="w-full"
-        />
-      </div>
-      <div class="space-y-1">
-        <label
-          class="peer-disabled:opacity-70 font-medium text-muted-foreground text-xs peer-disabled:cursor-not-allowed"
-          >Reason</label
-        >
-        <input
-          class="flex bg-background file:bg-transparent disabled:opacity-50 px-3 py-2 border border-input file:border-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 w-full h-10 file:font-medium placeholder:text-muted-foreground file:text-foreground md:text-sm file:text-sm text-base disabled:cursor-not-allowed"
-          placeholder="Reason"
-          :value="props.reason || ''"
-          @input="(e) => emit('update', { reason: (e.target as HTMLInputElement)?.value || '' })"
-        />
-      </div>
-      <div class="space-y-1">
-        <label
-          class="peer-disabled:opacity-70 font-medium text-muted-foreground text-xs peer-disabled:cursor-not-allowed"
-          >Reference (Optional)</label
-        >
-        <input
-          class="flex bg-background file:bg-transparent disabled:opacity-50 px-3 py-2 border border-input file:border-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 w-full h-10 file:font-medium placeholder:text-muted-foreground file:text-foreground md:text-sm file:text-sm text-base disabled:cursor-not-allowed"
-          placeholder="Add a reference"
-          :value="props.reference || ''"
-          @input="(e) => emit('update', { reference: (e.target as HTMLInputElement)?.value || '' })"
-        />
-      </div>
-      <div class="pt-2">
-        <button
-          class="inline-flex justify-center items-center gap-2 bg-destructive hover:bg-destructive/90 disabled:opacity-50 px-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 w-full h-9 [&_svg]:size-4 font-medium text-destructive-foreground text-sm whitespace-nowrap transition-colors [&_svg]:pointer-events-none disabled:pointer-events-none [&_svg]:shrink-0"
-          @click="$emit('remove')"
-        >
-          <Icon :icon="'carbon:trash-can'" class="mr-2 w-4 h-4" />
-          Remove Recipient
-        </button>
+  <Collapsible
+    :open="props.open"
+    @update:open="(val) => emit('update:open', val)"
+    class="bg-card shadow-sm mb-3 border border-gray-200 rounded-lg overflow-hidden"
+  >
+    <div class="flex justify-between items-center p-4 cursor-pointer">
+      <div class="font-medium">{{ props.name || '—' }}</div>
+      <div class="flex items-center">
+        <div class="mr-2 font-medium">
+          {{ formattedAmount }}
+        </div>
+        <CollapsibleTrigger as-child>
+          <Button variant="ghost" size="icon" class="w-8 h-8">
+            <Icon
+              :icon="props.open ? 'carbon:chevron-up' : 'carbon:chevron-down'"
+              class="w-4 h-4 text-gray-400"
+            />
+          </Button>
+        </CollapsibleTrigger>
       </div>
     </div>
-  </div>
+
+    <CollapsibleContent>
+      <div class="space-y-3 px-4 pt-0 pb-4">
+        <div class="space-y-1">
+          <Label class="font-normal text-gray-500">Recipient</Label>
+          <RecipientSearch
+            class="w-full"
+            @update:modelValue="
+              (option) =>
+                emit('update', {
+                  name: option.label,
+                  currencyCode: option.currencyCode,
+                })
+            "
+          />
+        </div>
+
+        <div class="space-y-1">
+          <Label class="font-normal text-gray-500">Amount</Label>
+          <MoneyInput
+            :model-value="props.amount ?? '0.00'"
+            :currency="props.currencyCode"
+            :disabled="false"
+            :currency-selectable="false"
+            @update:modelValue="(value) => emit('update', { amount: parseFloat(String(value)) })"
+            class="w-full"
+          />
+        </div>
+
+        <div class="space-y-1">
+          <Label class="font-normal text-gray-500">Reason</Label>
+          <Input placeholder="Reason" :value="props.reason" @input="handleInput('reason')" />
+        </div>
+
+        <div class="space-y-1">
+          <Label class="font-normal text-gray-500">Reference (Optional)</Label>
+          <Input
+            placeholder="Add a reference"
+            :value="props.reference"
+            @input="handleInput('reference')"
+          />
+        </div>
+
+        <div class="pt-2">
+          <Button variant="destructive" class="w-full" @click="emit('remove')">
+            <Icon icon="carbon:trash-can" class="mr-2 w-4 h-4" />
+            Remove Recipient
+          </Button>
+        </div>
+      </div>
+    </CollapsibleContent>
+  </Collapsible>
 </template>

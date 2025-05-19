@@ -44,8 +44,10 @@
         v-for="recipient in props.recipients"
         :key="recipient.id"
         v-bind="recipient"
+        :open="props.openIds ? props.openIds.includes(recipient.id) : false"
         @update="(data) => $emit('update', recipient.id, data)"
         @remove="() => $emit('remove', recipient.id)"
+        @update:open="(open: boolean) => $emit('toggle-open', recipient.id, open)"
         class="mb-2"
       />
       <div>
@@ -77,11 +79,13 @@ export type MultiPayRecipient = {
 
 const props = defineProps<{
   recipients: MultiPayRecipient[]
+  openIds?: number[]
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'add'): void
   (e: 'remove', id: number): void
   (e: 'update', id: number, newData: Partial<MultiPayRecipient>): void
+  (e: 'toggle-open', id: number, open: boolean): void
 }>()
 </script>

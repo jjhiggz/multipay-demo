@@ -24,6 +24,20 @@ module.exports = {
         destructive: 'hsl(var(--destructive))',
         'destructive-foreground': 'hsl(var(--destructive-foreground))',
       },
+      keyframes: {
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-collapsible-content-height, auto)' },
+        },
+        'accordion-up': {
+          from: { height: 'var(--radix-collapsible-content-height, auto)' },
+          to: { height: '0' },
+        },
+      },
+      animation: {
+        'accordion-down': 'accordion-down 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        'accordion-up': 'accordion-up 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+      },
     },
   },
   plugins: [],
