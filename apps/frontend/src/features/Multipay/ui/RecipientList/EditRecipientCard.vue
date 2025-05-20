@@ -120,14 +120,12 @@ const reasonSearchContainerRef = ref<VNodeRef | null>(null)
           />
         </div>
 
-        <div class="space-y-1" ref="reasonSearchContainerRef">
+        <div class="space-y-1 w-full" ref="">
           <Label class="font-normal text-gray-500">Reason</Label>
           <ReasonSearch
             :model-value="props.reason"
-            @update:modelValue="
-              (value: string | null) => emit('update', { reason: value || '' })
-            "
             class="w-full"
+            ref="reasonSearchContainerRef"
             :dropdownWidthRef="reasonSearchContainerRef"
           />
         </div>
