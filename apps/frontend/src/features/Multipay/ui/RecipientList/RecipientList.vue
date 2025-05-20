@@ -1,9 +1,18 @@
 <template>
   <div>
     <!-- Show when no recipients -->
-    <div v-if="props.recipients.length === 0">
-      <div>No recipients</div>
-      <Button @click="$emit('add')">Add Recipient</Button>
+    <div
+      v-if="props.recipients.length === 0"
+      class="flex flex-col items-center gap-4 py-8"
+    >
+      <div class="text-gray-500">No recipients added yet</div>
+      <Button
+        @click="$emit('add')"
+        class="flex items-center gap-2 bg-blue-300 hover:bg-blue-400 px-4 py-2 rounded-md text-white transition-colors"
+      >
+        <Icon :icon="'carbon:add'" class="w-5 h-5" />
+        Add Recipient
+      </Button>
     </div>
 
     <!-- Desktop Table Layout -->

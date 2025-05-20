@@ -6,7 +6,10 @@ import { computed } from 'vue'
 export function useProfile() {
   const email = computed(() => authClient.useSession().value.data?.user.email)
   const options = computed(() =>
-    orpcVueQuery.xeProfile.queryOptions({ input: { email: email.value! }, enabled: !!email.value }),
+    orpcVueQuery.getProfile.queryOptions({
+      input: { email: email.value! },
+      enabled: !!email.value,
+    }),
   )
   return useQuery(options)
 }
