@@ -42,7 +42,7 @@ const handleRecipientSelected = (
 
 <template>
   <TableRow
-    class="data-[state=selected]:bg-muted hover:bg-muted/50 border-b h-10 transition-colors"
+    class="data-[state=selected]:bg-muted border-b h-10 transition-colors"
   >
     <TableCell class="w-[220px]" ref="recipientSearchContainerRef">
       <RecipientSearch
