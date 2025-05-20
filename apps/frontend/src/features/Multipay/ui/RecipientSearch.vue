@@ -13,8 +13,15 @@
       </ComboboxTrigger>
     </ComboboxAnchor>
 
-    <ComboboxList :class="cn('w-full', props.menuClass)" :style="{ width: menuWidth }">
-      <ComboboxInput v-model="search" class="w-full" placeholder="Search recipient..." />
+    <ComboboxList
+      :class="cn('w-full', props.menuClass)"
+      :style="{ width: menuWidth }"
+    >
+      <ComboboxInput
+        v-model="search"
+        class="w-full"
+        placeholder="Search recipient..."
+      />
 
       <ComboboxEmpty> No recipient found. </ComboboxEmpty>
 
@@ -83,19 +90,19 @@ const menuWidth = computed(() => {
   return width.value ? `${width.value}px` : 'auto'
 })
 
-const { recipients } = useRecipients()
+const { data: recipients } = useRecipients()
 const recipientOptions = computed(() => {
-  return recipients.value.map((r) => ({
-    label: r.recipient.recipientDisplayName,
-    value: String(r.recipient.recipientId),
-    ...r.recipient,
+  return recipients.value?.map((r) => ({
+    label: r.recipientDisplayName,
+    value: String(r.recipientId),
+    ...r,
   }))
 })
 
 const search = ref('')
 const filteredRecipients = computed(() => {
-  if (!search.value) return recipientOptions.value.slice(0, 8)
-  return recipientOptions.value
+  if (!search.value) return recipientOptions.value?.slice(0, 8)
+  return (recipientOptions.value ?? [])
     .filter((r) => r.label.toLowerCase().includes(search.value.toLowerCase()))
     .slice(0, 8)
 })

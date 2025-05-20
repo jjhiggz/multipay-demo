@@ -45,21 +45,26 @@ const props = defineProps<{
   menuClass?: string
   displayClass?: string
 }>()
-const emit = defineEmits<(e: 'selected', value: CurrencyDropdownOption) => void>()
+const emit =
+  defineEmits<(e: 'selected', value: CurrencyDropdownOption) => void>()
 
 const search = ref('')
 
-const { currencies, isLoading } = useCurrencies()
+const { data: currencies } = useCurrencies()
 
 const allOptions = computed<CurrencyDropdownOption[]>(() =>
-  (currencies.value || []).map((c) => ({ label: c.name, value: c.isoCode as CurrencyCode })),
+  (currencies.value || []).map((c) => ({
+    label: c.name,
+    value: c.isoCode as CurrencyCode,
+  })),
 )
 
 const filteredOptions = computed(() => {
   if (!search.value) return allOptions.value
   const s = search.value.toLowerCase()
   return allOptions.value.filter(
-    (o) => o.label.toLowerCase().includes(s) || o.value.toLowerCase().includes(s),
+    (o) =>
+      o.label.toLowerCase().includes(s) || o.value.toLowerCase().includes(s),
   )
 })
 

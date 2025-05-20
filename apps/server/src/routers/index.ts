@@ -16,6 +16,8 @@ import {
 } from "../serializers/currencies-endpoint";
 import { os } from "@orpc/server";
 import { userExistsMiddleware, type Context } from "../lib/context";
+import { systemFieldsOutputSchema } from "@/db/schema/system-fields.schema";
+import { defaultSystemFieldsReturn } from "@/constants/system-fields-return";
 
 const healthcheckRoute = os
   .route({ method: "GET", path: "/healthcheck" })
@@ -192,9 +194,17 @@ const legacyXeProfileHandler = async ({
   return serialized;
 };
 
+const getSystemFieldsRoute = os
+  .route({ method: "GET", path: "/system/fields" })
+  .output(systemFieldsOutputSchema)
+  .handler(async () => {
+    return defaultSystemFieldsReturn;
+  });
+
 // New unified router object
 export const newAppRouter = {
   healthcheck: healthcheckRoute,
+  getSystemFieldsRoute,
   signIn: signInRoute,
   getProfile: getProfileRoute,
   getCurrencies: getCurrenciesRoute,
@@ -214,11 +224,3 @@ export const newAppRouter = {
 };
 
 export type NewAppRouter = typeof newAppRouter;
-
-// Delete or comment out old appRouter and its type
-/*
-export const appRouter = {
-  // ... old appRouter definitions
-};
-export type AppRouter = typeof appRouter;
-*/

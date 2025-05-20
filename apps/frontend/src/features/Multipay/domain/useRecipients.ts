@@ -1,7 +1,16 @@
 import { computed } from 'vue'
-import { useQuery } from '@tanstack/vue-query'
 import { orpcVueQuery } from '@/services/orpcClient'
 import { authClient } from '@/services/authClient'
+import { useMappedQuery } from '@/shared/lib/map-query'
+
+export type FERecipient = {
+  currencyCode: string
+  recipientId: number
+  recipientDisplayName: string
+  bankCountryCode: string
+  bankName: string
+  accountNumber: string
+}
 
 export function useRecipients() {
   const activeOrg = authClient.useActiveOrganization()
@@ -11,7 +20,7 @@ export function useRecipients() {
       input: { organizationId: organizationId.value },
     }),
   )
-  const { data, isPending, error } = useQuery(options)
-  const recipients = computed(() => data.value?.recipients ?? [])
-  return { recipients, isPending, error }
+  return useMappedQuery(options, {
+    mapData: (input): FERecipient[] => input.recipients.map((n) => n.recipient),
+  })
 }
