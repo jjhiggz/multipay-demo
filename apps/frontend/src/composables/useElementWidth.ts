@@ -6,6 +6,8 @@ import {
   type Ref,
   shallowRef,
   type VNodeRef,
+  toValue,
+  type ComponentPublicInstance,
 } from 'vue'
 
 export function useElementWidth(
@@ -15,10 +17,33 @@ export function useElementWidth(
   const observer = shallowRef<ResizeObserver | null>(null)
 
   const getElement = (): HTMLElement | null => {
-    if (target && typeof target === 'object' && 'value' in target) {
-      return target.value
+    let resolvedTarget = toValue(target)
+
+    // If resolvedTarget is a Ref object itself (e.g., target was Ref<Ref<Element/Component>>)
+    if (
+      resolvedTarget &&
+      typeof resolvedTarget === 'object' &&
+      'value' in resolvedTarget
+    ) {
+      resolvedTarget = toValue(resolvedTarget) // Unwrap it further
     }
-    return (target as HTMLElement) ?? null
+
+    if (resolvedTarget instanceof HTMLElement) {
+      return resolvedTarget
+    }
+    // Check if it's a component instance with an $el property
+    if (
+      resolvedTarget &&
+      typeof resolvedTarget === 'object' &&
+      resolvedTarget !== null &&
+      '$el' in resolvedTarget
+    ) {
+      const elProp = (resolvedTarget as ComponentPublicInstance).$el
+      if (elProp instanceof HTMLElement) {
+        return elProp
+      }
+    }
+    return null
   }
 
   const updateWidth = (element: HTMLElement | null) => {

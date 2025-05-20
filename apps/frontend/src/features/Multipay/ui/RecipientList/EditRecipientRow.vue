@@ -63,12 +63,9 @@ const handleRecipientSelected = (
         class="w-full"
       />
     </TableCell>
-    <TableCell class="w-[200px]" ref="reasonSearchContainerRef">
+    <TableCell class="w-[220px]" ref="reasonSearchContainerRef">
       <ReasonSearch
         :model-value="props.reason"
-        @update:modelValue="
-          (value: string | null) => emit('update', { reason: value || '' })
-        "
         class="w-full"
         :dropdownWidthRef="reasonSearchContainerRef"
       />

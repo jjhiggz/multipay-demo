@@ -1,5 +1,9 @@
 <template>
-  <Combobox v-model="selectedValue" by="value" @update:open="(v) => (open = v)">
+  <Combobox
+    v-model="selectedComboboxValue"
+    by="value"
+    @update:open="(v) => (open = v)"
+  >
     <ComboboxAnchor as-child>
       <ComboboxTrigger as-child>
         <Button
@@ -8,7 +12,7 @@
           :class="cn('w-full justify-between', props.class)"
           :aria-expanded="open"
         >
-          {{ selectedValue?.text ?? 'Select reason' }}
+          {{ selectedComboboxValue?.label ?? 'Select reason' }}
           <ChevronsUpDown class="opacity-50 ml-2 w-4 h-4 shrink-0" />
         </Button>
       </ComboboxTrigger>
@@ -26,12 +30,12 @@
       <ComboboxEmpty>No reason found.</ComboboxEmpty>
       <ComboboxGroup>
         <ComboboxItem
-          v-for="reason in filteredReasons"
-          :key="reason.value"
-          :value="reason"
-          @select="handleSelect(reason)"
+          v-for="reasonOpt in filteredReasonOptions"
+          :key="reasonOpt.value"
+          :value="reasonOpt"
+          @select="handleSelect(reasonOpt)"
         >
-          {{ reason.text }}
+          {{ reasonOpt.label }}
           <ComboboxItemIndicator>
             <Check :class="cn('ml-auto h-4 w-4')" />
           </ComboboxItemIndicator>
@@ -42,15 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  computed,
-  watch,
-  type Ref,
-  toValue,
-  type VNodeRef,
-  type VNode,
-} from 'vue'
+import { ref, computed, watch, type Ref, type VNodeRef } from 'vue'
 import { Check, ChevronsUpDown } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import {
@@ -71,73 +67,94 @@ import {
 } from '@/features/Multipay/domain/useReasonsForTransfer'
 import { useElementWidth } from '@/composables/useElementWidth'
 
+// Transformed option type for the combobox
+export type ReasonSearchOption = {
+  label: string // from reason.text
+  value: string // from reason.value
+  allowFreeText: boolean
+}
+
 const props = defineProps<{
-  modelValue: string | null
+  modelValue: string | null // This will be the 'value' property of ReasonSearchOption
   class?: string
   menuClass?: string
+  triggerRef?: any // For consistency with RecipientSearch
   dropdownWidthRef?: Ref<VNodeRef | null> | VNodeRef | null
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | null): void
-  (e: 'reasonSelected', reason: FEReasonForTransfer | null): void
+  (e: 'update:modelValue', value: string | null): void // Emits the string value for v-model compatibility
+  (e: 'reasonSelected', reason: ReasonSearchOption | null): void // Emits the full selected object
 }>()
 
-const { data: allReasons, isLoading, isError } = useReasonsForTransfer()
+const { data: allReasonsFromAPI, isLoading, isError } = useReasonsForTransfer()
 
 const searchQuery = ref('')
 const open = ref(false)
 
 const localTriggerRef = ref<HTMLElement | null>(null)
-const triggerRefToUse = computed(
-  () => props.dropdownWidthRef ?? localTriggerRef,
-)
+const triggerRefToUse = computed(() => props.triggerRef ?? localTriggerRef)
 
 const menuWidth = computed(() => {
   const width = useElementWidth(props.dropdownWidthRef)
   return width.value ? `${width.value}px` : 'auto'
 })
 
-const selectedValue = computed<FEReasonForTransfer | null>({
-  get() {
-    return allReasons.value?.find((r) => r.value === props.modelValue) || null
-  },
-  set(reason: FEReasonForTransfer | null) {
-    emit('update:modelValue', reason?.value ?? null)
-    emit('reasonSelected', reason)
-  },
+// Transform API reasons to ReasonSearchOption for the combobox
+const reasonOptions = computed<ReasonSearchOption[]>(() => {
+  return (
+    allReasonsFromAPI.value?.map((r: FEReasonForTransfer) => ({
+      label: r.text,
+      value: r.value,
+      allowFreeText: r.allowFreeText,
+    })) || []
+  )
 })
 
-const filteredReasons = computed(() => {
-  if (isLoading.value || isError.value || !allReasons.value) return []
+const filteredReasonOptions = computed(() => {
+  if (isLoading.value || isError.value || !reasonOptions.value) return []
   if (!searchQuery.value) {
-    return allReasons.value.slice(0, 10)
+    return reasonOptions.value.slice(0, 10)
   }
-  return allReasons.value
+  return reasonOptions.value
     .filter((reason) =>
-      reason.text.toLowerCase().includes(searchQuery.value.toLowerCase()),
+      reason.label.toLowerCase().includes(searchQuery.value.toLowerCase()),
     )
     .slice(0, 10)
 })
 
-const handleSelect = (reason: FEReasonForTransfer) => {
-  selectedValue.value = reason
-  open.value = false
-}
+// v-model for the Combobox, holds the full selected ReasonSearchOption object
+const selectedComboboxValue = ref<ReasonSearchOption | null>(null)
 
+// Watch for external changes to modelValue (string)
 watch(
   () => props.modelValue,
-  (newValue) => {
-    const currentSelection = allReasons.value?.find((r) => r.value === newValue)
-    if (
-      currentSelection &&
-      selectedValue.value?.value !== currentSelection.value
-    ) {
-      selectedValue.value = currentSelection
-    }
-    if (newValue === null && selectedValue.value !== null) {
-      selectedValue.value = null
+  (newModelValue) => {
+    if (newModelValue === null) {
+      selectedComboboxValue.value = null
+    } else {
+      const correspondingOption = reasonOptions.value.find(
+        (opt) => opt.value === newModelValue,
+      )
+      if (
+        correspondingOption &&
+        selectedComboboxValue.value?.value !== newModelValue
+      ) {
+        selectedComboboxValue.value = correspondingOption
+      }
     }
   },
+  { immediate: true }, // Ensure it runs on init to sync with initial modelValue
 )
+
+// Watch for internal changes to selectedComboboxValue (ReasonSearchOption object)
+watch(selectedComboboxValue, (newVal) => {
+  emit('update:modelValue', newVal?.value ?? null) // Emit the string value for v-model
+  emit('reasonSelected', newVal) // Emit the full object
+})
+
+const handleSelect = (reasonOpt: ReasonSearchOption) => {
+  selectedComboboxValue.value = reasonOpt
+  open.value = false
+}
 </script>
