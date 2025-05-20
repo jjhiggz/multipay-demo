@@ -11,6 +11,9 @@ import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod";
 import { RPCHandler } from "@orpc/server/fetch";
 
+const lag = 3000;
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const app = new Hono();
 
 app.use(logger());
@@ -39,6 +42,7 @@ app.on(["POST", "GET"], "/api/auth/**", async (c) => {
 
 // const handler = new RPCHandler(appRouter);
 app.use("*", async (c, next) => {
+  await wait(lag);
   const context = await createContext({ context: c });
 
   if (c.req.path.includes("/api")) {
