@@ -9,6 +9,7 @@ import { logger } from "hono/logger";
 import { newAppRouter } from "./routers";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod";
+import { RPCHandler } from "@orpc/server/fetch";
 
 const app = new Hono();
 
@@ -17,9 +18,10 @@ app.use(logger());
 const openAPIGenerator = new OpenAPIGenerator({
   schemaConverters: [new ZodToJsonSchemaConverter()],
 });
-const handler = new OpenAPIHandler(newAppRouter, {
+const openAPIHandler = new OpenAPIHandler(newAppRouter, {
   plugins: [new CORSPlugin()],
 });
+const rpcHandler = new RPCHandler(newAppRouter);
 
 app.use(
   "/*",
@@ -38,35 +40,39 @@ app.on(["POST", "GET"], "/api/auth/**", async (c) => {
 // const handler = new RPCHandler(appRouter);
 app.use("*", async (c, next) => {
   const context = await createContext({ context: c });
-  const { matched, response } = await handler.handle(c.req.raw, {
-    prefix: "/api",
-    context,
-  });
-  if (matched) {
-    return c.newResponse(response.body, response);
-  }
-  if (c.req.path === "/spec.json") {
-    const spec = await openAPIGenerator.generate(newAppRouter, {
-      info: {
-        title: "My Playground",
-        version: "1.0.0",
-      },
-      servers: [{ url: "/api" } /** Should use absolute URLs in production */],
-      security: [{ bearerAuth: [] }],
-      components: {
-        securitySchemes: {
-          bearerAuth: {
-            type: "http",
-            scheme: "bearer",
+
+  if (c.req.path.includes("/api")) {
+    const { matched, response } = await openAPIHandler.handle(c.req.raw, {
+      prefix: "/api",
+      context,
+    });
+    if (matched) {
+      return c.newResponse(response.body, response);
+    }
+    if (c.req.path === "/api/spec.json") {
+      const spec = await openAPIGenerator.generate(newAppRouter, {
+        info: {
+          title: "My Playground",
+          version: "1.0.0",
+        },
+        servers: [
+          { url: "/api" } /** Should use absolute URLs in production */,
+        ],
+        security: [{ bearerAuth: [] }],
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              scheme: "bearer",
+            },
           },
         },
-      },
-    });
+      });
 
-    return c.json(spec);
-  }
-  if (c.req.path === "/docs") {
-    const html = `
+      return c.json(spec);
+    }
+    if (c.req.path === "/api/docs") {
+      const html = `
     <!doctype html>
     <html>
       <head>
@@ -81,7 +87,7 @@ app.use("*", async (c, next) => {
         <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
         <script>
           Scalar.createApiReference('#app', {
-            url: '/spec.json',
+            url: '/api/spec.json',
             authentication: {
               securitySchemes: {
                 bearerAuth: {
@@ -94,7 +100,17 @@ app.use("*", async (c, next) => {
       </body>
     </html>
   `;
-    return c.html(html);
+      return c.html(html);
+    }
+  }
+  if (c.req.path.includes("/rpc")) {
+    const { matched, response } = await rpcHandler.handle(c.req.raw, {
+      prefix: "/rpc",
+      context,
+    });
+    if (matched) {
+      return c.newResponse(response.body, response);
+    }
   }
   await next();
 });

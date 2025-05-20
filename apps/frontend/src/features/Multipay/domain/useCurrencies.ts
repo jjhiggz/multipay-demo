@@ -1,8 +1,9 @@
-import { ref } from 'vue'
-import { useQuery } from '@tanstack/vue-query'
 import { orpcVueQuery } from '@/services/orpcClient'
+import { useMappedQuery } from '@/shared/lib/map-query'
+import { useQuery } from '@tanstack/vue-query'
 
-export type Currency = {
+import { watch } from 'vue'
+export type FECurrency = {
   amountPrecision: number
   isoCode: string
   name: string
@@ -13,8 +14,15 @@ export type Currency = {
 }
 
 export function useCurrencies() {
-  const options = orpcVueQuery.currencies.queryOptions()
+  const options = orpcVueQuery.getCurrencies.queryOptions()
   const { data: currencies, isPending: isLoading, error } = useQuery(options)
+  // useMappedQuery(options, {
+  //   mapData: (input) => input,
+  // })
+
+  watch(currencies, (newCurrencies) => {
+    console.log('Currencies updated:', newCurrencies)
+  })
 
   return {
     currencies,

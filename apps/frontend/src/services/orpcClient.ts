@@ -1,6 +1,6 @@
 import { createORPCClient } from '@orpc/client' // Import directly
 import { RPCLink } from '@orpc/client/fetch' // Correct import for RPCLink
-import type { AppRouter } from '../../../server/src/routers/index'
+import type { NewAppRouter } from '../../../server/src/routers/index'
 import type { RouterClient } from '@orpc/server' // For explicitly typing the client if needed
 import { createORPCVueQueryUtils } from '@orpc/vue-query'
 
@@ -20,5 +20,5 @@ const rpcLink = new RPCLink({
 // Create the typed oRPC client
 // The createORPCClient is generic over the AppRouter type from your backend
 // We'll try wrapping AppRouter with RouterClient from @orpc/server
-const orpcClient = createORPCClient<RouterClient<AppRouter>>(rpcLink)
+const orpcClient = createORPCClient<RouterClient<NewAppRouter>>(rpcLink)
 export const orpcVueQuery = createORPCVueQueryUtils(orpcClient)
