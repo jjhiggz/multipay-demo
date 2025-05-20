@@ -26,21 +26,31 @@
         v-model="searchQuery"
         class="w-full"
         placeholder="Search reason..."
+        :disabled="isLoading"
       />
-      <ComboboxEmpty>No reason found.</ComboboxEmpty>
-      <ComboboxGroup>
-        <ComboboxItem
-          v-for="reasonOpt in filteredReasonOptions"
-          :key="reasonOpt.value"
-          :value="reasonOpt"
-          @select="handleSelect(reasonOpt)"
-        >
-          {{ reasonOpt.label }}
-          <ComboboxItemIndicator>
-            <Check :class="cn('ml-auto h-4 w-4')" />
-          </ComboboxItemIndicator>
-        </ComboboxItem>
-      </ComboboxGroup>
+      <template v-if="isLoading">
+        <div class="p-2 text-center">
+          <LoadingDots />
+        </div>
+      </template>
+      <template v-else>
+        <ComboboxEmpty v-if="filteredReasonOptions.length === 0">
+          No reason found.
+        </ComboboxEmpty>
+        <ComboboxGroup v-else>
+          <ComboboxItem
+            v-for="reasonOpt in filteredReasonOptions"
+            :key="reasonOpt.value"
+            :value="reasonOpt"
+            @select="handleSelect(reasonOpt)"
+          >
+            {{ reasonOpt.label }}
+            <ComboboxItemIndicator>
+              <Check :class="cn('ml-auto h-4 w-4')" />
+            </ComboboxItemIndicator>
+          </ComboboxItem>
+        </ComboboxGroup>
+      </template>
     </ComboboxList>
   </Combobox>
 </template>
@@ -66,6 +76,7 @@ import {
   type FEReasonForTransfer,
 } from '@/features/Multipay/domain/useReasonsForTransfer'
 import { useElementWidth } from '@/composables/useElementWidth'
+import LoadingDots from '@/components/ui/LoadingDots.vue'
 
 // Transformed option type for the combobox
 export type ReasonSearchOption = {
@@ -112,7 +123,8 @@ const reasonOptions = computed<ReasonSearchOption[]>(() => {
 })
 
 const filteredReasonOptions = computed(() => {
-  if (isLoading.value || isError.value || !reasonOptions.value) return []
+  if (isLoading.value) return []
+  if (isError.value || !reasonOptions.value) return []
   if (!searchQuery.value) {
     return reasonOptions.value.slice(0, 10)
   }

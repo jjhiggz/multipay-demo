@@ -21,29 +21,38 @@
         v-model="search"
         class="w-full"
         placeholder="Search recipient..."
+        :disabled="isLoading"
       />
 
-      <ComboboxEmpty> No recipient found. </ComboboxEmpty>
-
-      <ComboboxGroup>
-        <ComboboxItem
-          v-for="recipient in filteredRecipients"
-          :key="recipient.value"
-          :value="recipient"
-        >
-          {{ recipient.label }}
-          <ComboboxItemIndicator>
-            <Check :class="cn('ml-auto h-4 w-4')" />
-          </ComboboxItemIndicator>
-        </ComboboxItem>
-      </ComboboxGroup>
+      <template v-if="isLoading">
+        <div class="p-2 text-center">
+          <LoadingDots />
+        </div>
+      </template>
+      <template v-else>
+        <ComboboxEmpty v-if="filteredRecipients.length === 0">
+          No recipient found.
+        </ComboboxEmpty>
+        <ComboboxGroup v-else>
+          <ComboboxItem
+            v-for="recipient in filteredRecipients"
+            :key="recipient.value"
+            :value="recipient"
+          >
+            {{ recipient.label }}
+            <ComboboxItemIndicator>
+              <Check :class="cn('ml-auto h-4 w-4')" />
+            </ComboboxItemIndicator>
+          </ComboboxItem>
+        </ComboboxGroup>
+      </template>
     </ComboboxList>
   </Combobox>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, type Ref, type VNodeRef } from 'vue'
-import { Check, ChevronsUpDown, Search } from 'lucide-vue-next'
+import { Check, ChevronsUpDown } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import {
   Combobox,
@@ -62,6 +71,7 @@ import {
   useRecipients,
   type FERecipient,
 } from '@/features/Multipay/domain/useRecipients'
+import LoadingDots from '@/components/ui/LoadingDots.vue'
 
 const props = defineProps<{
   class?: string
@@ -94,7 +104,7 @@ const menuWidth = computed(() => {
   return width.value ? `${width.value}px` : 'auto'
 })
 
-const { data: recipientsFromAPI } = useRecipients()
+const { data: recipientsFromAPI, isLoading } = useRecipients()
 
 // Transform API recipients to RecipientSearchOption for the combobox
 const recipientOptions = computed<RecipientSearchOption[]>(() => {
@@ -113,6 +123,7 @@ const recipientOptions = computed<RecipientSearchOption[]>(() => {
 
 const search = ref('')
 const filteredRecipients = computed(() => {
+  if (isLoading.value) return []
   if (!search.value) return recipientOptions.value.slice(0, 8)
   return recipientOptions.value
     .filter((r) => r.label.toLowerCase().includes(search.value.toLowerCase()))
