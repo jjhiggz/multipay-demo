@@ -6,6 +6,8 @@ import MoneyInput from '@/features/Multipay/ui/MoneyInput.vue'
 import { Icon } from '@iconify/vue'
 import TableRow from '@/components/ui/table/TableRow.vue'
 import TableCell from '@/components/ui/table/TableCell.vue'
+import type { FERecipient } from '@/features/Multipay/domain/useRecipients'
+import ReasonSearch from '../ReasonSearch.vue'
 
 const props = defineProps<{
   id: number
@@ -21,7 +23,14 @@ const emit = defineEmits<{
   (e: 'remove'): void
 }>()
 
-const isComplete = props.name.trim() !== '' && props.amount !== null && props.reason.trim() !== ''
+const handleRecipientSelected = (recipient: FERecipient | null) => {
+  if (recipient) {
+    emit('update', {
+      name: recipient.recipientDisplayName,
+      currencyCode: recipient.currencyCode as CurrencyCode,
+    })
+  }
+}
 </script>
 
 <template>
@@ -29,14 +38,7 @@ const isComplete = props.name.trim() !== '' && props.amount !== null && props.re
     class="data-[state=selected]:bg-muted hover:bg-muted/50 border-b h-10 transition-colors"
   >
     <TableCell>
-      <RecipientSearch
-        @update:modelValue="
-          emit('update', {
-            name: $event?.label,
-            currencyCode: $event?.currencyCode,
-          })
-        "
-      />
+      <RecipientSearch @recipientSelected="handleRecipientSelected" />
     </TableCell>
     <TableCell>
       <MoneyInput
@@ -44,20 +46,40 @@ const isComplete = props.name.trim() !== '' && props.amount !== null && props.re
         :currency="props.currencyCode"
         :disabled="false"
         :currency-selectable="false"
-        @update:modelValue="(value) => emit('update', { amount: parseFloat(String(value)) })"
+        @update:modelValue="
+          (value) => emit('update', { amount: parseFloat(String(value)) })
+        "
         class="w-full"
       />
     </TableCell>
-    <TableCell>{{ props.reason || '—' }}</TableCell>
-    <TableCell>
-      <input
-        :value="props.reference || ''"
-        @input="(e) => emit('update', { reference: (e.target as HTMLInputElement)?.value || '' })"
+    <TableCell class="w-[250px]">
+      <ReasonSearch
+        :model-value="props.reason"
+        @update:modelValue="
+          (value: string | null) => emit('update', { reason: value || '' })
+        "
+        class="w-full"
       />
     </TableCell>
     <TableCell>
-      <button @click="$emit('remove')" title="Remove Recipient">
-        <Icon :icon="'carbon:trash-can'" />
+      <input
+        :value="props.reference || ''"
+        @input="
+          (e) =>
+            emit('update', {
+              reference: (e.target as HTMLInputElement)?.value || '',
+            })
+        "
+        class="p-2 border rounded w-full"
+      />
+    </TableCell>
+    <TableCell>
+      <button
+        @click="$emit('remove')"
+        title="Remove Recipient"
+        class="text-red-500 hover:text-red-700"
+      >
+        <Icon :icon="'carbon:trash-can'" class="w-5 h-5" />
       </button>
     </TableCell>
   </TableRow>

@@ -1,5 +1,5 @@
 <template>
-  <Combobox v-model="value" by="value">
+  <Combobox v-model="selectedComboboxValue" by="value">
     <ComboboxAnchor as-child>
       <ComboboxTrigger as-child>
         <Button
@@ -7,7 +7,7 @@
           variant="outline"
           :class="cn('w-full justify-between', props.class)"
         >
-          {{ value?.label ?? 'Select recipient' }}
+          {{ selectedComboboxValue?.label ?? 'Select recipient' }}
           <ChevronsUpDown class="opacity-50 ml-2 w-4 h-4 shrink-0" />
         </Button>
       </ComboboxTrigger>
@@ -58,7 +58,10 @@ import {
 } from '@/components/ui/combobox'
 import Button from '@/components/ui/button/Button.vue'
 import { useElementWidth } from '@/composables/useElementWidth'
-import { useRecipients } from '@/features/Multipay/domain/useRecipients'
+import {
+  useRecipients,
+  type FERecipient,
+} from '@/features/Multipay/domain/useRecipients'
 
 const props = defineProps<{
   class?: string
@@ -67,7 +70,7 @@ const props = defineProps<{
   dropdownWidthRef?: Ref<HTMLElement | null> | HTMLElement | null
 }>()
 
-// Define the type for the emitted value
+// This is the transformed option type for the combobox internal state and for emitting
 export type RecipientSearchOption = {
   label: string
   value: string
@@ -76,11 +79,11 @@ export type RecipientSearchOption = {
   bankCountryCode: string
   bankName: string
   accountNumber: string
-  [key: string]: any
 }
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: (typeof recipients)[][number] | null): void
+  (e: 'update:modelValue', value: RecipientSearchOption | null): void
+  (e: 'recipientSelected', value: RecipientSearchOption | null): void
 }>()
 
 const localTriggerRef = ref<HTMLElement | null>(null)
@@ -90,39 +93,36 @@ const menuWidth = computed(() => {
   return width.value ? `${width.value}px` : 'auto'
 })
 
-const { data: recipients } = useRecipients()
-const recipientOptions = computed(() => {
-  return recipients.value?.map((r) => ({
-    label: r.recipientDisplayName,
-    value: String(r.recipientId),
-    ...r,
-  }))
+const { data: recipientsFromAPI } = useRecipients()
+
+// Transform API recipients to RecipientSearchOption for the combobox
+const recipientOptions = computed<RecipientSearchOption[]>(() => {
+  return (
+    recipientsFromAPI.value?.map((r: FERecipient) => ({
+      label: r.recipientDisplayName,
+      value: String(r.recipientId),
+      recipientId: r.recipientId,
+      currencyCode: r.currencyCode,
+      bankCountryCode: r.bankCountryCode,
+      bankName: r.bankName,
+      accountNumber: r.accountNumber,
+    })) || []
+  )
 })
 
 const search = ref('')
 const filteredRecipients = computed(() => {
-  if (!search.value) return recipientOptions.value?.slice(0, 8)
-  return (recipientOptions.value ?? [])
+  if (!search.value) return recipientOptions.value.slice(0, 8)
+  return recipientOptions.value
     .filter((r) => r.label.toLowerCase().includes(search.value.toLowerCase()))
     .slice(0, 8)
 })
 
-const value = ref<RecipientSearchOption | null>(null)
+// v-model for the Combobox, holds the full selected RecipientSearchOption object
+const selectedComboboxValue = ref<RecipientSearchOption | null>(null)
 
-watch(value, (val) => {
-  emit(
-    'update:modelValue',
-    val
-      ? {
-          label: val.label,
-          value: val.value,
-          recipientId: val.recipientId,
-          currencyCode: val.currencyCode,
-          bankCountryCode: val.bankCountryCode,
-          bankName: val.bankName,
-          accountNumber: val.accountNumber,
-        }
-      : null,
-  )
+watch(selectedComboboxValue, (newVal) => {
+  emit('update:modelValue', newVal)
+  emit('recipientSelected', newVal)
 })
 </script>

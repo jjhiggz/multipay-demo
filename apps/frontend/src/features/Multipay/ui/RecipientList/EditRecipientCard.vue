@@ -4,10 +4,16 @@ import { defineEmits, defineProps, computed, ref } from 'vue'
 import RecipientSearch from '@/features/Multipay/ui/RecipientSearch.vue'
 import MoneyInput from '@/features/Multipay/ui/MoneyInput.vue'
 import { Icon } from '@iconify/vue'
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from '@/components/ui/collapsible'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import type { FERecipient } from '@/features/Multipay/domain/useRecipients'
+import ReasonSearch from '../ReasonSearch.vue'
 
 const props = defineProps<{
   id: number
@@ -20,7 +26,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update', data: Partial<typeof props>): void
+  (e: 'update', data: Partial<Omit<typeof props, 'open'>>): void
   (e: 'remove'): void
   (e: 'update:open', val: boolean): void
 }>()
@@ -37,13 +43,22 @@ const formattedAmount = computed(() => {
   )
 })
 
-const handleInput = (field: keyof typeof props) => (e: Event) => {
+const handleReferenceInput = (e: Event) => {
   const value = (e.target as HTMLInputElement)?.value || ''
-  emit('update', { [field]: value })
+  emit('update', { reference: value })
 }
 
-const isOpen = ref(false)
+const handleRecipientSelected = (recipient: FERecipient | null) => {
+  if (recipient) {
+    emit('update', {
+      name: recipient.recipientDisplayName,
+      currencyCode: recipient.currencyCode as CurrencyCode,
+    })
+  }
+}
+
 const recipientSearchContainerRef = ref<HTMLElement | null>(null)
+const reasonSearchContainerRef = ref<HTMLElement | null>(null)
 </script>
 
 <template>
@@ -56,10 +71,10 @@ const recipientSearchContainerRef = ref<HTMLElement | null>(null)
       class="flex justify-between items-center p-4 cursor-pointer"
       @click="emit('update:open', !props.open)"
     >
-      <div class="font-medium">{{ props.name || '—' }}</div>
+      <div class="font-medium">{{ props.name || 'New Recipient' }}</div>
       <div class="flex items-center">
         <div class="mr-2 font-medium">
-          {{ formattedAmount }}
+          {{ formattedAmount || '-' }}
         </div>
         <CollapsibleTrigger as-child>
           <Button variant="ghost" size="icon" class="w-8 h-8" @click.stop>
@@ -74,7 +89,7 @@ const recipientSearchContainerRef = ref<HTMLElement | null>(null)
 
     <CollapsibleContent
       class="overflow-hidden"
-      :class="open ? 'animate-accordion-down' : 'animate-accordion-up'"
+      :class="props.open ? 'animate-accordion-down' : 'animate-accordion-up'"
     >
       <div class="space-y-3 px-4 pt-0 pb-4">
         <div class="space-y-1">
@@ -83,13 +98,7 @@ const recipientSearchContainerRef = ref<HTMLElement | null>(null)
             <RecipientSearch
               class="w-full"
               :dropdownWidthRef="recipientSearchContainerRef"
-              @update:modelValue="
-                (option) =>
-                  emit('update', {
-                    name: option.label,
-                    currencyCode: option.currencyCode,
-                  })
-              "
+              @recipientSelected="handleRecipientSelected"
             />
           </div>
         </div>
@@ -97,26 +106,35 @@ const recipientSearchContainerRef = ref<HTMLElement | null>(null)
         <div class="space-y-1">
           <Label class="font-normal text-gray-500">Amount</Label>
           <MoneyInput
-            :model-value="props.amount ?? '0.00'"
+            :model-value="props.amount ?? 0"
             :currency="props.currencyCode"
             :disabled="false"
             :currency-selectable="false"
-            @update:modelValue="(value) => emit('update', { amount: parseFloat(String(value)) })"
+            @update:modelValue="
+              (value) => emit('update', { amount: parseFloat(String(value)) })
+            "
             class="w-full"
           />
         </div>
 
         <div class="space-y-1">
           <Label class="font-normal text-gray-500">Reason</Label>
-          <Input placeholder="Reason" :value="props.reason" @input="handleInput('reason')" />
+          <ReasonSearch
+            :model-value="props.reason"
+            @update:modelValue="
+              (value: string | null) => emit('update', { reason: value || '' })
+            "
+            class="w-full"
+            :dropdownWidthRef="reasonSearchContainerRef"
+          />
         </div>
 
         <div class="space-y-1">
           <Label class="font-normal text-gray-500">Reference (Optional)</Label>
           <Input
             placeholder="Add a reference"
-            :value="props.reference"
-            @input="handleInput('reference')"
+            :value="props.reference || ''"
+            @input="handleReferenceInput"
           />
         </div>
 

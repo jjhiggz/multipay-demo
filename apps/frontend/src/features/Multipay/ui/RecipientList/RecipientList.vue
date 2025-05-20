@@ -42,7 +42,10 @@
     </div>
 
     <!-- Mobile Collapsible Card Layout -->
-    <div v-if="props.recipients.length > 0" class="md:hidden space-y-2 py-6 pt-0">
+    <div
+      v-if="props.recipients.length > 0"
+      class="md:hidden space-y-2 py-6 pt-0"
+    >
       <EditRecipientCard
         v-for="recipient in props.recipients"
         :key="recipient.id"
@@ -50,7 +53,9 @@
         :open="props.openIds ? props.openIds.includes(recipient.id) : false"
         @update="(data) => $emit('update', recipient.id, data)"
         @remove="() => $emit('remove', recipient.id)"
-        @update:open="(open: boolean) => $emit('toggle-open', recipient.id, open)"
+        @update:open="
+          (open: boolean) => $emit('toggle-open', recipient.id, open)
+        "
         class="mb-2"
       />
       <div>
@@ -72,7 +77,13 @@ import { Icon } from '@iconify/vue'
 import EditRecipientRow from './EditRecipientRow.vue'
 import EditRecipientCard from './EditRecipientCard.vue'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import { Table, TableHeader, TableBody, TableRow, TableHead } from '@/components/ui/table'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+} from '@/components/ui/table'
 import Button from '@/components/ui/button/Button.vue'
 
 export type MultiPayRecipient = {
