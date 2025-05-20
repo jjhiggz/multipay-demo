@@ -88,6 +88,7 @@ const emit = defineEmits<{
 
 const localTriggerRef = ref<HTMLElement | null>(null)
 const triggerRefToUse = computed(() => props.triggerRef ?? localTriggerRef)
+
 const menuWidth = computed(() => {
   const width = useElementWidth(props.dropdownWidthRef)
   return width.value ? `${width.value}px` : 'auto'

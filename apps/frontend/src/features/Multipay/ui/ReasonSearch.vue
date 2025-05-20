@@ -81,22 +81,11 @@ const searchQuery = ref('')
 const open = ref(false) // To control combobox open state if needed, or rely on internal
 
 // Ref for the internal trigger button
-const localTriggerRef = ref<any>(null)
-
-// Determine which ref to use for width calculation
-const widthSourceRef = computed(() => {
-  const external = toValue(props.dropdownWidthRef)
-  if (external) return external
-
-  const local = toValue(localTriggerRef.value)
-  // If local is a component instance, try to get its $el, otherwise use local itself
-  // This helps ensure an HTMLElement is passed to useElementWidth
-  return local?.$el ?? local
-})
+const localTriggerRef = ref<HTMLElement | null>(null)
 
 // Calculate menu width based on the determined source ref
 const menuWidth = computed(() => {
-  const width = useElementWidth(widthSourceRef.value)
+  const width = useElementWidth(props.dropdownWidthRef)
   return width.value ? `${width.value}px` : 'auto'
 })
 

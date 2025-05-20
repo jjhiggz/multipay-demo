@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import { defineEmits, defineProps } from 'vue'
-import RecipientSearch from '@/features/Multipay/ui/RecipientSearch.vue'
+import { defineEmits, defineProps, ref } from 'vue'
+import RecipientSearch, {
+  type RecipientSearchOption,
+} from '@/features/Multipay/ui/RecipientSearch.vue'
 import MoneyInput from '@/features/Multipay/ui/MoneyInput.vue'
 import { Icon } from '@iconify/vue'
 import TableRow from '@/components/ui/table/TableRow.vue'
 import TableCell from '@/components/ui/table/TableCell.vue'
-import type { FERecipient } from '@/features/Multipay/domain/useRecipients'
 import ReasonSearch from '../ReasonSearch.vue'
 
 const props = defineProps<{
@@ -23,11 +24,16 @@ const emit = defineEmits<{
   (e: 'remove'): void
 }>()
 
-const handleRecipientSelected = (recipient: FERecipient | null) => {
-  if (recipient) {
+const recipientSearchContainerRef = ref<HTMLElement | null>(null)
+const reasonSearchContainerRef = ref<HTMLElement | null>(null)
+
+const handleRecipientSelected = (
+  selectedOption: RecipientSearchOption | null,
+) => {
+  if (selectedOption) {
     emit('update', {
-      name: recipient.recipientDisplayName,
-      currencyCode: recipient.currencyCode as CurrencyCode,
+      name: selectedOption.label,
+      currencyCode: selectedOption.currencyCode as CurrencyCode,
     })
   }
 }
@@ -37,8 +43,11 @@ const handleRecipientSelected = (recipient: FERecipient | null) => {
   <TableRow
     class="data-[state=selected]:bg-muted hover:bg-muted/50 border-b h-10 transition-colors"
   >
-    <TableCell>
-      <RecipientSearch @recipientSelected="handleRecipientSelected" />
+    <TableCell class="w-[220px]" ref="recipientSearchContainerRef">
+      <RecipientSearch
+        @recipientSelected="handleRecipientSelected"
+        :dropdownWidthRef="recipientSearchContainerRef"
+      />
     </TableCell>
     <TableCell>
       <MoneyInput
@@ -47,18 +56,20 @@ const handleRecipientSelected = (recipient: FERecipient | null) => {
         :disabled="false"
         :currency-selectable="false"
         @update:modelValue="
-          (value) => emit('update', { amount: parseFloat(String(value)) })
+          (value: string | number) =>
+            emit('update', { amount: parseFloat(String(value)) })
         "
         class="w-full"
       />
     </TableCell>
-    <TableCell class="w-[250px]">
+    <TableCell class="w-[200px]" ref="reasonSearchContainerRef">
       <ReasonSearch
         :model-value="props.reason"
         @update:modelValue="
           (value: string | null) => emit('update', { reason: value || '' })
         "
         class="w-full"
+        :dropdownWidthRef="reasonSearchContainerRef"
       />
     </TableCell>
     <TableCell>

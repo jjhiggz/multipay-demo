@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 import { defineEmits, defineProps, computed, ref } from 'vue'
-import RecipientSearch from '@/features/Multipay/ui/RecipientSearch.vue'
+import RecipientSearch, {
+  type RecipientSearchOption,
+} from '@/features/Multipay/ui/RecipientSearch.vue'
 import MoneyInput from '@/features/Multipay/ui/MoneyInput.vue'
 import { Icon } from '@iconify/vue'
 import {
@@ -12,7 +14,6 @@ import {
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import type { FERecipient } from '@/features/Multipay/domain/useRecipients'
 import ReasonSearch from '../ReasonSearch.vue'
 
 const props = defineProps<{
@@ -48,11 +49,13 @@ const handleReferenceInput = (e: Event) => {
   emit('update', { reference: value })
 }
 
-const handleRecipientSelected = (recipient: FERecipient | null) => {
-  if (recipient) {
+const handleRecipientSelected = (
+  selectedOption: RecipientSearchOption | null,
+) => {
+  if (selectedOption) {
     emit('update', {
-      name: recipient.recipientDisplayName,
-      currencyCode: recipient.currencyCode as CurrencyCode,
+      name: selectedOption.label,
+      currencyCode: selectedOption.currencyCode as CurrencyCode,
     })
   }
 }
@@ -117,7 +120,7 @@ const reasonSearchContainerRef = ref<HTMLElement | null>(null)
           />
         </div>
 
-        <div class="space-y-1">
+        <div class="space-y-1" ref="reasonSearchContainerRef">
           <Label class="font-normal text-gray-500">Reason</Label>
           <ReasonSearch
             :model-value="props.reason"

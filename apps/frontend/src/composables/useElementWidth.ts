@@ -1,6 +1,8 @@
 import { ref, watch, onMounted, onBeforeUnmount, type Ref } from 'vue'
 
-export function useElementWidth(target: Ref<HTMLElement | null> | HTMLElement | null | undefined) {
+export function useElementWidth(
+  target: Ref<HTMLElement | null> | HTMLElement | null | undefined,
+) {
   const width = ref(0)
   let observer: ResizeObserver | null = null
 
@@ -18,6 +20,7 @@ export function useElementWidth(target: Ref<HTMLElement | null> | HTMLElement | 
 
   onMounted(() => {
     const el = getElement()
+    console.log({ el })
     if (el) {
       observer = new ResizeObserver(() => updateWidth())
       observer.observe(el)
