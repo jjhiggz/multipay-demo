@@ -3,7 +3,7 @@
     <ComboboxAnchor as-child>
       <ComboboxTrigger as-child>
         <Button
-          :ref="localTriggerRef"
+          :ref="triggerRefToUse"
           variant="outline"
           :class="cn('w-full justify-between', props.class)"
           :aria-expanded="open"
@@ -42,7 +42,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, type Ref, toValue, type VNodeRef } from 'vue'
+import {
+  ref,
+  computed,
+  watch,
+  type Ref,
+  toValue,
+  type VNodeRef,
+  type VNode,
+} from 'vue'
 import { Check, ChevronsUpDown } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import {
@@ -67,7 +75,7 @@ const props = defineProps<{
   modelValue: string | null
   class?: string
   menuClass?: string
-  dropdownWidthRef?: Ref<HTMLElement | null> | HTMLElement | null
+  dropdownWidthRef?: Ref<VNodeRef | null> | VNodeRef | null
 }>()
 
 const emit = defineEmits<{
@@ -80,23 +88,13 @@ const { data: allReasons, isLoading, isError } = useReasonsForTransfer()
 const searchQuery = ref('')
 const open = ref(false)
 
-const localTriggerRef = ref<VNodeRef | null>(null) // Ref for the internal Button component
-
-const widthSourceRef = computed(() => {
-  const externalElement = toValue(props.dropdownWidthRef)
-  if (externalElement) return externalElement
-
-  const triggerButtonComponentInstance = toValue(localTriggerRef.value)
-  // If triggerButtonComponentInstance is a Vue component instance, its root DOM node is $el.
-  // If it's already an HTMLElement (e.g. functional component exposing element directly),
-  // or if $el is not available, we fall back to the instance itself hoping it's an element.
-  return triggerButtonComponentInstance?.$el ?? triggerButtonComponentInstance
-})
+const localTriggerRef = ref<HTMLElement | null>(null)
+const triggerRefToUse = computed(
+  () => props.dropdownWidthRef ?? localTriggerRef,
+)
 
 const menuWidth = computed(() => {
-  const width = useElementWidth(
-    widthSourceRef.value as HTMLElement | Ref<HTMLElement | null>,
-  )
+  const width = useElementWidth(props.dropdownWidthRef)
   return width.value ? `${width.value}px` : 'auto'
 })
 

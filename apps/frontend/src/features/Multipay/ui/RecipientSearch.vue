@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, type Ref } from 'vue'
+import { ref, computed, onMounted, watch, type Ref, type VNodeRef } from 'vue'
 import { Check, ChevronsUpDown, Search } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import {
@@ -67,7 +67,7 @@ const props = defineProps<{
   class?: string
   menuClass?: string
   triggerRef?: any
-  dropdownWidthRef?: Ref<HTMLElement | null> | HTMLElement | null
+  dropdownWidthRef?: Ref<VNodeRef | null> | VNodeRef | null
 }>()
 
 // This is the transformed option type for the combobox internal state and for emitting

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import { defineEmits, defineProps, computed, ref } from 'vue'
+import { defineEmits, defineProps, computed, ref, type VNodeRef } from 'vue'
 import RecipientSearch, {
   type RecipientSearchOption,
 } from '@/features/Multipay/ui/RecipientSearch.vue'
@@ -60,8 +60,8 @@ const handleRecipientSelected = (
   }
 }
 
-const recipientSearchContainerRef = ref<HTMLElement | null>(null)
-const reasonSearchContainerRef = ref<HTMLElement | null>(null)
+const recipientSearchContainerRef = ref<VNodeRef | null>(null)
+const reasonSearchContainerRef = ref<VNodeRef | null>(null)
 </script>
 
 <template>

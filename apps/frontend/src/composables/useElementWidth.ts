@@ -5,10 +5,11 @@ import {
   onBeforeUnmount,
   type Ref,
   shallowRef,
+  type VNodeRef,
 } from 'vue'
 
 export function useElementWidth(
-  target: Ref<HTMLElement | null> | HTMLElement | null | undefined,
+  target: Ref<VNodeRef | null> | VNodeRef | null | undefined,
 ) {
   const width = ref(0)
   const observer = shallowRef<ResizeObserver | null>(null)
