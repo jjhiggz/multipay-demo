@@ -31,11 +31,10 @@ const isComplete = props.name.trim() !== '' && props.amount !== null && props.re
     <TableCell>
       <RecipientSearch
         @update:modelValue="
-          (option) =>
-            emit('update', {
-              name: option.label,
-              currencyCode: option.currencyCode,
-            })
+          emit('update', {
+            name: $event?.label,
+            currencyCode: $event?.currencyCode,
+          })
         "
       />
     </TableCell>

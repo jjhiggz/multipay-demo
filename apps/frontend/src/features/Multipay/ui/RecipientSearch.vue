@@ -49,11 +49,9 @@ import {
   ComboboxList,
   ComboboxTrigger,
 } from '@/components/ui/combobox'
-import { orpcVueQuery } from '../../../services/orpcClient'
-import { authClient } from '../../../services/authClient'
-import { useQuery } from '@tanstack/vue-query'
 import Button from '@/components/ui/button/Button.vue'
 import { useElementWidth } from '@/composables/useElementWidth'
+import { useRecipients } from '@/features/Multipay/domain/useRecipients'
 
 const props = defineProps<{
   class?: string
@@ -66,11 +64,16 @@ const props = defineProps<{
 export type RecipientSearchOption = {
   label: string
   value: string
+  recipientId: number
+  currencyCode: string
+  bankCountryCode: string
+  bankName: string
+  accountNumber: string
   [key: string]: any
 }
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: RecipientSearchOption | null): void
+  (e: 'update:modelValue', value: (typeof recipients)[][number] | null): void
 }>()
 
 const localTriggerRef = ref<HTMLElement | null>(null)
@@ -80,21 +83,9 @@ const menuWidth = computed(() => {
   return width.value ? `${width.value}px` : 'auto'
 })
 
-const activeOrg = authClient.useActiveOrganization()
-const organizationId = computed(() => activeOrg.value?.data?.id ?? '')
-const options = computed(() =>
-  orpcVueQuery.recipients.queryOptions({
-    input: {
-      organizationId: organizationId,
-    },
-  }),
-)
-
-const { data: recipientsData, isPending: isLoading, error } = useQuery(options)
-
-const recipients = computed(() => {
-  if (!recipientsData.value?.recipients) return []
-  return recipientsData.value.recipients.map((r) => ({
+const { recipients } = useRecipients()
+const recipientOptions = computed(() => {
+  return recipients.value.map((r) => ({
     label: r.recipient.recipientDisplayName,
     value: String(r.recipient.recipientId),
     ...r.recipient,
@@ -103,11 +94,28 @@ const recipients = computed(() => {
 
 const search = ref('')
 const filteredRecipients = computed(() => {
-  if (!search.value) return recipients.value.slice(0, 8)
-  return recipients.value
+  if (!search.value) return recipientOptions.value.slice(0, 8)
+  return recipientOptions.value
     .filter((r) => r.label.toLowerCase().includes(search.value.toLowerCase()))
     .slice(0, 8)
 })
 
-const value = ref<(typeof recipients.value)[0] | null>(null)
+const value = ref<RecipientSearchOption | null>(null)
+
+watch(value, (val) => {
+  emit(
+    'update:modelValue',
+    val
+      ? {
+          label: val.label,
+          value: val.value,
+          recipientId: val.recipientId,
+          currencyCode: val.currencyCode,
+          bankCountryCode: val.bankCountryCode,
+          bankName: val.bankName,
+          accountNumber: val.accountNumber,
+        }
+      : null,
+  )
+})
 </script>

@@ -130,16 +130,6 @@ const onRecievingCurrencySelected = (val: CurrencyDropdownOption | null) =>
   (recievingCurrency.value = val)
 
 const recipients = ref<MultiPayRecipient[]>([
-  { id: 1, name: 'John Doe', amount: 100, reason: 'Payment', currencyCode: 'USD', reference: '' },
-  { id: 2, name: '', amount: null, reason: '', currencyCode: 'USD', reference: '' },
-  {
-    id: 3,
-    name: 'Robert Johnson',
-    amount: 300,
-    reason: 'Payment',
-    currencyCode: 'USD',
-    reference: '',
-  },
 ])
 
 // --- Collapsible open state ---
