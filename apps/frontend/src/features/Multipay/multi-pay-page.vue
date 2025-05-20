@@ -143,18 +143,29 @@ const handleOpenChange = (id: number, open: boolean) => {
 }
 
 const addRecipient = () => {
-  const nextId = recipients.value.length > 0 ? Math.max(...recipients.value.map((r: MultiPayRecipient) => r.id)) + 1 : 1
+  const nextId = recipients.value.length > 0
+    ? Math.max(...recipients.value.map((r: MultiPayRecipient) => r.id)) + 1
+    : 1
   recipients.value = [
     ...recipients.value,
-    { id: nextId, name: '', amount: null, reason: '', currencyCode: 'USD' as CurrencyCode, reference: '' },
+    {
+      id: nextId,
+      name: '',
+      amount: null,
+      reason: '',
+      currencyCode: 'USD' as CurrencyCode,
+      reference: ''
+    },
   ]
 }
 
 const removeRecipient = (id: number) => {
-  recipients.value = recipients.value.filter((r: MultiPayRecipient) => r.id !== id)
+  recipients.value = [...recipients.value].filter((r: MultiPayRecipient) => r.id !== id)
 }
 
 const updateRecipient = (id: number, newData: Partial<MultiPayRecipient>) => {
-  recipients.value = recipients.value.map((r: MultiPayRecipient) => (r.id === id ? { ...r, ...newData } : r))
+  recipients.value = [...recipients.value].map((r: MultiPayRecipient) =>
+    r.id === id ? { ...r, ...newData } : { ...r }
+  )
 }
 </script>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import { defineEmits, defineProps, ref } from 'vue'
+import { ref } from 'vue'
 import RecipientSearch, {
   type RecipientSearchOption,
 } from '@/features/Multipay/ui/RecipientSearch.vue'
@@ -9,6 +9,7 @@ import { Icon } from '@iconify/vue'
 import TableRow from '@/components/ui/table/TableRow.vue'
 import TableCell from '@/components/ui/table/TableCell.vue'
 import ReasonSearch from '../ReasonSearch.vue'
+import { Button } from '@/components/ui/button'
 
 const props = defineProps<{
   id: number
@@ -85,13 +86,14 @@ const handleRecipientSelected = (
       />
     </TableCell>
     <TableCell>
-      <button
+      <Button
         @click="$emit('remove')"
         title="Remove Recipient"
         class="text-red-500 hover:text-red-700"
+        variant="ghost"
       >
         <Icon :icon="'carbon:trash-can'" class="w-5 h-5" />
-      </button>
+      </Button>
     </TableCell>
   </TableRow>
 </template>

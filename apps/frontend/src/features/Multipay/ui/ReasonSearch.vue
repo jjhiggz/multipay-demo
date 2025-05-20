@@ -3,7 +3,7 @@
     <ComboboxAnchor as-child>
       <ComboboxTrigger as-child>
         <Button
-          :ref="localTriggerRef as any"
+          :ref="localTriggerRef"
           variant="outline"
           :class="cn('w-full justify-between', props.class)"
           :aria-expanded="open"
@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, type Ref, toValue } from 'vue'
+import { ref, computed, watch, type Ref, toValue, type VNodeRef } from 'vue'
 import { Check, ChevronsUpDown } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import {
@@ -64,7 +64,7 @@ import {
 import { useElementWidth } from '@/composables/useElementWidth'
 
 const props = defineProps<{
-  modelValue: string | null // The value of the selected reason (FEReasonForTransfer['value'])
+  modelValue: string | null
   class?: string
   menuClass?: string
   dropdownWidthRef?: Ref<HTMLElement | null> | HTMLElement | null
@@ -75,21 +75,31 @@ const emit = defineEmits<{
   (e: 'reasonSelected', reason: FEReasonForTransfer | null): void
 }>()
 
-const { data: allReasons, isLoading, isError } = useReasonsForTransfer() // Add isLoading, isError if needed for UI
+const { data: allReasons, isLoading, isError } = useReasonsForTransfer()
 
 const searchQuery = ref('')
-const open = ref(false) // To control combobox open state if needed, or rely on internal
+const open = ref(false)
 
-// Ref for the internal trigger button
-const localTriggerRef = ref<HTMLElement | null>(null)
+const localTriggerRef = ref<VNodeRef | null>(null) // Ref for the internal Button component
 
-// Calculate menu width based on the determined source ref
+const widthSourceRef = computed(() => {
+  const externalElement = toValue(props.dropdownWidthRef)
+  if (externalElement) return externalElement
+
+  const triggerButtonComponentInstance = toValue(localTriggerRef.value)
+  // If triggerButtonComponentInstance is a Vue component instance, its root DOM node is $el.
+  // If it's already an HTMLElement (e.g. functional component exposing element directly),
+  // or if $el is not available, we fall back to the instance itself hoping it's an element.
+  return triggerButtonComponentInstance?.$el ?? triggerButtonComponentInstance
+})
+
 const menuWidth = computed(() => {
-  const width = useElementWidth(props.dropdownWidthRef)
+  const width = useElementWidth(
+    widthSourceRef.value as HTMLElement | Ref<HTMLElement | null>,
+  )
   return width.value ? `${width.value}px` : 'auto'
 })
 
-// The `v-model` of the Combobox will hold the full FEReasonForTransfer object
 const selectedValue = computed<FEReasonForTransfer | null>({
   get() {
     return allReasons.value?.find((r) => r.value === props.modelValue) || null
@@ -103,7 +113,7 @@ const selectedValue = computed<FEReasonForTransfer | null>({
 const filteredReasons = computed(() => {
   if (isLoading.value || isError.value || !allReasons.value) return []
   if (!searchQuery.value) {
-    return allReasons.value.slice(0, 10) // Show top 10 or all if less
+    return allReasons.value.slice(0, 10)
   }
   return allReasons.value
     .filter((reason) =>
@@ -112,13 +122,11 @@ const filteredReasons = computed(() => {
     .slice(0, 10)
 })
 
-// Handler for when an item is selected from the list
 const handleSelect = (reason: FEReasonForTransfer) => {
-  selectedValue.value = reason // This will trigger the computed setter
-  open.value = false // Close the combobox
+  selectedValue.value = reason
+  open.value = false
 }
 
-// Watch for external changes to modelValue to update internal selectedValue if needed
 watch(
   () => props.modelValue,
   (newValue) => {
@@ -134,7 +142,4 @@ watch(
     }
   },
 )
-
-// Consider adding loading/error states in the template if desired
-// For example, disable input or show a message within ComboboxList
 </script>
