@@ -23,7 +23,11 @@
           stroke-width="2"
           viewBox="0 0 24 24"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
     </slot>
@@ -47,7 +51,13 @@
                 viewBox="0 0 24 24"
               >
                 <circle cx="11" cy="11" r="7" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-linecap="round" />
+                <line
+                  x1="21"
+                  y1="21"
+                  x2="16.65"
+                  y2="16.65"
+                  stroke-linecap="round"
+                />
               </svg>
             </span>
             <input
@@ -56,11 +66,16 @@
               placeholder="Search..."
               v-model="searchValue"
               @input="onSearch"
+              :disabled="
+                disabled ||
+                (options.length === 0 && !$slots['no-options']) ||
+                (options.length === 0 && !!$slots['no-options'])
+              "
             />
           </div>
         </div>
         <div class="flex-1 overflow-y-auto custom-scrollbar">
-          <ul>
+          <ul v-if="options.length > 0">
             <li
               v-for="(option, idx) in options"
               :key="option.value"
@@ -70,7 +85,8 @@
                 {
                   'bg-gray-100 text-gray-900':
                     idx === activeIndex && option.value !== modelValue?.value,
-                  'bg-blue-50 border border-blue-100': option.value === modelValue?.value,
+                  'bg-blue-50 border border-blue-100':
+                    option.value === modelValue?.value,
                   'font-bold': option.value === modelValue?.value,
                 },
               ]"
@@ -85,6 +101,9 @@
               </slot>
             </li>
           </ul>
+          <div v-else class="p-4 text-muted-foreground text-sm text-center">
+            <slot name="no-options"> No options available. </slot>
+          </div>
         </div>
         <div
           v-if="$slots.footer"
@@ -97,7 +116,11 @@
   </div>
 </template>
 
-<script lang="ts" setup generic="T extends { label: string; value: string | number }">
+<script
+  lang="ts"
+  setup
+  generic="T extends { label: string; value: string | number }"
+>
 /**
  * Generic Dropdown component.
  *
@@ -109,9 +132,15 @@
  *   - option: Custom render for each dropdown option. Receives { option }.
  *   - trigger: Full custom trigger (overrides chevron and all content).
  *   - footer: Custom footer always visible at the bottom of the dropdown menu.
+ *   - no-options: Content to display when the options array is empty.
  */
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
-import { dropdownVariants, triggerVariants, menuVariants, itemVariants } from './dropdownVariants'
+import {
+  dropdownVariants,
+  triggerVariants,
+  menuVariants,
+  itemVariants,
+} from './dropdownVariants'
 
 export interface BaseDropdownOption {
   label: string
@@ -152,13 +181,21 @@ const selectedLabel = computed(() => {
 
 const rootClass = computed(() => [dropdownVariants(props.variant), props.class])
 const triggerClass = computed(() => [triggerVariants(props.variant)])
-const menuClassComputed = computed(() => [menuVariants(props.variant), props.menuClass])
+const menuClassComputed = computed(() => [
+  menuVariants(props.variant),
+  props.menuClass,
+])
 const itemClassComputed = (option: OptionType) => [
-  itemVariants(props.variant, option.value === (props.modelValue?.value ?? props.modelValue)),
+  itemVariants(
+    props.variant,
+    option.value === (props.modelValue?.value ?? props.modelValue),
+  ),
   props.itemClass,
 ]
 
-const menuStyle = computed(() => (menuWidth.value ? { minWidth: menuWidth.value } : {}))
+const menuStyle = computed(() =>
+  menuWidth.value ? { minWidth: menuWidth.value } : {},
+)
 
 const updateMenuWidth = () => {
   if (triggerRef.value) {
