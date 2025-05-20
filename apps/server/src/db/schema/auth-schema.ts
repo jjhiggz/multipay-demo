@@ -1,4 +1,9 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  integer,
+  primaryKey,
+} from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -214,20 +219,34 @@ export const currency = sqliteTable("currency", {
 });
 
 // --- UserToCurrencies Join Table ---
-export const userToCurrencies = sqliteTable("user_to_currencies", {
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  currencyIsoCode: text("currency_iso_code")
-    .notNull()
-    .references(() => currency.isoCode, { onDelete: "cascade" }),
-  amountPrecision: integer("amount_precision").notNull(),
-  canBuy: integer("can_buy", { mode: "boolean" }).notNull(),
-  canSell: integer("can_sell", { mode: "boolean" }).notNull(),
-  sameCurrencySupported: integer("same_currency_supported", {
-    mode: "boolean",
-  }).notNull(),
-  marketOrderEnabled: integer("market_order_enabled", {
-    mode: "boolean",
-  }).notNull(),
-});
+export const userToCurrencies = sqliteTable(
+  "user_to_currencies",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    currencyIsoCode: text("currency_iso_code")
+      .notNull()
+      .references(() => currency.isoCode, { onDelete: "cascade" }),
+    amountPrecision: integer("amount_precision").notNull(),
+    canBuy: integer("can_buy", { mode: "boolean" }).notNull(),
+    canSell: integer("can_sell", { mode: "boolean" }).notNull(),
+    sameCurrencySupported: integer("same_currency_supported", {
+      mode: "boolean",
+    }).notNull(),
+    marketOrderEnabled: integer("market_order_enabled", {
+      mode: "boolean",
+    }).notNull(),
+  },
+  (table) => {
+    return {
+      // Define a composite primary key on userId and currencyIsoCode
+      pk: primaryKey({ columns: [table.userId, table.currencyIsoCode] }),
+      // Alternatively, if you want an auto-incrementing id and a separate unique constraint:
+      // userIdCurrencyUnique: uniqueIndex("user_currency_unique_idx").on(
+      //   table.userId,
+      //   table.currencyIsoCode
+      // ),
+    };
+  }
+);

@@ -2,6 +2,7 @@ import { VALID_CURRENCY_CODES } from "@/constants/currency.constants";
 import { seedHelpers } from "./helpers/seed-helpers";
 import { db } from "..";
 import { currency } from "../schema/auth-schema";
+import { tag } from "@/utils/promise-handlers";
 
 const {
   resetDatabase,
@@ -22,7 +23,6 @@ const main = async () => {
       }))
     )
     .onConflictDoNothing();
-
   // Create users
   const jonAmerica = await createUser({
     email: "jon@achairs.com",
@@ -42,7 +42,7 @@ const main = async () => {
       ["MXN", {}],
       ["SGD", {}],
     ],
-  });
+  }).then(tag("created jon@achairs.com"));
 
   const canadianUser = await createUser({
     email: "canada@achairs.com",
@@ -70,7 +70,7 @@ const main = async () => {
         },
       ],
     ],
-  });
+  }).then(tag("created canada@achairs.com"));
 
   const indiaUser = await createUser({
     email: "india@achairs.com",
@@ -98,46 +98,54 @@ const main = async () => {
         },
       ],
     ],
-  });
+  }).then(tag("created india@achairs.com"));
 
   const americanChairs = await createOrganization({
     name: "AmericanChairs",
     slug: "american-chairs",
-  });
+  }).then(tag("created american-chairs org"));
 
   await addUserToOrganization({
     userId: jonAmerica.user.id,
     organizationId: americanChairs.id,
     role: "owner",
-  });
+  }).then(tag("added jon to american-chairs"));
+
   await addUserToOrganization({
     userId: canadianUser.user.id,
     organizationId: americanChairs.id,
     role: "member",
-  });
+  }).then(tag("added canada to american-chairs"));
+
   await addUserToOrganization({
     userId: indiaUser.user.id,
     organizationId: americanChairs.id,
     role: "member",
-  });
+  }).then(tag("added india to american-chairs"));
 
-  // Create a profile for jon@achairs.com
-  await createProfile({ email: jonAmerica.user.email }, {});
-  // Create a profile for canada@achairs.com
-  await createProfile({ email: canadianUser.user.email }, { region: "CA" });
-  // Create a profile for india@achairs.com
-  await createProfile({ email: indiaUser.user.email }, { region: "IN" });
-
-  await seedHelpers.createRecipientsForOrganization(
-    americanChairs.id,
-    seedHelpers.getRecipientData({
-      allowedCurrencies: ["USD", "CAD", "GBP"],
-      count: 300,
-    })
+  // Create profiles
+  await createProfile({ email: jonAmerica.user.email }, {}).then(
+    tag("created jon profile")
   );
+
+  await createProfile(
+    { email: canadianUser.user.email },
+    { region: "CA" }
+  ).then(tag("created canada profile"));
+
+  await createProfile({ email: indiaUser.user.email }, { region: "IN" }).then(
+    tag("created india profile")
+  );
+
+  await seedHelpers
+    .createRecipientsForOrganization(
+      americanChairs.id,
+      seedHelpers.getRecipientData({
+        allowedCurrencies: ["USD", "CAD", "GBP"],
+        count: 300,
+      })
+    )
+    .then(tag("created 300 recipients for american-chairs"));
 };
 
-main().catch((err) => {
-  console.error("Seeding failed:", err);
-  process.exit(1);
-});
+main();

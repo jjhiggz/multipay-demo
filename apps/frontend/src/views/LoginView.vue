@@ -93,6 +93,7 @@ const handleLogin = async () => {
       email: email.value,
       password: password.value,
     })
+
     if (authError) {
       throw new Error(authError.message || 'Login failed')
     }
