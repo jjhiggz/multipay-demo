@@ -10,6 +10,7 @@ import { newAppRouter } from "./routers";
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod";
 import { RPCHandler } from "@orpc/server/fetch";
+import { updateUSDRatesOnInterval } from "scripts/update-conversion-rates";
 
 const lag = 3000;
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -38,6 +39,11 @@ app.use(
 
 app.on(["POST", "GET"], "/api/auth/**", async (c) => {
   return auth.handler(c.req.raw);
+});
+
+app.use(async (_, next) => {
+  updateUSDRatesOnInterval(5000);
+  return next();
 });
 
 // const handler = new RPCHandler(appRouter);
