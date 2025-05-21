@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest'
 import { useElementWidth } from '../useElementWidth'
+import type { VNodeRef } from 'vue'
 
 // Adjusted to match actual ResizeObserverCallback signature
 type ResizeCallback = (
@@ -40,18 +41,18 @@ describe('useElementWidth', () => {
   })
 
   it('should return 0 for a null target', () => {
-    const target = ref<HTMLElement | null>(null)
+    const target = ref<VNodeRef | null>(null)
     const width = useElementWidth(target)
     expect(width.value).toBe(0)
   })
 
   it.skip('should initialize with elements offsetWidth and observe it', async () => {
-    const mockElement = document.createElement('div')
+    const mockElement = document.createElement('div') as unknown as VNodeRef
     Object.defineProperty(mockElement, 'offsetWidth', {
       configurable: true,
       value: 100,
     })
-    const target = ref<HTMLElement | null>(mockElement)
+    const target = ref<VNodeRef | null>(mockElement)
 
     const TestComponent = {
       template: '<div ref="el"></div>',
@@ -71,12 +72,12 @@ describe('useElementWidth', () => {
   })
 
   it('should update width when ResizeObserver callback is triggered', async () => {
-    const mockElement = document.createElement('div')
+    const mockElement = document.createElement('div') as unknown as VNodeRef
     Object.defineProperty(mockElement, 'offsetWidth', {
       configurable: true,
       value: 150,
     })
-    const target = ref<HTMLElement | null>(mockElement)
+    const target = ref<VNodeRef | null>(mockElement)
 
     let capturedResizeCallback: ResizeCallback | undefined
 
@@ -123,12 +124,12 @@ describe('useElementWidth', () => {
   })
 
   it('should stop observing when target becomes null', async () => {
-    const mockElement = document.createElement('div')
+    const mockElement = document.createElement('div') as unknown as VNodeRef
     Object.defineProperty(mockElement, 'offsetWidth', {
       configurable: true,
       value: 120,
     })
-    const target = ref<HTMLElement | null>(mockElement)
+    const target = ref<VNodeRef | null>(mockElement)
 
     const TestComponent = {
       template: '<div></div>',
@@ -156,12 +157,12 @@ describe('useElementWidth', () => {
   })
 
   it('should clean up on unmount', async () => {
-    const mockElement = document.createElement('div')
+    const mockElement = document.createElement('div') as unknown as VNodeRef
     Object.defineProperty(mockElement, 'offsetWidth', {
       configurable: true,
       value: 130,
     })
-    const target = ref<HTMLElement | null>(mockElement)
+    const target = ref<VNodeRef | null>(mockElement)
 
     const TestComponent = {
       template: '<div></div>',
@@ -185,18 +186,20 @@ describe('useElementWidth', () => {
   })
 
   it('should switch observation when target element changes', async () => {
-    const initialMockElement = document.createElement('div')
+    const initialMockElement = document.createElement(
+      'div',
+    ) as unknown as VNodeRef
     Object.defineProperty(initialMockElement, 'offsetWidth', {
       configurable: true,
       value: 100,
     })
-    const newMockElement = document.createElement('div')
+    const newMockElement = document.createElement('div') as unknown as VNodeRef
     Object.defineProperty(newMockElement, 'offsetWidth', {
       configurable: true,
       value: 200,
     })
 
-    const target = ref<HTMLElement | null>(initialMockElement)
+    const target = ref<VNodeRef | null>(initialMockElement)
 
     // For this test, we want to track calls on two distinct observer instances
     const initialObserverInstanceMocks = createResizeObserverMock()
@@ -246,7 +249,7 @@ describe('useElementWidth', () => {
   })
 
   it('should handle direct HTMLElement target (not a Ref)', async () => {
-    const mockElement = document.createElement('div')
+    const mockElement = document.createElement('div') as unknown as VNodeRef
     Object.defineProperty(mockElement, 'offsetWidth', {
       configurable: true,
       value: 250,
