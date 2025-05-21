@@ -7,7 +7,6 @@ import {
   xeProfileResponseSchema,
   mapToXeProfileResponse,
 } from "../serializers/profile-to-xe-profile";
-import { s } from "@/zod-schemas";
 import { handleZodFailure } from "@/utils/promise-handlers";
 import { SyncPromise } from "@/utils/sync-promise";
 import {
@@ -18,6 +17,13 @@ import { os } from "@orpc/server";
 import { userExistsMiddleware, type Context } from "../lib/context";
 import { systemFieldsOutputSchema } from "@/db/schema/system-fields.schema";
 import { defaultSystemFieldsReturn } from "@/constants/system-fields-return";
+import {
+  createQuoteInputSchema,
+  createQuoteResponse,
+  getQuoteById,
+  getQuoteResponseSchema,
+} from "@/serializers/get-quotes";
+import { s } from "@/zod-schemas";
 
 const healthcheckRoute = os
   .route({ method: "GET", path: "/healthcheck" })
@@ -201,6 +207,31 @@ const getSystemFieldsRoute = os
     return defaultSystemFieldsReturn;
   });
 
+const postQuote = os
+  .route({ method: "POST", path: "/quote" })
+  .input(createQuoteInputSchema)
+  .output(getQuoteResponseSchema)
+  .handler(async (c) => {
+    return createQuoteResponse(c.input);
+  });
+
+const getQuote = os
+  .route({ method: "GET", path: "/quote/:quoteId" })
+  .input(
+    z.object({
+      quoteId: z.string(),
+      refreshPaymentMethods: z.boolean(),
+      paymentMethod: z.string().optional(),
+      language: z.string().optional(),
+      country: z.string().optional(),
+      platformType: z.string().optional(),
+    })
+  )
+  .output(getQuoteResponseSchema)
+  .handler(async (c) => {
+    return getQuoteById(c.input.quoteId);
+  });
+
 // New unified router object
 export const newAppRouter = {
   healthcheck: healthcheckRoute,
@@ -208,6 +239,7 @@ export const newAppRouter = {
   signIn: signInRoute,
   getProfile: getProfileRoute,
   getCurrencies: getCurrenciesRoute,
+  postQuote,
   addCurrency: addCurrencyRoute,
   removeCurrency: removeCurrencyRoute,
   recipients: os
@@ -221,6 +253,7 @@ export const newAppRouter = {
     .input(z.object({ email: z.string().email() }))
     .output(xeProfileResponseSchema)
     .handler(legacyXeProfileHandler),
+  getQuote,
 };
 
 export type NewAppRouter = typeof newAppRouter;

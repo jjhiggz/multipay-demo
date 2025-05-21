@@ -63,6 +63,7 @@ export const updateUSDRatesOnInterval = (
   });
 
   const updateConversionRates = async () => {
+    console.log("Making New Rates");
     const newRates = createToUSDRates();
     await Bun.write(
       "./conversion-rates-to-usd.json",
@@ -87,9 +88,11 @@ export const updateUSDRatesOnInterval = (
     });
   };
 
+  updateConversionRates();
   startAccurateTimer(() => {
-    console.log("updated conversion rates");
     updateConversionRates();
     if (debug) logUsefulShit();
   }, updateInterval);
 };
+
+updateUSDRatesOnInterval(15000);

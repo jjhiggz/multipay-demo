@@ -42,6 +42,7 @@
     "db:studio": "drizzle-kit studio",
     "dev": "bun run --hot src/index.ts",
     "lint": "eslint .",
+    "simulate-conversion-rates": "bun scripts/update-conversion-rates.ts",
     "start": "bun run dist/src/index.js"
   },
   "type": "module"

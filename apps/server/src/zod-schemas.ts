@@ -17,10 +17,13 @@ import {
   type CurrencyCode,
 } from "./constants/currency.constants";
 import { z } from "zod";
+import { countryCodes, type CountryCode } from "./constants/country.constants";
 
 export const currencyCodeSchema = z.enum(
   VALID_CURRENCY_CODES.map((n) => n.code) as [CurrencyCode]
 );
+
+export const countryCodeSchema = z.enum(countryCodes as [CountryCode]);
 
 // User schemas
 export const s = {

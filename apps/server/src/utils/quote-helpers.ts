@@ -1,5 +1,17 @@
 import type { CurrencyCode } from "@/constants/currency.constants";
 
+export const getRate = async ({
+  from,
+  to,
+}: {
+  from: CurrencyCode;
+  to: CurrencyCode;
+}): Promise<number> => {
+  const toUSDRates = await getUSDConversionRates();
+  const rate = toUSDRates[from] / toUSDRates[to];
+  return rate;
+};
+
 export const convertAmount = async ({
   from,
   to,

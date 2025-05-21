@@ -10,7 +10,7 @@ type CountryData = {
   officialLanguageNameEn: string;
   officialLanguageNameLocal: string;
   countryCallingCode: string;
-  areaCodes?: any[];
+  areaCodes?: string[];
   region: string;
   flag: string;
 };
