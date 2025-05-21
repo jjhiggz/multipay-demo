@@ -17,7 +17,8 @@ import {
   type CurrencyCode,
 } from "./constants/currency.constants";
 import { z } from "zod";
-const currencyCode = z.enum(
+
+export const currencyCodeSchema = z.enum(
   VALID_CURRENCY_CODES.map((n) => n.code) as [CurrencyCode]
 );
 
@@ -25,18 +26,18 @@ const currencyCode = z.enum(
 export const s = {
   currency: {
     insert: createInsertSchema(currency, {
-      isoCode: currencyCode,
+      isoCode: currencyCodeSchema,
     }),
     select: createSelectSchema(currency, {
-      isoCode: currencyCode,
+      isoCode: currencyCodeSchema,
     }),
   },
   userToCurrencies: {
     insert: createInsertSchema(userToCurrencies, {
-      currencyIsoCode: currencyCode,
+      currencyIsoCode: currencyCodeSchema,
     }),
     select: createSelectSchema(userToCurrencies, {
-      currencyIsoCode: currencyCode,
+      currencyIsoCode: currencyCodeSchema,
     }),
   },
   user: {
@@ -77,7 +78,7 @@ export const s = {
     refined: createInsertSchema(recipient, {
       recipientDisplayName: (schema) => schema.min(1),
       currencyCode: (schema) =>
-        schema.refine((val) => currencyCode.safeParse(val).success, {
+        schema.refine((val) => currencyCodeSchema.safeParse(val).success, {
           message: "Invalid currency code",
         }),
       bankCountryCode: (schema) => schema.length(2),
@@ -86,15 +87,15 @@ export const s = {
   },
   profile: {
     insert: createInsertSchema(profile, {
-      expectedTradeCurrency: currencyCode,
-      regionalAccountingCurrency: currencyCode,
-      expectedPayoutCurrency: currencyCode,
+      expectedTradeCurrency: currencyCodeSchema,
+      regionalAccountingCurrency: currencyCodeSchema,
+      expectedPayoutCurrency: currencyCodeSchema,
     }),
     select: createSelectSchema(profile, {
-      expectedTradeCurrency: currencyCode,
-      regionalAccountingCurrency: currencyCode,
-      expectedPayoutCurrency: currencyCode,
+      expectedTradeCurrency: currencyCodeSchema,
+      regionalAccountingCurrency: currencyCodeSchema,
+      expectedPayoutCurrency: currencyCodeSchema,
     }),
   },
-  currencyCode,
+  currencyCode: currencyCodeSchema,
 } as const;
