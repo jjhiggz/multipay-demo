@@ -239,7 +239,6 @@ export const newAppRouter = {
   signIn: signInRoute,
   getProfile: getProfileRoute,
   getCurrencies: getCurrenciesRoute,
-  postQuote,
   addCurrency: addCurrencyRoute,
   removeCurrency: removeCurrencyRoute,
   recipients: os
@@ -253,6 +252,7 @@ export const newAppRouter = {
     .input(z.object({ email: z.string().email() }))
     .output(xeProfileResponseSchema)
     .handler(legacyXeProfileHandler),
+  postQuote,
   getQuote,
 };
 
