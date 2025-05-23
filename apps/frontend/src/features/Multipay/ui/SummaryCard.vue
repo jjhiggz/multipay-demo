@@ -8,7 +8,9 @@
     ]"
     style="max-width: 100vw"
   >
-    <div class="items-center gap-y-2 md:gap-x-6 md:gap-y-0 grid grid-cols-2 md:grid-cols-5">
+    <div
+      class="items-center gap-y-2 md:gap-x-6 md:gap-y-0 grid grid-cols-2 md:grid-cols-5"
+    >
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Total to send</span>
         <span class="mt-0.5 text-gray-900 text-base">{{ totalToSend }}</span>
@@ -19,12 +21,16 @@
       </div>
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Recipients will receive</span>
-        <span class="mt-0.5 text-gray-900 text-base">{{ recipientsWillReceive }}</span>
+        <span class="mt-0.5 text-gray-900 text-base">{{
+          recipientsWillReceive
+        }}</span>
       </div>
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Total to pay</span>
         <span class="mt-0.5 text-gray-900 text-base">{{ totalToPay }}</span>
-        <span class="mt-0.5 text-gray-400 text-xs">Includes fee: {{ fee }}</span>
+        <span class="mt-0.5 text-gray-400 text-xs"
+          >Includes fee: {{ fee }}</span
+        >
       </div>
       <div class="flex md:justify-end col-span-2 md:col-span-1 mt-2 md:mt-0">
         <button
@@ -53,13 +59,45 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  totalToSend: string
-  exchangeRate: string
-  recipientsWillReceive: string
-  totalToPay: string
-  fee: string
+import { computed } from 'vue'
+import type { FEQuote } from '../domain/useGetQuote'
+
+const props = defineProps<{
+  quote: FEQuote | undefined
 }>()
+
+const totalToSend = computed(() => {
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  console.log({ defaultQuote: JSON.parse(JSON.stringify(defaultQuote)) })
+  return `${defaultQuote.sellAmount} ${props.quote.sellCcy}`
+})
+
+const exchangeRate = computed(() => {
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  return `1 ${props.quote.sellCcy} = ${defaultQuote.rate} ${props.quote.buyCcy}`
+})
+
+const recipientsWillReceive = computed(() => {
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  return `${defaultQuote.buyAmount} ${props.quote.buyCcy}`
+})
+
+const totalToPay = computed(() => {
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  return `${defaultQuote.totalCostAmount} ${props.quote.sellCcy}`
+})
+
+const fee = computed(() => {
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  const totalFee =
+    Number(defaultQuote.transferFee) + Number(defaultQuote.paymentMethodFee)
+  return `${totalFee} ${props.quote.sellCcy}`
+})
 
 defineEmits(['continue'])
 </script>

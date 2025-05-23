@@ -71,11 +71,7 @@
         <!-- Recipients Table Placeholder -->
       </div>
       <SummaryCard
-        total-to-send="$1,500.00 USD"
-        exchange-rate="1 USD = 0.92 GBP"
-        recipients-will-receive="£1,380.00 GBP"
-        total-to-pay="$1,515.00 USD"
-        fee="$15.00 USD"
+      :quote="quoteData"
         @continue="() => {}"
       />
     </div>
@@ -83,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import IsolatedPageLayout from '@/layouts/IsolatedPageLayout.vue'
 import CurrencyDropdown, { type CurrencyDropdownOption } from '@/features/Multipay/ui/CurrencyDropdown.vue'
 import ToggleButton from '@/features/Multipay/ui/ToggleButton.vue'
@@ -94,6 +90,8 @@ import SummaryCard from '@/features/Multipay/ui/SummaryCard.vue'
 import CalendarDropdown from '@/features/Multipay/ui/CalendarDropdown.vue'
 import RecipientList from './ui/RecipientList/RecipientList.vue'
 import type { MultiPayRecipient } from './ui/RecipientList/RecipientList.vue'
+import { useCreateQuoteOnInputChange, type UseCreateQuoteInput } from './composables/useCreateQuoteOnInputChange'
+import { useGetQuote } from './domain/useGetQuote'
 
 const { data: profileData } = useProfile()
 
@@ -168,4 +166,35 @@ const updateRecipient = (id: number, newData: Partial<MultiPayRecipient>) => {
     r.id === id ? { ...r, ...newData } : { ...r }
   )
 }
+
+
+const totalAmount = computed(() =>
+// 100
+  recipients.value.reduce((sum, recipient) => sum + (recipient.amount ?? 0), 0)
+)
+
+
+
+
+const quoteInput = computed<UseCreateQuoteInput>(() => ({
+  amount: totalAmount.value,
+  userCountry: 'US',
+  countryTo: 'GB',
+  amountTo: null,
+  sellCcy: typeof sendingCurrency.value === 'string' ? sendingCurrency.value : sendingCurrency.value?.value ?? 'USD',
+  buyCcy: typeof recievingCurrency.value === 'string' ? recievingCurrency.value : recievingCurrency.value?.value ?? 'GBP',
+  fixedCcy: typeof sendingCurrency.value === 'string' ? sendingCurrency.value : sendingCurrency.value?.value ?? 'USD',
+  screen: 'multipay',
+  platformType: 'web',
+  shouldCalcAmountFrom: true,
+  promotionCodes: [],
+  deliveryMethod: 'BankAccount'
+}))
+
+const { quoteId, isLoading } = useCreateQuoteOnInputChange(quoteInput)
+const {data: quoteData} = useGetQuote(quoteId)
+
+
+watch(quoteData, () => console.log(quoteData))
+
 </script>

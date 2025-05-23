@@ -20,10 +20,24 @@ import { defaultSystemFieldsReturn } from "@/constants/system-fields-return";
 import {
   createQuoteInputSchema,
   createQuoteResponse,
+  deliveryMethodSchema,
   getQuoteById,
   getQuoteResponseSchema,
+  individualQuoteSchema,
 } from "@/serializers/get-quotes";
-import { s } from "@/zod-schemas";
+import {
+  countryCodeSchema,
+  countryCodeSchema,
+  currencyCodeSchema,
+  currencyCodeSchema,
+  currencyCodeSchema,
+  s,
+} from "@/zod-schemas";
+import {
+  countryCodes,
+  countryCodes,
+  type CountryCode,
+} from "@/constants/country.constants";
 
 const healthcheckRoute = os
   .route({ method: "GET", path: "/healthcheck" })
@@ -209,10 +223,56 @@ const getSystemFieldsRoute = os
 
 const postQuote = os
   .route({ method: "POST", path: "/quote" })
-  .input(createQuoteInputSchema)
-  .output(getQuoteResponseSchema)
+  .input(
+    z.object({
+      userCountry: countryCodeSchema,
+      countryTo: countryCodeSchema,
+      amount: z.number().nullable(),
+      amountTo: z.number().nullable(),
+      sellCcy: currencyCodeSchema,
+      buyCcy: currencyCodeSchema,
+      fixedCcy: currencyCodeSchema,
+      screen: z.string(),
+      platflormType: z.string(),
+      shouldCalcAmountFrom: z.boolean(),
+      promotionCodes: z.array(z.unknown()),
+      deliveryMethod: deliveryMethodSchema,
+    })
+  )
+  .output(
+    z.object({
+      quote: z.object({
+        buyCcy: currencyCodeSchema,
+        sellCcy: currencyCodeSchema,
+        fixedCcy: currencyCodeSchema,
+        baseCcy: currencyCodeSchema,
+        quoteId: z.string(),
+        // TODO: Maybe we should look at this and refine this in the future
+        quoteStatus: z.string(),
+        deliveryMethod: deliveryMethodSchema,
+        // float
+        fixedAmountInUsd: z.number(),
+        countryTo: z.enum(countryCodes as [CountryCode]),
+        individualQuotes: z.array(individualQuoteSchema),
+        offeredDeliveryMethods: z.array(
+          z.object({
+            method: deliveryMethodSchema,
+            isEnabled: z.boolean(),
+            cashOpenPaymentAvailable: z.boolean(),
+          })
+        ),
+        infoMessages: z.unknown(),
+        warnMessages: z.unknown(),
+        errorMessages: z.unknown(),
+        expiryTimeMillis: z.number(),
+        availableSettlementProxies: z.array(z.unknown()),
+        provideRecipientLater: z.boolean(),
+      }),
+      warning: z.string(),
+    })
+  )
   .handler(async (c) => {
-    return createQuoteResponse(c.input);
+    return await createQuoteResponse(c.input);
   });
 
 const getQuote = os
@@ -227,7 +287,38 @@ const getQuote = os
       platformType: z.string().optional(),
     })
   )
-  .output(getQuoteResponseSchema)
+  .output(
+    z.object({
+      quote: z.object({
+        buyCcy: currencyCodeSchema,
+        sellCcy: currencyCodeSchema,
+        fixedCcy: currencyCodeSchema,
+        baseCcy: currencyCodeSchema,
+        quoteId: z.string(),
+        // TODO: Maybe we should look at this and refine this in the future
+        quoteStatus: z.string(),
+        deliveryMethod: deliveryMethodSchema,
+        // float
+        fixedAmountInUsd: z.number(),
+        countryTo: z.enum(countryCodes as [CountryCode]),
+        individualQuotes: z.array(individualQuoteSchema),
+        offeredDeliveryMethods: z.array(
+          z.object({
+            method: deliveryMethodSchema,
+            isEnabled: z.boolean(),
+            cashOpenPaymentAvailable: z.boolean(),
+          })
+        ),
+        infoMessages: z.unknown(),
+        warnMessages: z.unknown(),
+        errorMessages: z.unknown(),
+        expiryTimeMillis: z.number(),
+        availableSettlementProxies: z.array(z.unknown()),
+        provideRecipientLater: z.boolean(),
+      }),
+      warning: z.string(),
+    })
+  )
   .handler(async (c) => {
     return getQuoteById(c.input.quoteId);
   });
