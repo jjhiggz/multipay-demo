@@ -64,9 +64,11 @@ import type { FEQuote } from '../domain/useGetQuote'
 
 const props = defineProps<{
   quote: FEQuote | undefined
+  isLoading: boolean
 }>()
 
 const totalToSend = computed(() => {
+  if (props.isLoading) return 'Loading...'
   if (!props.quote) return ''
   const defaultQuote = props.quote.individualQuotes[0]
   console.log({ defaultQuote: JSON.parse(JSON.stringify(defaultQuote)) })
@@ -74,24 +76,28 @@ const totalToSend = computed(() => {
 })
 
 const exchangeRate = computed(() => {
+  if (props.isLoading) return 'Loading...'
   if (!props.quote) return ''
   const defaultQuote = props.quote.individualQuotes[0]
   return `1 ${props.quote.sellCcy} = ${defaultQuote.rate} ${props.quote.buyCcy}`
 })
 
 const recipientsWillReceive = computed(() => {
+  if (props.isLoading) return 'Loading...'
   if (!props.quote) return ''
   const defaultQuote = props.quote.individualQuotes[0]
   return `${defaultQuote.buyAmount} ${props.quote.buyCcy}`
 })
 
 const totalToPay = computed(() => {
+  if (props.isLoading) return 'Loading...'
   if (!props.quote) return ''
   const defaultQuote = props.quote.individualQuotes[0]
   return `${defaultQuote.totalCostAmount} ${props.quote.sellCcy}`
 })
 
 const fee = computed(() => {
+  if (props.isLoading) return 'Loading...'
   if (!props.quote) return ''
   const defaultQuote = props.quote.individualQuotes[0]
   const totalFee =

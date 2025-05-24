@@ -11,7 +11,7 @@ import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod";
 import { RPCHandler } from "@orpc/server/fetch";
 
-const lag = 0.3;
+const lag = 3000;
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const app = new Hono();

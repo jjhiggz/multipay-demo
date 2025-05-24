@@ -72,6 +72,7 @@
       </div>
       <SummaryCard
       :quote="quoteData"
+      :is-loading="isLoadingQuote"
         @continue="() => {}"
       />
     </div>
@@ -192,7 +193,7 @@ const quoteInput = computed<UseCreateQuoteInput>(() => ({
 }))
 
 const { quoteId, isLoading } = useCreateQuoteOnInputChange(quoteInput)
-const {data: quoteData} = useGetQuote(quoteId)
+const {data: quoteData, isLoading: isLoadingQuote } = useGetQuote(quoteId)
 
 
 watch(quoteData, () => console.log(quoteData))

@@ -1,21 +1,24 @@
 import { orpcVueQuery } from '@/services/orpcClient'
 import { useMutation } from '@tanstack/vue-query'
 import { computed, ref, watch, type ComputedRef } from 'vue'
+import z from 'zod'
 
-export type UseCreateQuoteInput = {
-  userCountry: string
-  countryTo: string
-  amount: number | null
-  amountTo: number | null
-  sellCcy: string
-  buyCcy: string
-  fixedCcy: string
-  screen: string
-  platformType: string
-  shouldCalcAmountFrom: boolean
-  promotionCodes: unknown[]
-  deliveryMethod: string
-}
+export const useCreateQuoteInputSchema = z.object({
+  userCountry: z.string(),
+  countryTo: z.string(),
+  amount: z.number().nullable(),
+  amountTo: z.number().nullable(),
+  sellCcy: z.string(),
+  buyCcy: z.string(),
+  fixedCcy: z.string(),
+  screen: z.string(),
+  platformType: z.string(),
+  shouldCalcAmountFrom: z.boolean(),
+  promotionCodes: z.array(z.unknown()),
+  deliveryMethod: z.string(),
+})
+
+export type UseCreateQuoteInput = z.infer<typeof useCreateQuoteInputSchema>
 
 const isQuoteInputValid = (input: UseCreateQuoteInput): [boolean, string[]] => {
   const reasons: string[] = []
@@ -57,7 +60,7 @@ export const useCreateQuoteOnInputChange = (
           platflormType: 'Cheese',
         })
         .then((response) => {
-          quoteId.value = response.quote.quoteId
+          quoteId.value = response.quote.quoteId as string
         })
     } else {
       console.log('Quote input invalid:', result[1])

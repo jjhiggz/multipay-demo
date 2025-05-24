@@ -18,26 +18,13 @@ import { userExistsMiddleware, type Context } from "../lib/context";
 import { systemFieldsOutputSchema } from "@/db/schema/system-fields.schema";
 import { defaultSystemFieldsReturn } from "@/constants/system-fields-return";
 import {
-  createQuoteInputSchema,
   createQuoteResponse,
   deliveryMethodSchema,
   getQuoteById,
-  getQuoteResponseSchema,
   individualQuoteSchema,
 } from "@/serializers/get-quotes";
-import {
-  countryCodeSchema,
-  countryCodeSchema,
-  currencyCodeSchema,
-  currencyCodeSchema,
-  currencyCodeSchema,
-  s,
-} from "@/zod-schemas";
-import {
-  countryCodes,
-  countryCodes,
-  type CountryCode,
-} from "@/constants/country.constants";
+import { countryCodeSchema, currencyCodeSchema, s } from "@/zod-schemas";
+import { countryCodes, type CountryCode } from "@/constants/country.constants";
 
 const healthcheckRoute = os
   .route({ method: "GET", path: "/healthcheck" })
@@ -89,8 +76,8 @@ const getCurrenciesRoute = os
       .select()
       .from(userToCurrencies)
       .where(eq(userToCurrencies.userId, context.session.user.id));
-    const parsedUserCurrencies = z
-      .array(s.userToCurrencies.select)
+    const parsedUserCurrencies = s.userToCurrencies.select
+      .array()
       .parse(userCurrenciesFromDb);
     return serializeCurrenciesEndpoint(parsedUserCurrencies);
   });
@@ -132,15 +119,16 @@ const removeCurrencyRoute = os
       .select()
       .from(userToCurrencies)
       .where(eq(userToCurrencies.userId, context.session.user.id));
-    const parsedRemainingCurrencies = z
-      .array(s.userToCurrencies.select)
+    const parsedRemainingCurrencies = s.userToCurrencies.select
+      .array()
       .parse(remainingCurrenciesFromDb);
+
     return serializeCurrenciesEndpoint(parsedRemainingCurrencies);
   });
 
 const legacyRecipientsOutputSchema = z.object({
-  recipients: z.array(
-    z.object({
+  recipients: z
+    .object({
       recipient: z.object({
         recipientId: z.number(),
         recipientDisplayName: z.string(),
@@ -156,7 +144,7 @@ const legacyRecipientsOutputSchema = z.object({
         })
       ),
     })
-  ),
+    .array(),
 });
 const legacyRecipientsHandler = async ({
   input,

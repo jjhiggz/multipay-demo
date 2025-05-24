@@ -130,7 +130,13 @@ export const useGetQuote = (quoteId: Ref<string | null>) => {
     }),
   )
 
-  return useMappedQuery(options, {
+  const query = useMappedQuery(options, {
     mapData: (input): FEQuote => feQuoteSchema.parse(input.quote),
   })
+
+  return {
+    ...query,
+    data: query.data as ComputedRef<FEQuote | undefined>,
+    isLoading: query.isLoading as Ref<boolean>,
+  }
 }
