@@ -15,32 +15,32 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import ReasonSearch from '../ReasonSearch.vue'
+import type { FERecipient } from '../../domain/useRecipients'
+import type { MultipayRecipientValues } from './recipient-list.types'
 
 const props = defineProps<{
-  id: number
-  name: string
-  currencyCode: CurrencyCode
-  amount: number | null
-  reason: string
-  reference?: string
+  index: number
+  values: MultipayRecipientValues
   open: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update', data: Partial<Omit<typeof props, 'open'>>): void
+  (e: 'update', data: Partial<MultipayRecipientValues>): void
   (e: 'remove'): void
   (e: 'update:open', val: boolean): void
 }>()
 
 const formattedAmount = computed(() => {
-  if (!props.amount || isNaN(props.amount)) return ''
+  if (!props.values.amount || isNaN(props.values.amount)) return ''
+  const currency =
+    (props.values.recipient?.currencyCode as CurrencyCode) || 'USD'
   return (
     new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: props.currencyCode,
-    }).format(props.amount) +
+      currency: currency,
+    }).format(props.values.amount) +
     ' ' +
-    props.currencyCode
+    currency
   )
 })
 
@@ -53,10 +53,17 @@ const handleRecipientSelected = (
   selectedOption: RecipientSearchOption | null,
 ) => {
   if (selectedOption) {
-    emit('update', {
-      name: selectedOption.label,
+    const newRecipient: FERecipient = {
+      recipientId: selectedOption.recipientId,
+      recipientDisplayName: selectedOption.label,
       currencyCode: selectedOption.currencyCode as CurrencyCode,
-    })
+      bankCountryCode: selectedOption.bankCountryCode,
+      bankName: selectedOption.bankName,
+      accountNumber: selectedOption.accountNumber,
+    }
+    emit('update', { recipient: newRecipient })
+  } else {
+    emit('update', { recipient: null })
   }
 }
 
@@ -74,7 +81,9 @@ const reasonSearchContainerRef = ref<VNodeRef | null>(null)
       class="flex justify-between items-center p-4 cursor-pointer"
       @click="emit('update:open', !props.open)"
     >
-      <div class="font-medium">{{ props.name || 'New Recipient' }}</div>
+      <div class="font-medium">
+        {{ props.values.recipient?.recipientDisplayName || 'New Recipient' }}
+      </div>
       <div class="flex items-center">
         <div class="mr-2 font-medium">
           {{ formattedAmount || '-' }}
@@ -100,6 +109,7 @@ const reasonSearchContainerRef = ref<VNodeRef | null>(null)
           <div ref="recipientSearchContainerRef" class="w-full">
             <RecipientSearch
               class="w-full"
+              :initial-recipient="props.values.recipient"
               :dropdownWidthRef="recipientSearchContainerRef"
               @recipientSelected="handleRecipientSelected"
             />
@@ -109,9 +119,11 @@ const reasonSearchContainerRef = ref<VNodeRef | null>(null)
         <div class="space-y-1">
           <Label class="font-normal text-gray-500">Amount</Label>
           <MoneyInput
-            :model-value="props.amount ?? 0"
-            :currency="props.currencyCode"
-            :disabled="false"
+            :model-value="props.values.amount ?? 0"
+            :currency="
+              (props.values.recipient?.currencyCode as CurrencyCode) || 'USD'
+            "
+            :disabled="!props.values.recipient"
             :currency-selectable="false"
             @update:modelValue="
               (value) => emit('update', { amount: parseFloat(String(value)) })
@@ -120,10 +132,13 @@ const reasonSearchContainerRef = ref<VNodeRef | null>(null)
           />
         </div>
 
-        <div class="space-y-1 w-full" ref="">
+        <div class="space-y-1 w-full">
           <Label class="font-normal text-gray-500">Reason</Label>
           <ReasonSearch
-            :model-value="props.reason"
+            :model-value="props.values.reason"
+            @update:modelValue="
+              (newReason) => emit('update', { reason: newReason })
+            "
             class="w-full"
             ref="reasonSearchContainerRef"
             :dropdownWidthRef="reasonSearchContainerRef"
@@ -134,7 +149,7 @@ const reasonSearchContainerRef = ref<VNodeRef | null>(null)
           <Label class="font-normal text-gray-500">Reference (Optional)</Label>
           <Input
             placeholder="Add a reference"
-            :value="props.reference || ''"
+            :value="props.values.reference || ''"
             @input="handleReferenceInput"
           />
         </div>

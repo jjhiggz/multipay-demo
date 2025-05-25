@@ -32,9 +32,10 @@
             <EditRecipientRow
               v-for="recipient in props.recipients"
               :key="recipient.index"
-              v-bind="recipient"
-              @update="emit('update', recipient.id, $event)"
-              @remove="$emit('remove', recipient.id)"
+              :index="recipient.index"
+              :values="recipient.values"
+              @update="emit('update', recipient.index, $event)"
+              @remove="$emit('remove', recipient.index)"
             />
           </TableBody>
         </Table>
@@ -58,11 +59,12 @@
       <EditRecipientCard
         v-for="recipient in props.recipients"
         :key="recipient.index"
-        v-bind="recipient"
+        :index="recipient.index"
+        :values="recipient.values"
         :open="props.openIds.includes(recipient.index)"
         @update="$emit('update', recipient.index, $event)"
         @remove="$emit('remove', recipient.index)"
-        @update:open="$emit('toggle-open', recipient.id, $event)"
+        @update:open="$emit('toggle-open', recipient.index, $event)"
         class="mb-2"
       />
       <div>
@@ -92,76 +94,7 @@ import {
 } from '@/components/ui/table'
 import Button from '@/components/ui/button/Button.vue'
 import type { FERecipient } from '../../domain/useRecipients'
-
-export type MultipayRecipientValues = {
-  recipient: FERecipient | null
-  amount: number | null
-  reason: string | null
-  reference: string | null
-}
-
-type ValidatorFn<T> = (input: T) =>
-  | {
-      isValid: true
-      reasons: null
-    }
-  | {
-      isValid: false
-      reason: string
-    }
-
-export const multipayRecipientValidators: {
-  [K in keyof MultipayRecipientValues]: ValidatorFn<MultipayRecipientValues[K]>
-} = {
-  recipient: (input: FERecipient | null) => {
-    if (input === null) {
-      return {
-        isValid: false,
-        reason: 'Please select recipient',
-      }
-    }
-    return {
-      isValid: !!input,
-      reasons: null,
-    }
-  },
-  amount: (input: number | null) => {
-    if (typeof input !== 'number' || isNaN(input)) {
-      return {
-        isValid: false,
-        reason: 'Please enter a valid amount',
-      }
-    }
-    return {
-      isValid: true,
-      reasons: null,
-    }
-  },
-  reason: (input: string | null) => {
-    if (typeof input !== 'string' || input.length === 0) {
-      return {
-        isValid: false,
-        reason: 'Please enter a reason',
-      }
-    }
-    return {
-      isValid: true,
-      reasons: null,
-    }
-  },
-  reference: (input: string | null) => {
-    if (typeof input !== 'string') {
-      return {
-        isValid: false,
-        reason: 'Please enter a valid reference',
-      }
-    }
-    return {
-      isValid: true,
-      reasons: null,
-    }
-  },
-}
+import type { MultipayRecipientValues } from './recipient-list.types'
 
 export type MultiPayRecipient = {
   index: number
@@ -182,8 +115,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'add'): void
-  (e: 'remove', id: number): void
-  (e: 'update', id: number, newData: Partial<MultiPayRecipient>): void
-  (e: 'toggle-open', id: number, open: boolean): void
+  (e: 'remove', index: number): void
+  (
+    e: 'update',
+    index: number,
+    newValues: Partial<MultipayRecipientValues>,
+  ): void
+  (e: 'toggle-open', index: number, open: boolean): void
 }>()
 </script>

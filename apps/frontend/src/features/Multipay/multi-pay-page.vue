@@ -91,6 +91,7 @@ import SummaryCard from '@/features/Multipay/ui/SummaryCard.vue'
 import CalendarDropdown from '@/features/Multipay/ui/CalendarDropdown.vue'
 import RecipientList from './ui/RecipientList/RecipientList.vue'
 import type { MultiPayRecipient } from './ui/RecipientList/RecipientList.vue'
+import type { MultipayRecipientValues } from './ui/RecipientList/recipient-list.types'
 import { useCreateQuoteOnInputChange, type UseCreateQuoteInput } from './composables/useCreateQuoteOnInputChange'
 import { useGetQuote } from './domain/useGetQuote'
 
@@ -142,36 +143,42 @@ const handleOpenChange = (id: number, open: boolean) => {
 }
 
 const addRecipient = () => {
-  const nextId = recipients.value.length > 0
-    ? Math.max(...recipients.value.map((r: MultiPayRecipient) => r.id)) + 1
+  const nextIndex = recipients.value.length > 0
+    ? Math.max(...recipients.value.map((r: MultiPayRecipient) => r.index)) + 1
     : 1
   recipients.value = [
     ...recipients.value,
     {
-      index: nextId,
-      name: '',
-      amount: null,
-      reason: '',
-      currencyCode: 'USD' as CurrencyCode,
-      reference: ''
+      index: nextIndex,
+      values: {
+        recipient: null,
+        amount: null,
+        reason: '',
+        reference: '',
+      },
+      state: {
+        recipient: { hasEnteredFocus: false, hasLeftFocus: false },
+        amount: { hasEnteredFocus: false, hasLeftFocus: false },
+        reason: { hasEnteredFocus: false, hasLeftFocus: false },
+        reference: { hasEnteredFocus: false, hasLeftFocus: false },
+      }
     },
   ]
 }
 
-const removeRecipient = (id: number) => {
-  recipients.value = [...recipients.value].filter((r: MultiPayRecipient) => r.id !== id)
+const removeRecipient = (index: number) => {
+  recipients.value = [...recipients.value].filter((r: MultiPayRecipient) => r.index !== index)
 }
 
-const updateRecipient = (id: number, newData: Partial<MultiPayRecipient>) => {
+const updateRecipient = (index: number, newValues: Partial<MultipayRecipientValues>) => {
   recipients.value = [...recipients.value].map((r: MultiPayRecipient) =>
-    r.id === id ? { ...r, ...newData } : { ...r }
+    r.index === index ? { ...r, values: { ...r.values, ...newValues } } : { ...r }
   )
 }
 
 
 const totalAmount = computed(() =>
-// 100
-  recipients.value.reduce((sum, recipient) => sum + (recipient.amount ?? 0), 0)
+  recipients.value.reduce((sum, recipient) => sum + (recipient.values.amount ?? 0), 0)
 )
 
 

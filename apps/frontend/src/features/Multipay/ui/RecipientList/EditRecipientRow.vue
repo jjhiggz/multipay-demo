@@ -10,18 +10,16 @@ import TableRow from '@/components/ui/table/TableRow.vue'
 import TableCell from '@/components/ui/table/TableCell.vue'
 import ReasonSearch from '../ReasonSearch.vue'
 import { Button } from '@/components/ui/button'
+import type { FERecipient } from '../../domain/useRecipients'
+import type { MultipayRecipientValues } from './recipient-list.types'
 
 const props = defineProps<{
-  id: number
-  name: string
-  currencyCode: CurrencyCode
-  amount: number | null
-  reason: string
-  reference?: string
+  index: number
+  values: MultipayRecipientValues
 }>()
 
 const emit = defineEmits<{
-  (e: 'update', data: Partial<typeof props>): void
+  (e: 'update', data: Partial<MultipayRecipientValues>): void
   (e: 'remove'): void
 }>()
 
@@ -32,10 +30,17 @@ const handleRecipientSelected = (
   selectedOption: RecipientSearchOption | null,
 ) => {
   if (selectedOption) {
-    emit('update', {
-      name: selectedOption.label,
+    const newRecipient: FERecipient = {
+      recipientId: selectedOption.recipientId,
+      recipientDisplayName: selectedOption.label,
       currencyCode: selectedOption.currencyCode as CurrencyCode,
-    })
+      bankCountryCode: selectedOption.bankCountryCode,
+      bankName: selectedOption.bankName,
+      accountNumber: selectedOption.accountNumber,
+    }
+    emit('update', { recipient: newRecipient })
+  } else {
+    emit('update', { recipient: null })
   }
 }
 </script>
@@ -46,15 +51,18 @@ const handleRecipientSelected = (
   >
     <TableCell class="w-[220px]" ref="recipientSearchContainerRef">
       <RecipientSearch
+        :initial-recipient="props.values.recipient"
         @recipientSelected="handleRecipientSelected"
         :dropdownWidthRef="recipientSearchContainerRef"
       />
     </TableCell>
     <TableCell>
       <MoneyInput
-        :model-value="props.amount !== null ? props.amount : ''"
-        :currency="props.currencyCode"
-        :disabled="false"
+        :model-value="props.values.amount !== null ? props.values.amount : ''"
+        :currency="
+          (props.values.recipient?.currencyCode as CurrencyCode) || 'USD'
+        "
+        :disabled="!props.values.recipient"
         :currency-selectable="false"
         @update:modelValue="
           (value: string | number) =>
@@ -65,14 +73,17 @@ const handleRecipientSelected = (
     </TableCell>
     <TableCell class="w-[220px]" ref="reasonSearchContainerRef">
       <ReasonSearch
-        :model-value="props.reason"
+        :model-value="props.values.reason"
+        @update:modelValue="
+          (newReason) => emit('update', { reason: newReason })
+        "
         class="w-full"
         :dropdownWidthRef="reasonSearchContainerRef"
       />
     </TableCell>
     <TableCell>
       <input
-        :value="props.reference || ''"
+        :value="props.values.reference || ''"
         @input="
           (e) =>
             emit('update', {
@@ -80,6 +91,7 @@ const handleRecipientSelected = (
             })
         "
         class="p-2 border rounded w-full"
+        placeholder="Optional reference"
       />
     </TableCell>
     <TableCell>
