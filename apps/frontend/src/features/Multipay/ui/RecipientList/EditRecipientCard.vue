@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import ReasonSearch from '../ReasonSearch.vue'
 import type { FERecipient } from '../../domain/useRecipients'
 import type { MultipayRecipientValues } from './recipient-list.types'
+import Flag from '@/components/Flag.vue'
 
 const props = defineProps<{
   index: number
@@ -131,7 +132,28 @@ const recipientValidator = computed(() => {
               :dropdownWidthRef="recipientSearchContainerRef"
               @recipientSelected="handleRecipientSelected"
               :validator="recipientValidator"
-            />
+            >
+              <template #invalid-item="{ recipient: invalidRecipientInfo }">
+                <div
+                  class="flex items-center"
+                  :title="invalidRecipientInfo.validationReason"
+                >
+                  <span class="opacity-50">{{
+                    invalidRecipientInfo.label
+                  }}</span>
+                  <Flag
+                    :currencyCode="
+                      invalidRecipientInfo.currencyCode as CurrencyCode
+                    "
+                    class="opacity-50 ml-2"
+                  />
+                  <Icon
+                    icon="carbon:misuse"
+                    class="opacity-75 ml-1 w-4 h-4 text-red-500"
+                  />
+                </div>
+              </template>
+            </RecipientSearch>
           </div>
         </div>
 

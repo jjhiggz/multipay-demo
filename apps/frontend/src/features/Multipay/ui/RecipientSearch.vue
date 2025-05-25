@@ -39,14 +39,22 @@
             :key="recipient.value"
             :value="recipient"
             :disabled="!recipient.isValid"
+            class="flex justify-between items-center w-full"
           >
-            {{ recipient.label }}
-            <span
-              v-if="!recipient.isValid && recipient.validationReason"
-              class="ml-2 text-red-500 text-xs italic"
-            >
-              ({{ recipient.validationReason }})
-            </span>
+            <template v-if="!recipient.isValid && $slots['invalid-item']">
+              <slot name="invalid-item" :recipient="recipient"></slot>
+            </template>
+            <template v-else>
+              <span :class="{ 'opacity-50': !recipient.isValid }">{{
+                recipient.label
+              }}</span>
+              <span
+                v-if="!recipient.isValid && recipient.validationReason"
+                class="ml-2 text-red-500 text-xs italic"
+              >
+                ({{ recipient.validationReason }})
+              </span>
+            </template>
             <ComboboxItemIndicator>
               <Check
                 :class="
