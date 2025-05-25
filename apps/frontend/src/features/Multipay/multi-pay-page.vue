@@ -66,6 +66,7 @@
             @update="updateRecipient"
             :open-ids="openIds"
             @toggle-open="handleOpenChange"
+            :selectedCurrencyCode="selectedCurrency.value?.value"
           />
         </div>
         <!-- Recipients Table Placeholder -->

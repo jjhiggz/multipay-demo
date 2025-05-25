@@ -34,6 +34,7 @@
               :key="recipient.index"
               :index="recipient.index"
               :values="recipient.values"
+              :selectedCurrencyCode="props.selectedCurrencyCode"
               @update="emit('update', recipient.index, $event)"
               @remove="$emit('remove', recipient.index)"
             />
@@ -62,6 +63,7 @@
         :index="recipient.index"
         :values="recipient.values"
         :open="props.openIds.includes(recipient.index)"
+        :selectedCurrencyCode="props.selectedCurrencyCode"
         @update="$emit('update', recipient.index, $event)"
         @remove="$emit('remove', recipient.index)"
         @update:open="$emit('toggle-open', recipient.index, $event)"
@@ -95,6 +97,7 @@ import {
 import Button from '@/components/ui/button/Button.vue'
 import type { FERecipient } from '../../domain/useRecipients'
 import type { MultipayRecipientValues } from './recipient-list.types'
+import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 
 export type MultiPayRecipient = {
   index: number
@@ -111,6 +114,7 @@ export type MultiPayRecipient = {
 const props = defineProps<{
   recipients: MultiPayRecipient[]
   openIds: number[]
+  selectedCurrencyCode?: CurrencyCode | null
 }>()
 
 const emit = defineEmits<{

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
-import { ref, type VNodeRef } from 'vue'
+import { ref, type VNodeRef, computed } from 'vue'
 import RecipientSearch, {
   type RecipientSearchOption,
 } from '@/features/Multipay/ui/RecipientSearch.vue'
@@ -16,6 +16,7 @@ import type { MultipayRecipientValues } from './recipient-list.types'
 const props = defineProps<{
   index: number
   values: MultipayRecipientValues
+  selectedCurrencyCode?: CurrencyCode | null
 }>()
 
 const emit = defineEmits<{
@@ -25,6 +26,23 @@ const emit = defineEmits<{
 
 const recipientSearchContainerRef = ref<VNodeRef | null>(null)
 const reasonSearchContainerRef = ref<VNodeRef | null>(null)
+
+const recipientValidator = computed(() => {
+  return (
+    recipient: FERecipient,
+  ): { isValid: true } | { isValid: false; reason: string } => {
+    if (
+      props.selectedCurrencyCode &&
+      recipient.currencyCode !== props.selectedCurrencyCode
+    ) {
+      return {
+        isValid: false,
+        reason: `Currency mismatch (needs ${props.selectedCurrencyCode})`,
+      }
+    }
+    return { isValid: true }
+  }
+})
 
 const handleRecipientSelected = (
   selectedOption: RecipientSearchOption | null,
@@ -54,6 +72,7 @@ const handleRecipientSelected = (
         :initial-recipient="props.values.recipient"
         @recipientSelected="handleRecipientSelected"
         :dropdownWidthRef="recipientSearchContainerRef"
+        :validator="recipientValidator"
       />
     </TableCell>
     <TableCell>

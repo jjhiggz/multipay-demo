@@ -22,6 +22,7 @@ const props = defineProps<{
   index: number
   values: MultipayRecipientValues
   open: boolean
+  selectedCurrencyCode?: CurrencyCode | null
 }>()
 
 const emit = defineEmits<{
@@ -69,6 +70,23 @@ const handleRecipientSelected = (
 
 const recipientSearchContainerRef = ref<VNodeRef | null>(null)
 const reasonSearchContainerRef = ref<VNodeRef | null>(null)
+
+const recipientValidator = computed(() => {
+  return (
+    recipient: FERecipient,
+  ): { isValid: true } | { isValid: false; reason: string } => {
+    if (
+      props.selectedCurrencyCode &&
+      recipient.currencyCode !== props.selectedCurrencyCode
+    ) {
+      return {
+        isValid: false,
+        reason: `Currency mismatch (needs ${props.selectedCurrencyCode})`,
+      }
+    }
+    return { isValid: true }
+  }
+})
 </script>
 
 <template>
@@ -112,6 +130,7 @@ const reasonSearchContainerRef = ref<VNodeRef | null>(null)
               :initial-recipient="props.values.recipient"
               :dropdownWidthRef="recipientSearchContainerRef"
               @recipientSelected="handleRecipientSelected"
+              :validator="recipientValidator"
             />
           </div>
         </div>
