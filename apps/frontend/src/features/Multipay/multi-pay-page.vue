@@ -148,7 +148,7 @@ const addRecipient = () => {
   recipients.value = [
     ...recipients.value,
     {
-      id: nextId,
+      index: nextId,
       name: '',
       amount: null,
       reason: '',
