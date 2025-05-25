@@ -66,7 +66,7 @@
             @update="updateRecipient"
             :open-ids="openIds"
             @toggle-open="handleOpenChange"
-            :selectedCurrencyCode="selectedCurrency.value?.value"
+            :selectedCurrencyCode="receivingCurrencyCode"
           />
         </div>
         <!-- Recipients Table Placeholder -->
@@ -129,6 +129,8 @@ const onSendingCurrencySelected = (val: CurrencyDropdownOption | null) =>
   (sendingCurrency.value = val)
 const onRecievingCurrencySelected = (val: CurrencyDropdownOption | null) =>
   (recievingCurrency.value = val)
+
+const receivingCurrencyCode = computed(() => recievingCurrency.value?.value ?? null)
 
 const recipients = ref<MultiPayRecipient[]>([
 ])

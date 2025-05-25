@@ -77,18 +77,11 @@ const handleRecipientSelected = (
       >
         <template #invalid-item="{ recipient: invalidRecipientInfo }">
           <div
-            class="flex items-center"
+            class="flex justify-between items-center w-full"
             :title="invalidRecipientInfo.validationReason"
           >
             <span class="opacity-50">{{ invalidRecipientInfo.label }}</span>
-            <Flag
-              :currencyCode="invalidRecipientInfo.currencyCode as CurrencyCode"
-              class="opacity-50 ml-2"
-            />
-            <Icon
-              icon="carbon:misuse"
-              class="opacity-75 ml-1 w-4 h-4 text-red-500"
-            />
+            <Icon icon="carbon:misuse" class="ml-1 w-4 h-4 text-red-500" />
           </div>
         </template>
       </RecipientSearch>

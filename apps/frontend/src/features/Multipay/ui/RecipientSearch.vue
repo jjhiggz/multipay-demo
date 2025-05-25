@@ -45,15 +45,26 @@
               <slot name="invalid-item" :recipient="recipient"></slot>
             </template>
             <template v-else>
-              <span :class="{ 'opacity-50': !recipient.isValid }">{{
-                recipient.label
-              }}</span>
-              <span
-                v-if="!recipient.isValid && recipient.validationReason"
-                class="ml-2 text-red-500 text-xs italic"
-              >
-                ({{ recipient.validationReason }})
-              </span>
+              <div class="flex items-center">
+                <Flag
+                  v-if="recipient.isValid"
+                  :currencyCode="recipient.currencyCode as CurrencyCode"
+                  class="mr-2"
+                />
+                <span :class="{ 'opacity-50': !recipient.isValid }">{{
+                  recipient.label
+                }}</span>
+                <span
+                  v-if="
+                    !recipient.isValid &&
+                    recipient.validationReason &&
+                    !$slots['invalid-item']
+                  "
+                  class="ml-2 text-red-500 text-xs italic"
+                >
+                  ({{ recipient.validationReason }})
+                </span>
+              </div>
             </template>
             <ComboboxItemIndicator>
               <Check
@@ -91,6 +102,8 @@ import {
   type FERecipient,
 } from '@/features/Multipay/domain/useRecipients'
 import LoadingDots from '@/components/ui/LoadingDots.vue'
+import Flag from '@/components/Flag.vue'
+import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 
 const props = defineProps<{
   class?: string
