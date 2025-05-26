@@ -155,10 +155,8 @@ const recipientValidator = computed(() => {
           <Label class="font-normal text-gray-500">Amount</Label>
           <MoneyInput
             :model-value="props.values.amount ?? 0"
-            :currency="
-              (props.values.recipient?.currencyCode as CurrencyCode) || 'USD'
-            "
-            :disabled="!props.values.recipient"
+            :currency="props.selectedCurrencyCode || 'USD'"
+            :disabled="!props.values.recipient || !props.selectedCurrencyCode"
             :currency-selectable="false"
             @update:modelValue="
               (value) => emit('update', { amount: parseFloat(String(value)) })

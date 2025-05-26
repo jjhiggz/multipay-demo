@@ -89,10 +89,8 @@ const handleRecipientSelected = (
     <TableCell>
       <MoneyInput
         :model-value="props.values.amount !== null ? props.values.amount : ''"
-        :currency="
-          (props.values.recipient?.currencyCode as CurrencyCode) || 'USD'
-        "
-        :disabled="!props.values.recipient"
+        :currency="props.selectedCurrencyCode || 'USD'"
+        :disabled="!props.values.recipient || !props.selectedCurrencyCode"
         :currency-selectable="false"
         @update:modelValue="
           (value: string | number) =>
