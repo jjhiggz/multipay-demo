@@ -5,6 +5,11 @@
         <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
       </div>
       <div class="flex flex-col flex-grow gap-8 bg-white shadow p-8 rounded-lg w-full">
+        <!-- Add a button to trigger the modal for demonstration -->
+        <div class="my-4">
+          <Button @click="showDemoModal">Show Warning Modal</Button>
+        </div>
+
         <div class="flex flex-col gap-6">
           <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
           <div class="flex sm:flex-row flex-col gap-2">
@@ -77,6 +82,7 @@
         @continue="() => {}"
       />
     </div>
+    <WarningModal :state="warningModal" />
   </IsolatedPageLayout v-if="false">
 </template>
 
@@ -95,8 +101,11 @@ import type { MultiPayRecipient } from './ui/RecipientList/RecipientList.vue'
 import type { MultipayRecipientValues } from './ui/RecipientList/recipient-list.types'
 import { useCreateQuoteOnInputChange, type UseCreateQuoteInput } from './composables/useCreateQuoteOnInputChange'
 import { useGetQuote } from './domain/useGetQuote'
+import WarningModal from '@/components/WarningModal.vue'
+import { useWarningModal } from '@/composables/useWarningModal'
+import Button from '@/components/ui/button/Button.vue'
 
-const { data: profileData } = useProfile()
+const warningModal = useWarningModal();
 
 const distributeCurrencyBy = ref<'send-currency' | 'recieving-currency'>('send-currency')
 const toggleDistributeCurrencyBy = () => {
@@ -110,6 +119,8 @@ const selectedCurrency = computed(() =>
 const sendDate = ref<Date | null>(new Date())
 const sendingCurrency = ref<CurrencyDropdownOption | null>(null)
 const recievingCurrency = ref<CurrencyDropdownOption | null>(null)
+
+const { data: profileData } = useProfile()
 
 watchEffect(() => {
   if (profileData.value?.profile) {
@@ -207,5 +218,20 @@ const {data: quoteData, isLoading: isLoadingQuote } = useGetQuote(quoteId)
 
 
 watch(quoteData, () => console.log(quoteData))
+
+// Function to trigger the modal and log the result
+const showDemoModal = async () => {
+  const { accepted } = await warningModal.open({
+    title: "Demo Warning Updated",
+    message: "This is a test of the updated warning modal. Please choose an action."
+  });
+
+  if (accepted) {
+    console.log('Modal accepted (updated flow)');
+  } else {
+    console.log('Modal rejected/cancelled (updated flow)');
+  }
+};
+
 
 </script>
