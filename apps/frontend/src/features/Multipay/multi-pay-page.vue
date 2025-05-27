@@ -16,39 +16,28 @@
             <div class="flex flex-row justify-start sm:justify-end gap-2 w-full">
               <div class="">
                 <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
-                <CurrencyDropdown
-                  :selected="sendingCurrency"
-                  @selected="onSendingCurrencySelected"
-                  class="w-28 sm:w-32 md:w-44"
-                />
+                <CurrencyDropdown :selected="sendingCurrency" @selected="onSendingCurrencySelected"
+                  class="w-28 sm:w-32 md:w-44" />
               </div>
               <div class="">
                 <label class="block mb-1 text-gray-500 text-xs">Recieving currency</label>
-                <CurrencyDropdown
-                  :selected="recievingCurrency"
-                  @selected="onRecievingCurrencySelected"
-                  class="w-28 sm:w-32 md:w-44"
-                />
+                <CurrencyDropdown :selected="recievingCurrency" @selected="onRecievingCurrencySelected"
+                  class="w-28 sm:w-32 md:w-44" />
               </div>
             </div>
           </div>
 
           <div class="flex items-center gap-2">
-            <ToggleButton
-              :disabled="!selectedCurrency.value"
-              :model-value="distributeCurrencyBy === 'send-currency'"
-              @update:model-value="toggleDistributeCurrencyBy"
-            />
+            <ToggleButton :disabled="!selectedCurrency.value" :model-value="distributeCurrencyBy === 'send-currency'"
+              @update:model-value="toggleDistributeCurrencyBy" />
 
-            <div
-              :class="[
-                'flex items-center gap-2',
-                {
-                  'opacity-50 text-gray-600': !selectedCurrency.value,
-                  'text-gray-700': selectedCurrency.value,
-                },
-              ]"
-            >
+            <div :class="[
+              'flex items-center gap-2',
+              {
+                'opacity-50 text-gray-600': !selectedCurrency.value,
+                'text-gray-700': selectedCurrency.value,
+              },
+            ]">
               <div v-if="selectedCurrency.value" class="flex items-center gap-2">
                 <p class="whitespace-nowrap">Distribute with:</p>
                 <Flag :currency-code="selectedCurrency.value.value" />
@@ -60,23 +49,13 @@
         </div>
         <!-- Select Recipients List -->
         <div class="">
-          <RecipientList
-            :recipients="recipients"
-            @add="addRecipient"
-            @remove="removeRecipient"
-            @update="updateRecipient"
-            :open-ids="openIds"
-            @toggle-open="handleOpenChange"
-            :selectedCurrencyCode="receivingCurrencyCode"
-          />
+          <RecipientList :recipients="recipients" @add="addRecipient" @remove="removeRecipient"
+            @update="updateRecipient" :open-ids="openIds" @toggle-open="handleOpenChange"
+            :selectedCurrencyCode="receivingCurrencyCode" />
         </div>
         <!-- Recipients Table Placeholder -->
       </div>
-      <SummaryCard
-      :quote="quoteData"
-      :is-loading="isLoadingQuote"
-        @continue="() => {}"
-      />
+      <SummaryCard :quote="quoteData" :is-loading="isLoadingQuote" @continue="() => { }" />
     </div>
     <WarningModal :state="warningModal" />
   </IsolatedPageLayout v-if="false">
@@ -103,20 +82,6 @@ import Button from '@/components/ui/button/Button.vue'
 const warningModal = useWarningModal();
 
 const distributeCurrencyBy = ref<'send-currency' | 'recieving-currency'>('send-currency')
-const toggleDistributeCurrencyBy = async () => {
-  const { accepted } = await warningModal.open({
-    title: "Confirm Change",
-    message: "Changing the distribution currency will reset all recipient amounts. Are you sure?"
-  });
-  if (accepted) {
-    distributeCurrencyBy.value =
-      distributeCurrencyBy.value === 'send-currency' ? 'recieving-currency' : 'send-currency';
-    resetAllRecipientAmounts();
-  } // If not accepted, do nothing, UI should reflect original state
-}
-const selectedCurrency = computed(() =>
-  distributeCurrencyBy.value === 'recieving-currency' ? recievingCurrency : sendingCurrency,
-)
 
 const sendDate = ref<Date | null>(new Date())
 const sendingCurrency = ref<CurrencyDropdownOption | null>(null)
@@ -244,8 +209,37 @@ const quoteInput = computed<UseCreateQuoteInput>(() => {
 })
 
 const { quoteId, isLoading } = useCreateQuoteOnInputChange(quoteInput)
-const {data: quoteData, isLoading: isLoadingQuote } = useGetQuote(quoteId)
+const { data: quoteData, isLoading: isLoadingQuote } = useGetQuote(quoteId)
 
+
+const shouldWarnForCurrencyChange = computed(() => {
+  if (recipients.value.length === 0) {
+    return false
+  }
+  if (recipients.value.every(recipient => recipient.values.amount === 0 || recipient.values.amount === null)) {
+    return false
+  }
+  return true
+})
+
+const toggleDistributeCurrencyBy = async () => {
+  const shouldContinue = shouldWarnForCurrencyChange.value
+    ? (await warningModal.open({
+        title: 'Confirm Change',
+        message: 'Changing the distribution currency will reset all recipient amounts. Are you sure?'
+      })).accepted
+    : true
+
+  if (shouldContinue) {
+    distributeCurrencyBy.value = distributeCurrencyBy.value === 'send-currency'
+      ? 'recieving-currency'
+      : 'send-currency'
+    resetAllRecipientAmounts()
+  }
+}
+const selectedCurrency = computed(() =>
+  distributeCurrencyBy.value === 'recieving-currency' ? recievingCurrency : sendingCurrency,
+)
 
 
 // Function to reset all recipient amounts
@@ -259,19 +253,6 @@ const resetAllRecipientAmounts = () => {
   }));
 };
 
-// Function to trigger the modal and log the result
-const showDemoModal = async () => {
-  const { accepted } = await warningModal.open({
-    title: "Demo Warning Updated",
-    message: "This is a test of the updated warning modal. Please choose an action."
-  });
-
-  if (accepted) {
-    console.log('Modal accepted (updated flow)');
-  } else {
-    console.log('Modal rejected/cancelled (updated flow)');
-  }
-};
 
 
 </script>
