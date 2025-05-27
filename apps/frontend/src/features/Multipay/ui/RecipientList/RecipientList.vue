@@ -95,10 +95,7 @@ import {
   TableHead,
 } from '@/components/ui/table'
 import Button from '@/components/ui/button/Button.vue'
-import type {
-  MultiPayRecipientContainer,
-  RecipientFields,
-} from './recipient-list.types'
+import type { MultiPayRecipientContainer } from './recipient-list.types'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 
 const props = defineProps<{
@@ -110,7 +107,11 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'add'): void
   (e: 'remove', index: number): void
-  (e: 'update', index: number, newValues: Partial<RecipientFields>): void
+  (
+    e: 'update',
+    index: number,
+    newValues: Partial<MultiPayRecipientContainer['values']>,
+  ): void
   (e: 'toggle-open', index: number, open: boolean): void
 }>()
 </script>

@@ -1,5 +1,12 @@
 import type { FERecipient } from '../../domain/useRecipients'
-import type { RecipientFields, ValidatorFn } from './recipient-list.types'
+import type {
+  ValidatorFn,
+  MultiPayRecipientContainer,
+} from './recipient-list.types'
+
+// Define RecipientFields locally for the structure of multipayRecipientValidators
+// This must match the structure of MultiPayRecipientContainer['values']
+type RecipientFields = MultiPayRecipientContainer['values']
 
 export const multipayRecipientValidators: {
   [K in keyof RecipientFields]: ValidatorFn<RecipientFields[K]>
@@ -23,13 +30,19 @@ export const multipayRecipientValidators: {
         reason: 'Please enter a valid amount',
       }
     }
+    if (input <= 0) {
+      return {
+        isValid: false,
+        reason: 'Amount must be greater than zero',
+      }
+    }
     return {
       isValid: true,
       reasons: null,
     }
   },
   reason: (input: string | null) => {
-    if (typeof input !== 'string' || input.length === 0) {
+    if (typeof input !== 'string' || input.trim().length === 0) {
       return {
         isValid: false,
         reason: 'Please enter a reason',
@@ -41,10 +54,10 @@ export const multipayRecipientValidators: {
     }
   },
   reference: (input: string | null) => {
-    if (typeof input !== 'string') {
+    if (input !== null && typeof input !== 'string') {
       return {
         isValid: false,
-        reason: 'Please enter a valid reference',
+        reason: 'Invalid reference format',
       }
     }
     return {
