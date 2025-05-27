@@ -156,6 +156,7 @@ const onSendingCurrencySelected = async (
       title: 'Confirm Currency Change',
       message:
         'Changing the sending currency will reset all recipient amounts. Are you sure?',
+      icon: 'warning',
     })
     if (accepted) {
       sendingCurrency.value = newVal
@@ -174,6 +175,7 @@ const onRecievingCurrencySelected = async (
       title: 'Confirm Currency Change',
       message:
         'Changing the receiving currency will reset all recipient amounts. Are you sure?',
+      icon: 'warning',
     })
     if (accepted) {
       recievingCurrency.value = newVal
@@ -314,6 +316,7 @@ const toggleDistributeCurrencyBy = async () => {
           title: 'Confirm Change',
           message:
             'Changing the distribution currency will reset all recipient amounts, and may invalidate your recipients. Are you sure?',
+          icon: 'warning',
         })
       ).accepted
     : true

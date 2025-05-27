@@ -4,6 +4,7 @@ import { ref, readonly } from 'vue'
 const isVisible = ref(false)
 const title = ref('')
 const message = ref('')
+const icon = ref<string | null>(null)
 let currentPromiseResolve: ((value: { accepted: boolean }) => void) | null =
   null
 
@@ -11,9 +12,11 @@ export const useWarningModal = () => {
   const open = (options: {
     title: string
     message: string
+    icon?: string
   }): Promise<{ accepted: boolean }> => {
     title.value = options.title
     message.value = options.message
+    icon.value = options.icon || null
     isVisible.value = true
     return new Promise((resolve) => {
       currentPromiseResolve = resolve
@@ -40,6 +43,7 @@ export const useWarningModal = () => {
     isVisible: readonly(isVisible), // Expose as readonly to encourage mutation via methods
     title: readonly(title),
     message: readonly(message),
+    icon: readonly(icon),
     open,
     confirm,
     cancel,
