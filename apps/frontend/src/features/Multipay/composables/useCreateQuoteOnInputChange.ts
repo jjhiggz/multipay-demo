@@ -39,21 +39,22 @@ const isQuoteInputValid = (input: UseCreateQuoteInput): [boolean, string[]] => {
     reasons.push('Delivery method must be selected')
   }
 
+  console.log(reasons)
   return [reasons.length === 0, reasons]
 }
 
 export const useCreateQuoteOnInputChange = (
   input: ComputedRef<UseCreateQuoteInput>,
 ) => {
-  const options = computed(() => orpcVueQuery.postQuote.mutationOptions())
+  const options = computed(() => orpcVueQuery.postQuote.mutationOptions({}))
   const inputVal = computed(() => input.value)
   const createQuote = useMutation(options)
 
   const quoteId = ref<string | null>(null)
 
   watch(inputVal, () => {
-    const result = isQuoteInputValid(inputVal.value)
-    if (result[0]) {
+    const [isValid, reasons] = isQuoteInputValid(inputVal.value)
+    if (isValid) {
       createQuote
         .mutateAsync({
           ...input.value,
@@ -63,7 +64,8 @@ export const useCreateQuoteOnInputChange = (
           quoteId.value = response.quote.quoteId as string
         })
     } else {
-      console.log('Quote input invalid:', result[1])
+      quoteId.value = null
+      // do nothing
     }
   })
 

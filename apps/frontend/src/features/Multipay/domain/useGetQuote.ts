@@ -127,6 +127,7 @@ export const useGetQuote = (quoteId: Ref<string | null>) => {
         quoteId: quoteId.value ?? '',
         refreshPaymentMethods: true,
       },
+      enabled: !!quoteId.value,
     }),
   )
 

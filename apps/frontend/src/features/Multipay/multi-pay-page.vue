@@ -6,10 +6,6 @@
       </div>
       <div class="flex flex-col flex-grow gap-8 bg-white shadow p-8 rounded-lg w-full">
         <!-- Add a button to trigger the modal for demonstration -->
-        <div class="my-4">
-          <Button @click="showDemoModal">Show Warning Modal</Button>
-        </div>
-
         <div class="flex flex-col gap-6">
           <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
           <div class="flex sm:flex-row flex-col gap-2">
@@ -87,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import IsolatedPageLayout from '@/layouts/IsolatedPageLayout.vue'
 import CurrencyDropdown, { type CurrencyDropdownOption } from '@/features/Multipay/ui/CurrencyDropdown.vue'
 import ToggleButton from '@/features/Multipay/ui/ToggleButton.vue'
@@ -108,9 +104,16 @@ import Button from '@/components/ui/button/Button.vue'
 const warningModal = useWarningModal();
 
 const distributeCurrencyBy = ref<'send-currency' | 'recieving-currency'>('send-currency')
-const toggleDistributeCurrencyBy = () => {
-  distributeCurrencyBy.value =
-    distributeCurrencyBy.value === 'send-currency' ? 'recieving-currency' : 'send-currency'
+const toggleDistributeCurrencyBy = async () => {
+  const { accepted } = await warningModal.open({
+    title: "Confirm Change",
+    message: "Changing the distribution currency will reset all recipient amounts. Are you sure?"
+  });
+  if (accepted) {
+    distributeCurrencyBy.value =
+      distributeCurrencyBy.value === 'send-currency' ? 'recieving-currency' : 'send-currency';
+    resetAllRecipientAmounts();
+  } // If not accepted, do nothing, UI should reflect original state
 }
 const selectedCurrency = computed(() =>
   distributeCurrencyBy.value === 'recieving-currency' ? recievingCurrency : sendingCurrency,
@@ -123,7 +126,7 @@ const recievingCurrency = ref<CurrencyDropdownOption | null>(null)
 const { data: profileData } = useProfile()
 
 watchEffect(() => {
-  if (profileData.value?.profile) {
+  if (profileData.value?.profile && !sendingCurrency.value && !recievingCurrency.value) {
     const { expectedTradeCurrency, expectedPayoutCurrency } = profileData.value.profile
     sendingCurrency.value = {
       value: expectedTradeCurrency as CurrencyCode,
@@ -136,10 +139,35 @@ watchEffect(() => {
   }
 })
 
-const onSendingCurrencySelected = (val: CurrencyDropdownOption | null) =>
-  (sendingCurrency.value = val)
-const onRecievingCurrencySelected = (val: CurrencyDropdownOption | null) =>
-  (recievingCurrency.value = val)
+const onSendingCurrencySelected = async (newVal: CurrencyDropdownOption | null) => {
+  if (newVal?.value !== sendingCurrency.value?.value) {
+    const { accepted } = await warningModal.open({
+      title: "Confirm Currency Change",
+      message: "Changing the sending currency will reset all recipient amounts. Are you sure?"
+    });
+    if (accepted) {
+      sendingCurrency.value = newVal;
+      resetAllRecipientAmounts();
+    } // Else: do nothing, dropdown should reflect original sendingCurrency.value
+  } else if (newVal?.value === sendingCurrency.value?.value) {
+    // If it's the same value, ensure it's assigned (e.g. if initial was null)
+    sendingCurrency.value = newVal;
+  }
+}
+const onRecievingCurrencySelected = async (newVal: CurrencyDropdownOption | null) => {
+  if (newVal?.value !== recievingCurrency.value?.value) {
+    const { accepted } = await warningModal.open({
+      title: "Confirm Currency Change",
+      message: "Changing the receiving currency will reset all recipient amounts. Are you sure?"
+    });
+    if (accepted) {
+      recievingCurrency.value = newVal;
+      resetAllRecipientAmounts();
+    } // Else: do nothing, dropdown should reflect original recievingCurrency.value
+  } else if (newVal?.value === recievingCurrency.value?.value) {
+    recievingCurrency.value = newVal;
+  }
+}
 
 const receivingCurrencyCode = computed(() => recievingCurrency.value?.value ?? null)
 
@@ -198,26 +226,39 @@ const totalAmount = computed(() =>
 
 
 
-const quoteInput = computed<UseCreateQuoteInput>(() => ({
-  amount: totalAmount.value,
-  userCountry: 'US',
-  countryTo: 'GB',
-  amountTo: null,
-  sellCcy: typeof sendingCurrency.value === 'string' ? sendingCurrency.value : sendingCurrency.value?.value ?? 'USD',
-  buyCcy: typeof recievingCurrency.value === 'string' ? recievingCurrency.value : recievingCurrency.value?.value ?? 'GBP',
-  fixedCcy: typeof sendingCurrency.value === 'string' ? sendingCurrency.value : sendingCurrency.value?.value ?? 'USD',
-  screen: 'multipay',
-  platformType: 'web',
-  shouldCalcAmountFrom: true,
-  promotionCodes: [],
-  deliveryMethod: 'BankAccount'
-}))
+const quoteInput = computed<UseCreateQuoteInput>(() => {
+  console.log("triggered")
+  return ({
+    amount: totalAmount.value,
+    userCountry: 'US',
+    countryTo: 'GB',
+    amountTo: null,
+    sellCcy: typeof sendingCurrency.value === 'string' ? sendingCurrency.value : sendingCurrency.value?.value ?? 'USD',
+    buyCcy: typeof recievingCurrency.value === 'string' ? recievingCurrency.value : recievingCurrency.value?.value ?? 'GBP',
+    fixedCcy: typeof sendingCurrency.value === 'string' ? sendingCurrency.value : sendingCurrency.value?.value ?? 'USD',
+    screen: 'multipay',
+    platformType: 'web',
+    shouldCalcAmountFrom: true,
+    promotionCodes: [],
+    deliveryMethod: 'BankAccount'
+  })
+})
 
 const { quoteId, isLoading } = useCreateQuoteOnInputChange(quoteInput)
 const {data: quoteData, isLoading: isLoadingQuote } = useGetQuote(quoteId)
 
 
-watch(quoteData, () => console.log(quoteData))
+
+// Function to reset all recipient amounts
+const resetAllRecipientAmounts = () => {
+  recipients.value = recipients.value.map(r => ({
+    ...r,
+    values: {
+      ...r.values,
+      amount: 0, // Or 0, depending on desired reset state
+    },
+  }));
+};
 
 // Function to trigger the modal and log the result
 const showDemoModal = async () => {
