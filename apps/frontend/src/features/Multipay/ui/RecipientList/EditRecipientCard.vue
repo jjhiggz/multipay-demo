@@ -16,7 +16,11 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import ReasonSearch from '../ReasonSearch.vue'
 import type { FERecipient } from '../../domain/useRecipients'
-import type { MultiPayRecipientContainer } from './recipient-list.types'
+import type {
+  MultiPayRecipientContainer,
+  MultipayRecipientValidations,
+  RecipientFields,
+} from './recipient-list.types'
 import Flag from '@/components/Flag.vue'
 
 const props = defineProps<{
@@ -24,12 +28,15 @@ const props = defineProps<{
   values: MultiPayRecipientContainer['values']
   open: boolean
   selectedCurrencyCode?: CurrencyCode | null
+  validationState?: MultipayRecipientValidations
 }>()
 
 const emit = defineEmits<{
   (e: 'update', data: Partial<MultiPayRecipientContainer['values']>): void
   (e: 'remove'): void
   (e: 'update:open', val: boolean): void
+  (e: 'field-focus', fieldName: keyof RecipientFields): void
+  (e: 'field-blur', fieldName: keyof RecipientFields): void
 }>()
 
 const formattedAmount = computed(() => {
@@ -94,7 +101,14 @@ const recipientValidator = computed(() => {
   <Collapsible
     :open="props.open"
     @update:open="(val) => emit('update:open', val)"
-    class="bg-card shadow-sm mb-3 border border-gray-200 rounded-lg overflow-hidden"
+    :class="[
+      'bg-card shadow-sm mb-3 border border-gray-200 rounded-lg overflow-hidden',
+      {
+        'border-l-4 border-red-500':
+          validationState?.recipientErrors &&
+          validationState.recipientErrors.length > 0,
+      },
+    ]"
   >
     <div
       class="flex justify-between items-center p-4 cursor-pointer"
@@ -131,6 +145,8 @@ const recipientValidator = computed(() => {
               :initial-recipient="props.values.recipient"
               :dropdownWidthRef="recipientSearchContainerRef"
               @recipientSelected="handleRecipientSelected"
+              @focus="emit('field-focus', 'recipient')"
+              @blur="emit('field-blur', 'recipient')"
               :validator="recipientValidator"
             >
               <template #invalid-item="{ recipient: invalidRecipientInfo }">
@@ -148,6 +164,17 @@ const recipientValidator = computed(() => {
                 </div>
               </template>
             </RecipientSearch>
+            <div
+              v-if="validationState?.fieldErrors?.recipient?.length"
+              class="mt-1 text-red-500 text-xs"
+            >
+              <div
+                v-for="error in validationState.fieldErrors.recipient"
+                :key="error"
+              >
+                {{ error }}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -161,8 +188,21 @@ const recipientValidator = computed(() => {
             @update:modelValue="
               (value) => emit('update', { amount: parseFloat(String(value)) })
             "
+            @focus="emit('field-focus', 'amount')"
+            @blur="emit('field-blur', 'amount')"
             class="w-full"
           />
+          <div
+            v-if="validationState?.fieldErrors?.amount?.length"
+            class="mt-1 text-red-500 text-xs"
+          >
+            <div
+              v-for="error in validationState.fieldErrors.amount"
+              :key="error"
+            >
+              {{ error }}
+            </div>
+          </div>
         </div>
 
         <div class="space-y-1 w-full">
@@ -172,10 +212,23 @@ const recipientValidator = computed(() => {
             @update:modelValue="
               (newReason) => emit('update', { reason: newReason })
             "
+            @focus="emit('field-focus', 'reason')"
+            @blur="emit('field-blur', 'reason')"
             class="w-full"
             ref="reasonSearchContainerRef"
             :dropdownWidthRef="reasonSearchContainerRef"
           />
+          <div
+            v-if="validationState?.fieldErrors?.reason?.length"
+            class="mt-1 text-red-500 text-xs"
+          >
+            <div
+              v-for="error in validationState.fieldErrors.reason"
+              :key="error"
+            >
+              {{ error }}
+            </div>
+          </div>
         </div>
 
         <div class="space-y-1">
@@ -184,7 +237,20 @@ const recipientValidator = computed(() => {
             placeholder="Add a reference"
             :value="props.values.reference || ''"
             @input="handleReferenceInput"
+            @focus="emit('field-focus', 'reference')"
+            @blur="emit('field-blur', 'reference')"
           />
+          <div
+            v-if="validationState?.fieldErrors?.reference?.length"
+            class="mt-1 text-red-500 text-xs"
+          >
+            <div
+              v-for="error in validationState.fieldErrors.reference"
+              :key="error"
+            >
+              {{ error }}
+            </div>
+          </div>
         </div>
 
         <div class="pt-2">

@@ -78,9 +78,12 @@
             @add="addRecipient"
             @remove="removeRecipient"
             @update="updateRecipient"
+            @recipient-field-focus="handleFieldFocus"
+            @recipient-field-blur="handleFieldBlur"
             :open-ids="openIds"
             @toggle-open="handleOpenChange"
             :selectedCurrencyCode="receivingCurrencyCode"
+            :has-form-been-submitted="hasFormBeenSubmitted"
           />
         </div>
         <!-- Recipients Table Placeholder -->
@@ -88,7 +91,7 @@
       <SummaryCard
         :quote="quoteData"
         :is-loading="isLoadingQuote"
-        @continue="() => {}"
+        @continue="handleContinue"
       />
     </div>
     <WarningModal :state="warningModal" />
@@ -108,7 +111,10 @@ import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 import SummaryCard from '@/features/Multipay/ui/SummaryCard.vue'
 import CalendarDropdown from '@/features/Multipay/ui/CalendarDropdown.vue'
 import RecipientList from './ui/RecipientList/RecipientList.vue'
-import type { MultiPayRecipientContainer } from './ui/RecipientList/recipient-list.types'
+import type {
+  MultiPayRecipientContainer,
+  RecipientFields,
+} from './ui/RecipientList/recipient-list.types'
 import {
   useCreateQuoteOnInputChange,
   type UseCreateQuoteInput,
@@ -116,8 +122,10 @@ import {
 import { useGetQuote } from './domain/useGetQuote'
 import WarningModal from '@/components/WarningModal.vue'
 import { useWarningModal } from '@/composables/useWarningModal'
+import { getMultipayRecipientValidations } from '@/features/Multipay/ui/RecipientList/recipient-list.validators'
 
 const warningModal = useWarningModal()
+const hasFormBeenSubmitted = ref(false)
 
 const distributeCurrencyBy = ref<'send-currency' | 'recieving-currency'>(
   'send-currency',
@@ -181,10 +189,14 @@ const addRecipient = () => {
         reference: '',
       },
       state: {
-        recipient: { hasEnteredFocus: false, hasLeftFocus: false },
-        amount: { hasEnteredFocus: false, hasLeftFocus: false },
-        reason: { hasEnteredFocus: false, hasLeftFocus: false },
-        reference: { hasEnteredFocus: false, hasLeftFocus: false },
+        byField: {
+          recipient: { hasEnteredFocus: false, hasLeftFocus: false },
+          amount: { hasEnteredFocus: false, hasLeftFocus: false },
+          reason: { hasEnteredFocus: false, hasLeftFocus: false },
+          reference: { hasEnteredFocus: false, hasLeftFocus: false },
+        },
+        hasEnteredFocus: false,
+        hasLeftFocus: false,
       },
     },
   ]
@@ -200,12 +212,15 @@ const updateRecipient = (
   index: number,
   newValues: Partial<MultiPayRecipientContainer['values']>,
 ) => {
-  recipients.value = [...recipients.value].map(
-    (r: MultiPayRecipientContainer) =>
-      r.index === index
-        ? { ...r, values: { ...r.values, ...newValues } }
-        : { ...r },
-  )
+  recipients.value = recipients.value.map((r) => {
+    if (r.index === index) {
+      const updatedValues = { ...r.values, ...newValues }
+      const newState = { ...r.state }
+
+      return { ...r, values: updatedValues, state: newState }
+    }
+    return r
+  })
 }
 
 const totalAmount = computed(() =>
@@ -216,24 +231,14 @@ const totalAmount = computed(() =>
 )
 
 const quoteInput = computed<UseCreateQuoteInput>(() => {
-  console.log('triggered')
   return {
     amount: totalAmount.value,
     userCountry: 'US',
     countryTo: 'GB',
     amountTo: null,
-    sellCcy:
-      typeof sendingCurrency.value === 'string'
-        ? sendingCurrency.value
-        : (sendingCurrency.value?.value ?? 'USD'),
-    buyCcy:
-      typeof recievingCurrency.value === 'string'
-        ? recievingCurrency.value
-        : (recievingCurrency.value?.value ?? 'GBP'),
-    fixedCcy:
-      typeof sendingCurrency.value === 'string'
-        ? sendingCurrency.value
-        : (sendingCurrency.value?.value ?? 'USD'),
+    sellCcy: sendingCurrency.value?.value ?? 'USD',
+    buyCcy: recievingCurrency.value?.value ?? 'GBP',
+    fixedCcy: sendingCurrency.value?.value ?? 'USD',
     screen: 'multipay',
     platformType: 'web',
     shouldCalcAmountFrom: true,
@@ -245,30 +250,25 @@ const quoteInput = computed<UseCreateQuoteInput>(() => {
 const { quoteId, isLoading } = useCreateQuoteOnInputChange(quoteInput)
 const { data: quoteData, isLoading: isLoadingQuote } = useGetQuote(quoteId)
 
-// Function to reset all recipient amounts
 const resetAllRecipientAmounts = () => {
   recipients.value = recipients.value.map((r) => ({
     ...r,
     values: {
       ...r.values,
-      amount: 0, // Or 0, depending on desired reset state
+      amount: 0,
     },
   }))
+  hasFormBeenSubmitted.value = false
 }
 
 const shouldWarnForCurrencyChange = computed(() => {
   if (recipients.value.length === 0) {
     return false
   }
-  if (
-    recipients.value.every(
-      (recipient) =>
-        recipient.values.amount === 0 || recipient.values.amount === null,
-    )
-  ) {
-    return false
-  }
-  return true
+  return recipients.value.some(
+    (recipient) =>
+      recipient.values.amount !== 0 && recipient.values.amount !== null,
+  )
 })
 
 const openWarningModalIfNecessaryAndExecuteIfNotRejected = async <T,>(
@@ -278,13 +278,16 @@ const openWarningModalIfNecessaryAndExecuteIfNotRejected = async <T,>(
     message: string
     icon?: string
   },
+  checkAmounts = true,
 ): Promise<T | null> => {
-  const shouldContinue = shouldWarnForCurrencyChange.value
+  const shouldWarn = checkAmounts ? shouldWarnForCurrencyChange.value : true
+  const shouldContinue = shouldWarn
     ? (await warningModal.open(warningOptions)).accepted
     : true
 
   if (shouldContinue) {
-    return await executor()
+    const result = await executor()
+    return result
   }
   return null
 }
@@ -310,6 +313,10 @@ const toggleDistributeCurrencyBy = async () => {
 const onSendingCurrencySelected = async (
   newVal: CurrencyDropdownOption | null,
 ) => {
+  if (newVal?.value === sendingCurrency.value?.value && newVal !== null) {
+    sendingCurrency.value = newVal
+    return
+  }
   await openWarningModalIfNecessaryAndExecuteIfNotRejected(
     () => {
       sendingCurrency.value = newVal
@@ -321,12 +328,17 @@ const onSendingCurrencySelected = async (
         'Changing the sending currency will reset all recipient amounts. Are you sure?',
       icon: 'warning',
     },
+    recipients.value.length > 0 && sendingCurrency.value !== null,
   )
 }
 
 const onRecievingCurrencySelected = async (
   newVal: CurrencyDropdownOption | null,
 ) => {
+  if (newVal?.value === recievingCurrency.value?.value && newVal !== null) {
+    recievingCurrency.value = newVal
+    return
+  }
   await openWarningModalIfNecessaryAndExecuteIfNotRejected(
     () => {
       recievingCurrency.value = newVal
@@ -338,6 +350,7 @@ const onRecievingCurrencySelected = async (
         'Changing the receiving currency will reset all recipient amounts. Are you sure?',
       icon: 'warning',
     },
+    recipients.value.length > 0 && recievingCurrency.value !== null,
   )
 }
 
@@ -346,4 +359,59 @@ const selectedCurrency = computed(() =>
     ? recievingCurrency
     : sendingCurrency,
 )
+
+const handleContinue = () => {
+  hasFormBeenSubmitted.value = true
+  console.log('Continue clicked, form submission attempted.')
+
+  const allRecipientsValid = recipients.value.every((recipient) => {
+    const validationState = getMultipayRecipientValidations(recipient, true)
+    return !(
+      validationState.recipientErrors.length > 0 ||
+      Object.values(validationState.fieldErrors).some(
+        (errors: string[]) => errors.length > 0,
+      )
+    )
+  })
+
+  if (allRecipientsValid) {
+    console.log('All recipients are valid. Proceeding...')
+  } else {
+    console.log('Some recipients have errors. Please review.')
+  }
+}
+
+const handleFieldFocus = (
+  recipientIndex: number,
+  fieldName: keyof RecipientFields,
+) => {
+  const recipient = recipients.value.find((r) => r.index === recipientIndex)
+  if (recipient) {
+    recipient.state.byField[fieldName].hasEnteredFocus = true
+    // Mark the container as entered if any field is focused
+    recipient.state.hasEnteredFocus = true
+    // Optional: If a field is re-focused, its hasLeftFocus should be reset for that specific field
+    recipient.state.byField[fieldName].hasLeftFocus = false
+    // Optional: Reset overall container left focus if a new field interaction starts
+    // recipient.state.hasLeftFocus = false;
+  }
+}
+
+const handleFieldBlur = (
+  recipientIndex: number,
+  fieldName: keyof RecipientFields,
+) => {
+  const recipient = recipients.value.find((r) => r.index === recipientIndex)
+  if (recipient) {
+    recipient.state.byField[fieldName].hasLeftFocus = true
+    // If the container was already marked as entered, and now a field blurs,
+    // it means the user has interacted and potentially left the container fields.
+    if (recipient.state.hasEnteredFocus) {
+      // This logic might need refinement: when does the *container* truly lose focus?
+      // For now, any blur after an enter marks the container as having been left.
+      // A more sophisticated approach might check if all active/focused elements within are now blurred.
+      recipient.state.hasLeftFocus = true
+    }
+  }
+}
 </script>

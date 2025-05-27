@@ -8,7 +8,7 @@ import type { FERecipient } from '../../domain/useRecipients'
  */
 
 // RecipientFields is now internal to this file
-type RecipientFields = {
+export type RecipientFields = {
   recipient: FERecipient | null
   amount: number | null
   reason: string | null
@@ -18,13 +18,22 @@ type RecipientFields = {
 export type MultiPayRecipientContainer = {
   index: number
   values: RecipientFields // Still uses the internal RecipientFields type
-  state: Record<
-    keyof RecipientFields,
-    {
-      hasEnteredFocus: boolean
-      hasLeftFocus: boolean
-    }
-  >
+  state: {
+    hasEnteredFocus: boolean
+    hasLeftFocus: boolean
+    byField: Record<
+      keyof RecipientFields,
+      {
+        hasEnteredFocus: boolean
+        hasLeftFocus: boolean
+      }
+    >
+  }
+}
+
+export type MultipayRecipientValidations = {
+  recipientErrors: string[]
+  fieldErrors: Record<keyof RecipientFields, string[]>
 }
 
 export type ValidatorFn<T> = (input: T) =>

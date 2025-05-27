@@ -11,18 +11,24 @@ import TableCell from '@/components/ui/table/TableCell.vue'
 import ReasonSearch from '../ReasonSearch.vue'
 import { Button } from '@/components/ui/button'
 import type { FERecipient } from '../../domain/useRecipients'
-import type { MultiPayRecipientContainer } from './recipient-list.types'
-import Flag from '@/components/Flag.vue'
+import type {
+  MultiPayRecipientContainer,
+  MultipayRecipientValidations,
+  RecipientFields,
+} from './recipient-list.types'
 
 const props = defineProps<{
   index: number
   values: MultiPayRecipientContainer['values']
   selectedCurrencyCode?: CurrencyCode | null
+  validationState?: MultipayRecipientValidations
 }>()
 
 const emit = defineEmits<{
   (e: 'update', data: Partial<MultiPayRecipientContainer['values']>): void
   (e: 'remove'): void
+  (e: 'field-focus', fieldName: keyof RecipientFields): void
+  (e: 'field-blur', fieldName: keyof RecipientFields): void
 }>()
 
 const recipientSearchContainerRef = ref<VNodeRef | null>(null)
@@ -66,12 +72,24 @@ const handleRecipientSelected = (
 
 <template>
   <TableRow
-    class="data-[state=selected]:bg-muted border-b h-10 transition-colors"
+    :class="[
+      'data-[state=selected]:bg-muted border-b h-10 transition-colors',
+      {
+        'border-l-4 border-red-500':
+          validationState?.recipientErrors &&
+          validationState.recipientErrors.length > 0,
+      },
+    ]"
   >
-    <TableCell class="w-[220px]" ref="recipientSearchContainerRef">
+    <TableCell
+      class="py-2 w-[220px] align-top"
+      ref="recipientSearchContainerRef"
+    >
       <RecipientSearch
         :initial-recipient="props.values.recipient"
         @recipientSelected="handleRecipientSelected"
+        @focus="emit('field-focus', 'recipient')"
+        @blur="emit('field-blur', 'recipient')"
         :dropdownWidthRef="recipientSearchContainerRef"
         :validator="recipientValidator"
       >
@@ -85,8 +103,19 @@ const handleRecipientSelected = (
           </div>
         </template>
       </RecipientSearch>
+      <div
+        v-if="validationState?.fieldErrors?.recipient?.length"
+        class="mt-1 text-red-500 text-xs"
+      >
+        <div
+          v-for="error in validationState.fieldErrors.recipient"
+          :key="error"
+        >
+          {{ error }}
+        </div>
+      </div>
     </TableCell>
-    <TableCell>
+    <TableCell class="py-2 align-top">
       <MoneyInput
         :model-value="props.values.amount !== null ? props.values.amount : ''"
         :currency="props.selectedCurrencyCode || 'USD'"
@@ -96,20 +125,36 @@ const handleRecipientSelected = (
           (value: string | number) =>
             emit('update', { amount: parseFloat(String(value)) })
         "
-        class="w-full"
+        @focus="emit('field-focus', 'amount')"
+        @blur="emit('field-blur', 'amount')"
       />
+      <div :v-if="true" class="mt-1 text-red-500 text-xs">
+        <div v-for="error in validationState?.fieldErrors.amount" :key="error">
+          {{ error }}
+        </div>
+      </div>
     </TableCell>
-    <TableCell class="w-[220px]" ref="reasonSearchContainerRef">
+    <TableCell class="py-2 w-[220px] align-top" ref="reasonSearchContainerRef">
       <ReasonSearch
         :model-value="props.values.reason"
         @update:modelValue="
           (newReason) => emit('update', { reason: newReason })
         "
+        @focus="emit('field-focus', 'reason')"
+        @blur="emit('field-blur', 'reason')"
         class="w-full"
         :dropdownWidthRef="reasonSearchContainerRef"
       />
+      <div
+        v-if="validationState?.fieldErrors?.reason?.length"
+        class="mt-1 text-red-500 text-xs"
+      >
+        <div v-for="error in validationState.fieldErrors.reason" :key="error">
+          {{ error }}
+        </div>
+      </div>
     </TableCell>
-    <TableCell>
+    <TableCell class="py-2 align-top">
       <input
         :value="props.values.reference || ''"
         @input="
@@ -118,11 +163,24 @@ const handleRecipientSelected = (
               reference: (e.target as HTMLInputElement)?.value || '',
             })
         "
+        @focus="emit('field-focus', 'reference')"
+        @blur="emit('field-blur', 'reference')"
         class="p-2 border rounded w-full"
         placeholder="Optional reference"
       />
+      <div
+        v-if="validationState?.fieldErrors?.reference?.length"
+        class="mt-1 text-red-500 text-xs"
+      >
+        <div
+          v-for="error in validationState.fieldErrors.reference"
+          :key="error"
+        >
+          {{ error }}
+        </div>
+      </div>
     </TableCell>
-    <TableCell>
+    <TableCell class="py-2 align-top">
       <Button
         @click="$emit('remove')"
         title="Remove Recipient"

@@ -30,13 +30,22 @@
           </TableHeader>
           <TableBody>
             <EditRecipientRow
-              v-for="recipient in props.recipients"
+              v-for="(recipient, idx) in props.recipients"
               :key="recipient.index"
               :index="recipient.index"
               :values="recipient.values"
               :selectedCurrencyCode="props.selectedCurrencyCode"
+              :validationState="recipientValidationStates[idx]"
               @update="emit('update', recipient.index, $event)"
               @remove="$emit('remove', recipient.index)"
+              @field-focus="
+                (fieldName) =>
+                  emit('recipient-field-focus', recipient.index, fieldName)
+              "
+              @field-blur="
+                (fieldName) =>
+                  emit('recipient-field-blur', recipient.index, fieldName)
+              "
             />
           </TableBody>
         </Table>
@@ -58,15 +67,24 @@
       class="md:hidden space-y-2 py-6 pt-0"
     >
       <EditRecipientCard
-        v-for="recipient in props.recipients"
+        v-for="(recipient, idx) in props.recipients"
         :key="recipient.index"
         :index="recipient.index"
         :values="recipient.values"
         :open="props.openIds.includes(recipient.index)"
         :selectedCurrencyCode="props.selectedCurrencyCode"
+        :validationState="recipientValidationStates[idx]"
         @update="$emit('update', recipient.index, $event)"
         @remove="$emit('remove', recipient.index)"
         @update:open="$emit('toggle-open', recipient.index, $event)"
+        @field-focus="
+          (fieldName) =>
+            emit('recipient-field-focus', recipient.index, fieldName)
+        "
+        @field-blur="
+          (fieldName) =>
+            emit('recipient-field-blur', recipient.index, fieldName)
+        "
         class="mb-2"
       />
       <div>
@@ -83,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import EditRecipientRow from './EditRecipientRow.vue'
 import EditRecipientCard from './EditRecipientCard.vue'
@@ -95,13 +113,19 @@ import {
   TableHead,
 } from '@/components/ui/table'
 import Button from '@/components/ui/button/Button.vue'
-import type { MultiPayRecipientContainer } from './recipient-list.types'
+import type {
+  MultiPayRecipientContainer,
+  MultipayRecipientValidations,
+  RecipientFields,
+} from './recipient-list.types'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
+import { getMultipayRecipientValidations } from './recipient-list.validators'
 
 const props = defineProps<{
   recipients: MultiPayRecipientContainer[]
   openIds: number[]
   selectedCurrencyCode?: CurrencyCode | null
+  hasFormBeenSubmitted?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -113,5 +137,28 @@ const emit = defineEmits<{
     newValues: Partial<MultiPayRecipientContainer['values']>,
   ): void
   (e: 'toggle-open', index: number, open: boolean): void
+  (
+    e: 'recipient-field-focus',
+    recipientIndex: number,
+    fieldName: keyof RecipientFields,
+  ): void
+  (
+    e: 'recipient-field-blur',
+    recipientIndex: number,
+    fieldName: keyof RecipientFields,
+  ): void
 }>()
+
+// Computed property for validation states
+const recipientValidationStates = computed<MultipayRecipientValidations[]>(
+  () => {
+    return props.recipients.map((recipient) =>
+      getMultipayRecipientValidations(
+        recipient,
+        // true,
+        props.hasFormBeenSubmitted || false,
+      ),
+    )
+  },
+)
 </script>
