@@ -26,7 +26,7 @@
 
       <template v-if="isLoading">
         <div class="p-2 text-center">
-          <LoadingDots />
+          <Loader2 class="mx-auto w-6 h-6 animate-spin" />
         </div>
       </template>
       <template v-else>
@@ -82,7 +82,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, type Ref, type VNodeRef } from 'vue'
-import { Check, ChevronsUpDown } from 'lucide-vue-next'
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import {
   Combobox,
