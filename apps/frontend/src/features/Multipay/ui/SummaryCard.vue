@@ -10,23 +10,35 @@
     role="region"
     aria-label="Transfer summary"
   >
-    <div class="items-start gap-y-2 md:gap-x-6 md:gap-y-0 grid grid-cols-2 md:grid-cols-5">
+    <div
+      class="items-start gap-y-2 md:gap-x-6 md:gap-y-0 grid grid-cols-2 md:grid-cols-5"
+    >
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Total to send</span>
-        <span class="mt-0.5 text-gray-700 font-medium text-base">{{ totalToSend }}</span>
+        <span class="mt-0.5 font-medium text-gray-700 text-base">{{
+          totalToSend
+        }}</span>
       </div>
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Exchange rate</span>
-        <span class="mt-0.5 text-gray-700 text-base font-medium">{{ exchangeRate }}</span>
+        <span class="mt-0.5 font-medium text-gray-700 text-base">{{
+          exchangeRate
+        }}</span>
       </div>
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Recipients will receive</span>
-        <span class="mt-0.5 text-gray-700 text-base font-medium">{{ recipientsWillReceive }}</span>
+        <span class="mt-0.5 font-medium text-gray-700 text-base">{{
+          recipientsWillReceive
+        }}</span>
       </div>
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Total to pay</span>
-        <span class="mt-0.5 text-gray-700 font-bold text-base">{{ totalToPay }}</span>
-        <span class="mt-0.5 text-gray-400 text-xs">Includes fee: {{ fee }}</span>
+        <span class="mt-0.5 font-bold text-gray-700 text-base">{{
+          totalToPay
+        }}</span>
+        <span class="mt-0.5 text-gray-400 text-xs"
+          >Includes fee: {{ fee }}</span
+        >
       </div>
       <div class="flex md:justify-end col-span-2 md:col-span-1 mt-2 md:mt-0">
         <slot name="action">
@@ -47,17 +59,16 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import Button from '@/components/ui/button/Button.vue'
+import type { FEQuote } from '../domain/useGetQuote'
+
 /**
  * SummaryCardProps defines the props for the SummaryCard component.
  * All props are required for clarity and type safety.
  */
 export interface SummaryCardProps {
-  totalToSend: string
-  exchangeRate: string
-  recipientsWillReceive: string
-  totalToPay: string
-  fee: string
+  quote: FEQuote | undefined
   isLoading?: boolean
   isDisabled?: boolean
   buttonAriaLabel?: string
@@ -67,6 +78,47 @@ const props = withDefaults(defineProps<SummaryCardProps>(), {
   isLoading: false,
   isDisabled: false,
   buttonAriaLabel: 'Continue to payment',
+})
+
+const totalToSend = computed(() => {
+  if (props.isLoading) return 'Loading...'
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  return `${defaultQuote.sellAmount} ${props.quote.sellCcy}`
+})
+
+const exchangeRate = computed(() => {
+  if (props.isLoading) return 'Loading...'
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  const rateValue = parseFloat(String(defaultQuote.rate))
+  if (Number.isNaN(rateValue)) {
+    return `1 ${props.quote.sellCcy} = N/A ${props.quote.buyCcy}`
+  }
+  return `1 ${props.quote.sellCcy} = ${rateValue.toFixed(2)} ${props.quote.buyCcy}`
+})
+
+const recipientsWillReceive = computed(() => {
+  if (props.isLoading) return 'Loading...'
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  return `${defaultQuote.buyAmount} ${props.quote.buyCcy}`
+})
+
+const totalToPay = computed(() => {
+  if (props.isLoading) return 'Loading...'
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  return `${defaultQuote.totalCostAmount} ${props.quote.sellCcy}`
+})
+
+const fee = computed(() => {
+  if (props.isLoading) return 'Loading...'
+  if (!props.quote) return ''
+  const defaultQuote = props.quote.individualQuotes[0]
+  const totalFee =
+    Number(defaultQuote.transferFee) + Number(defaultQuote.paymentMethodFee)
+  return `${totalFee} ${props.quote.sellCcy}`
 })
 
 defineEmits<{ (e: 'continue'): void }>()

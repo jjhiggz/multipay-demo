@@ -179,6 +179,7 @@ export const createQuoteResponse = async (
       "<!-- Warning: Automatic extraction of rates is prohibited under the Terms of Use. -->",
   } as const;
   await writeQuote(result);
+  console.log(result);
   return result;
 };
 

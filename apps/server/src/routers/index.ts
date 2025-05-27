@@ -18,12 +18,13 @@ import { userExistsMiddleware, type Context } from "../lib/context";
 import { systemFieldsOutputSchema } from "@/db/schema/system-fields.schema";
 import { defaultSystemFieldsReturn } from "@/constants/system-fields-return";
 import {
-  createQuoteInputSchema,
   createQuoteResponse,
+  deliveryMethodSchema,
   getQuoteById,
-  getQuoteResponseSchema,
+  individualQuoteSchema,
 } from "@/serializers/get-quotes";
-import { s } from "@/zod-schemas";
+import { countryCodeSchema, currencyCodeSchema, s } from "@/zod-schemas";
+import { countryCodes, type CountryCode } from "@/constants/country.constants";
 
 const healthcheckRoute = os
   .route({ method: "GET", path: "/healthcheck" })
@@ -75,8 +76,8 @@ const getCurrenciesRoute = os
       .select()
       .from(userToCurrencies)
       .where(eq(userToCurrencies.userId, context.session.user.id));
-    const parsedUserCurrencies = z
-      .array(s.userToCurrencies.select)
+    const parsedUserCurrencies = s.userToCurrencies.select
+      .array()
       .parse(userCurrenciesFromDb);
     return serializeCurrenciesEndpoint(parsedUserCurrencies);
   });
@@ -118,15 +119,16 @@ const removeCurrencyRoute = os
       .select()
       .from(userToCurrencies)
       .where(eq(userToCurrencies.userId, context.session.user.id));
-    const parsedRemainingCurrencies = z
-      .array(s.userToCurrencies.select)
+    const parsedRemainingCurrencies = s.userToCurrencies.select
+      .array()
       .parse(remainingCurrenciesFromDb);
+
     return serializeCurrenciesEndpoint(parsedRemainingCurrencies);
   });
 
 const legacyRecipientsOutputSchema = z.object({
-  recipients: z.array(
-    z.object({
+  recipients: z
+    .object({
       recipient: z.object({
         recipientId: z.number(),
         recipientDisplayName: z.string(),
@@ -142,7 +144,7 @@ const legacyRecipientsOutputSchema = z.object({
         })
       ),
     })
-  ),
+    .array(),
 });
 const legacyRecipientsHandler = async ({
   input,
@@ -209,10 +211,56 @@ const getSystemFieldsRoute = os
 
 const postQuote = os
   .route({ method: "POST", path: "/quote" })
-  .input(createQuoteInputSchema)
-  .output(getQuoteResponseSchema)
+  .input(
+    z.object({
+      userCountry: countryCodeSchema,
+      countryTo: countryCodeSchema,
+      amount: z.number().nullable(),
+      amountTo: z.number().nullable(),
+      sellCcy: currencyCodeSchema,
+      buyCcy: currencyCodeSchema,
+      fixedCcy: currencyCodeSchema,
+      screen: z.string(),
+      platflormType: z.string(),
+      shouldCalcAmountFrom: z.boolean(),
+      promotionCodes: z.array(z.unknown()),
+      deliveryMethod: deliveryMethodSchema,
+    })
+  )
+  .output(
+    z.object({
+      quote: z.object({
+        buyCcy: currencyCodeSchema,
+        sellCcy: currencyCodeSchema,
+        fixedCcy: currencyCodeSchema,
+        baseCcy: currencyCodeSchema,
+        quoteId: z.string(),
+        // TODO: Maybe we should look at this and refine this in the future
+        quoteStatus: z.string(),
+        deliveryMethod: deliveryMethodSchema,
+        // float
+        fixedAmountInUsd: z.number(),
+        countryTo: z.enum(countryCodes as [CountryCode]),
+        individualQuotes: z.array(individualQuoteSchema),
+        offeredDeliveryMethods: z.array(
+          z.object({
+            method: deliveryMethodSchema,
+            isEnabled: z.boolean(),
+            cashOpenPaymentAvailable: z.boolean(),
+          })
+        ),
+        infoMessages: z.unknown(),
+        warnMessages: z.unknown(),
+        errorMessages: z.unknown(),
+        expiryTimeMillis: z.number(),
+        availableSettlementProxies: z.array(z.unknown()),
+        provideRecipientLater: z.boolean(),
+      }),
+      warning: z.string(),
+    })
+  )
   .handler(async (c) => {
-    return createQuoteResponse(c.input);
+    return await createQuoteResponse(c.input);
   });
 
 const getQuote = os
@@ -227,7 +275,38 @@ const getQuote = os
       platformType: z.string().optional(),
     })
   )
-  .output(getQuoteResponseSchema)
+  .output(
+    z.object({
+      quote: z.object({
+        buyCcy: currencyCodeSchema,
+        sellCcy: currencyCodeSchema,
+        fixedCcy: currencyCodeSchema,
+        baseCcy: currencyCodeSchema,
+        quoteId: z.string(),
+        // TODO: Maybe we should look at this and refine this in the future
+        quoteStatus: z.string(),
+        deliveryMethod: deliveryMethodSchema,
+        // float
+        fixedAmountInUsd: z.number(),
+        countryTo: z.enum(countryCodes as [CountryCode]),
+        individualQuotes: z.array(individualQuoteSchema),
+        offeredDeliveryMethods: z.array(
+          z.object({
+            method: deliveryMethodSchema,
+            isEnabled: z.boolean(),
+            cashOpenPaymentAvailable: z.boolean(),
+          })
+        ),
+        infoMessages: z.unknown(),
+        warnMessages: z.unknown(),
+        errorMessages: z.unknown(),
+        expiryTimeMillis: z.number(),
+        availableSettlementProxies: z.array(z.unknown()),
+        provideRecipientLater: z.boolean(),
+      }),
+      warning: z.string(),
+    })
+  )
   .handler(async (c) => {
     return getQuoteById(c.input.quoteId);
   });
@@ -239,7 +318,6 @@ export const newAppRouter = {
   signIn: signInRoute,
   getProfile: getProfileRoute,
   getCurrencies: getCurrenciesRoute,
-  postQuote,
   addCurrency: addCurrencyRoute,
   removeCurrency: removeCurrencyRoute,
   recipients: os
@@ -253,6 +331,7 @@ export const newAppRouter = {
     .input(z.object({ email: z.string().email() }))
     .output(xeProfileResponseSchema)
     .handler(legacyXeProfileHandler),
+  postQuote,
   getQuote,
 };
 

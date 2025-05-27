@@ -15,32 +15,41 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import ReasonSearch from '../ReasonSearch.vue'
+import type { FERecipient } from '../../domain/useRecipients'
+import type {
+  MultiPayRecipientContainer,
+  MultipayRecipientValidations,
+  RecipientFields,
+} from './recipient-list.types'
+import Flag from '@/components/Flag.vue'
 
 const props = defineProps<{
-  id: number
-  name: string
-  currencyCode: CurrencyCode
-  amount: number | null
-  reason: string
-  reference?: string
+  index: number
+  values: MultiPayRecipientContainer['values']
   open: boolean
+  selectedCurrencyCode?: CurrencyCode | null
+  validationState?: MultipayRecipientValidations
 }>()
 
 const emit = defineEmits<{
-  (e: 'update', data: Partial<Omit<typeof props, 'open'>>): void
+  (e: 'update', data: Partial<MultiPayRecipientContainer['values']>): void
   (e: 'remove'): void
   (e: 'update:open', val: boolean): void
+  (e: 'field-focus', fieldName: keyof RecipientFields): void
+  (e: 'field-blur', fieldName: keyof RecipientFields): void
 }>()
 
 const formattedAmount = computed(() => {
-  if (!props.amount || isNaN(props.amount)) return ''
+  if (!props.values.amount || isNaN(props.values.amount)) return ''
+  const currency =
+    (props.values.recipient?.currencyCode as CurrencyCode) || 'USD'
   return (
     new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: props.currencyCode,
-    }).format(props.amount) +
+      currency: currency,
+    }).format(props.values.amount) +
     ' ' +
-    props.currencyCode
+    currency
   )
 })
 
@@ -53,28 +62,61 @@ const handleRecipientSelected = (
   selectedOption: RecipientSearchOption | null,
 ) => {
   if (selectedOption) {
-    emit('update', {
-      name: selectedOption.label,
+    const newRecipient: FERecipient = {
+      recipientId: selectedOption.recipientId,
+      recipientDisplayName: selectedOption.label,
       currencyCode: selectedOption.currencyCode as CurrencyCode,
-    })
+      bankCountryCode: selectedOption.bankCountryCode,
+      bankName: selectedOption.bankName,
+      accountNumber: selectedOption.accountNumber,
+    }
+    emit('update', { recipient: newRecipient })
+  } else {
+    emit('update', { recipient: null })
   }
 }
 
 const recipientSearchContainerRef = ref<VNodeRef | null>(null)
 const reasonSearchContainerRef = ref<VNodeRef | null>(null)
+
+const recipientValidator = computed(() => {
+  return (
+    recipient: FERecipient,
+  ): { isValid: true } | { isValid: false; reason: string } => {
+    if (
+      props.selectedCurrencyCode &&
+      recipient.currencyCode !== props.selectedCurrencyCode
+    ) {
+      return {
+        isValid: false,
+        reason: `Currency mismatch (needs ${props.selectedCurrencyCode})`,
+      }
+    }
+    return { isValid: true }
+  }
+})
 </script>
 
 <template>
   <Collapsible
     :open="props.open"
     @update:open="(val) => emit('update:open', val)"
-    class="bg-card shadow-sm mb-3 border border-gray-200 rounded-lg overflow-hidden"
+    :class="[
+      'bg-card shadow-sm mb-3 border border-gray-200 rounded-lg overflow-hidden',
+      {
+        'border-l-4 border-red-500':
+          validationState?.recipientErrors &&
+          validationState.recipientErrors.length > 0,
+      },
+    ]"
   >
     <div
       class="flex justify-between items-center p-4 cursor-pointer"
       @click="emit('update:open', !props.open)"
     >
-      <div class="font-medium">{{ props.name || 'New Recipient' }}</div>
+      <div class="font-medium">
+        {{ props.values.recipient?.recipientDisplayName || 'New Recipient' }}
+      </div>
       <div class="flex items-center">
         <div class="mr-2 font-medium">
           {{ formattedAmount || '-' }}
@@ -100,43 +142,115 @@ const reasonSearchContainerRef = ref<VNodeRef | null>(null)
           <div ref="recipientSearchContainerRef" class="w-full">
             <RecipientSearch
               class="w-full"
+              :initial-recipient="props.values.recipient"
               :dropdownWidthRef="recipientSearchContainerRef"
               @recipientSelected="handleRecipientSelected"
-            />
+              @focus="emit('field-focus', 'recipient')"
+              @blur="emit('field-blur', 'recipient')"
+              :validator="recipientValidator"
+            >
+              <template #invalid-item="{ recipient: invalidRecipientInfo }">
+                <div
+                  class="flex justify-between items-center w-full"
+                  :title="invalidRecipientInfo.validationReason"
+                >
+                  <span class="opacity-50">{{
+                    invalidRecipientInfo.label
+                  }}</span>
+                  <Icon
+                    icon="carbon:misuse"
+                    class="ml-1 w-4 h-4 text-red-500"
+                  />
+                </div>
+              </template>
+            </RecipientSearch>
+            <div
+              v-if="validationState?.fieldErrors?.recipient?.length"
+              class="mt-1 text-red-500 text-xs"
+            >
+              <div
+                v-for="error in validationState.fieldErrors.recipient"
+                :key="error"
+              >
+                {{ error }}
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="space-y-1">
           <Label class="font-normal text-gray-500">Amount</Label>
           <MoneyInput
-            :model-value="props.amount ?? 0"
-            :currency="props.currencyCode"
-            :disabled="false"
+            :model-value="props.values.amount ?? 0"
+            :currency="props.selectedCurrencyCode || 'USD'"
+            :disabled="!props.values.recipient || !props.selectedCurrencyCode"
             :currency-selectable="false"
             @update:modelValue="
               (value) => emit('update', { amount: parseFloat(String(value)) })
             "
+            @focus="emit('field-focus', 'amount')"
+            @blur="emit('field-blur', 'amount')"
             class="w-full"
           />
+          <div
+            v-if="validationState?.fieldErrors?.amount?.length"
+            class="mt-1 text-red-500 text-xs"
+          >
+            <div
+              v-for="error in validationState.fieldErrors.amount"
+              :key="error"
+            >
+              {{ error }}
+            </div>
+          </div>
         </div>
 
-        <div class="space-y-1 w-full" ref="">
+        <div class="space-y-1 w-full">
           <Label class="font-normal text-gray-500">Reason</Label>
           <ReasonSearch
-            :model-value="props.reason"
+            :model-value="props.values.reason"
+            @update:modelValue="
+              (newReason) => emit('update', { reason: newReason })
+            "
+            @focus="emit('field-focus', 'reason')"
+            @blur="emit('field-blur', 'reason')"
             class="w-full"
             ref="reasonSearchContainerRef"
             :dropdownWidthRef="reasonSearchContainerRef"
           />
+          <div
+            v-if="validationState?.fieldErrors?.reason?.length"
+            class="mt-1 text-red-500 text-xs"
+          >
+            <div
+              v-for="error in validationState.fieldErrors.reason"
+              :key="error"
+            >
+              {{ error }}
+            </div>
+          </div>
         </div>
 
         <div class="space-y-1">
           <Label class="font-normal text-gray-500">Reference (Optional)</Label>
           <Input
             placeholder="Add a reference"
-            :value="props.reference || ''"
+            :value="props.values.reference || ''"
             @input="handleReferenceInput"
+            @focus="emit('field-focus', 'reference')"
+            @blur="emit('field-blur', 'reference')"
           />
+          <div
+            v-if="validationState?.fieldErrors?.reference?.length"
+            class="mt-1 text-red-500 text-xs"
+          >
+            <div
+              v-for="error in validationState.fieldErrors.reference"
+              :key="error"
+            >
+              {{ error }}
+            </div>
+          </div>
         </div>
 
         <div class="pt-2">
