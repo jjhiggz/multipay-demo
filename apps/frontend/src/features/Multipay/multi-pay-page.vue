@@ -148,44 +148,6 @@ watchEffect(() => {
   }
 })
 
-const onSendingCurrencySelected = async (
-  newVal: CurrencyDropdownOption | null,
-) => {
-  if (newVal?.value !== sendingCurrency.value?.value) {
-    const { accepted } = await warningModal.open({
-      title: 'Confirm Currency Change',
-      message:
-        'Changing the sending currency will reset all recipient amounts. Are you sure?',
-      icon: 'warning',
-    })
-    if (accepted) {
-      sendingCurrency.value = newVal
-      resetAllRecipientAmounts()
-    } // Else: do nothing, dropdown should reflect original sendingCurrency.value
-  } else if (newVal?.value === sendingCurrency.value?.value) {
-    // If it's the same value, ensure it's assigned (e.g. if initial was null)
-    sendingCurrency.value = newVal
-  }
-}
-const onRecievingCurrencySelected = async (
-  newVal: CurrencyDropdownOption | null,
-) => {
-  if (newVal?.value !== recievingCurrency.value?.value) {
-    const { accepted } = await warningModal.open({
-      title: 'Confirm Currency Change',
-      message:
-        'Changing the receiving currency will reset all recipient amounts. Are you sure?',
-      icon: 'warning',
-    })
-    if (accepted) {
-      recievingCurrency.value = newVal
-      resetAllRecipientAmounts()
-    } // Else: do nothing, dropdown should reflect original recievingCurrency.value
-  } else if (newVal?.value === recievingCurrency.value?.value) {
-    recievingCurrency.value = newVal
-  }
-}
-
 const receivingCurrencyCode = computed(
   () => recievingCurrency.value?.value ?? null,
 )
@@ -309,25 +271,74 @@ const shouldWarnForCurrencyChange = computed(() => {
   return true
 })
 
-const toggleDistributeCurrencyBy = async () => {
+const openWarningModalIfNecessaryAndExecuteIfNotRejected = async <T,>(
+  executor: () => Promise<T> | T,
+  warningOptions: {
+    title: string
+    message: string
+    icon?: string
+  },
+): Promise<T | null> => {
   const shouldContinue = shouldWarnForCurrencyChange.value
-    ? (
-        await warningModal.open({
-          title: 'Confirm Change',
-          message:
-            'Changing the distribution currency will reset all recipient amounts, and may invalidate your recipients. Are you sure?',
-          icon: 'warning',
-        })
-      ).accepted
+    ? (await warningModal.open(warningOptions)).accepted
     : true
 
   if (shouldContinue) {
-    distributeCurrencyBy.value =
-      distributeCurrencyBy.value === 'send-currency'
-        ? 'recieving-currency'
-        : 'send-currency'
-    resetAllRecipientAmounts()
+    return await executor()
   }
+  return null
+}
+
+const toggleDistributeCurrencyBy = async () => {
+  await openWarningModalIfNecessaryAndExecuteIfNotRejected(
+    () => {
+      distributeCurrencyBy.value =
+        distributeCurrencyBy.value === 'send-currency'
+          ? 'recieving-currency'
+          : 'send-currency'
+      resetAllRecipientAmounts()
+    },
+    {
+      title: 'Confirm Change',
+      message:
+        'Changing the distribution currency will reset all recipient amounts, and may invalidate your recipients. Are you sure?',
+      icon: 'warning',
+    },
+  )
+}
+
+const onSendingCurrencySelected = async (
+  newVal: CurrencyDropdownOption | null,
+) => {
+  await openWarningModalIfNecessaryAndExecuteIfNotRejected(
+    () => {
+      sendingCurrency.value = newVal
+      resetAllRecipientAmounts()
+    },
+    {
+      title: 'Confirm Currency Change',
+      message:
+        'Changing the sending currency will reset all recipient amounts. Are you sure?',
+      icon: 'warning',
+    },
+  )
+}
+
+const onRecievingCurrencySelected = async (
+  newVal: CurrencyDropdownOption | null,
+) => {
+  await openWarningModalIfNecessaryAndExecuteIfNotRejected(
+    () => {
+      recievingCurrency.value = newVal
+      resetAllRecipientAmounts()
+    },
+    {
+      title: 'Confirm Currency Change',
+      message:
+        'Changing the receiving currency will reset all recipient amounts. Are you sure?',
+      icon: 'warning',
+    },
+  )
 }
 
 const selectedCurrency = computed(() =>
