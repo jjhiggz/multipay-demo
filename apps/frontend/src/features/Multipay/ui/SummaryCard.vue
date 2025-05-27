@@ -79,7 +79,13 @@ const exchangeRate = computed(() => {
   if (props.isLoading) return 'Loading...'
   if (!props.quote) return ''
   const defaultQuote = props.quote.individualQuotes[0]
-  return `1 ${props.quote.sellCcy} = ${defaultQuote.rate} ${props.quote.buyCcy}`
+  const rateValue = parseFloat(String(defaultQuote.rate))
+  if (Number.isNaN(rateValue)) {
+    // Handle cases where rate might not be a valid number
+    // You might want to return a specific error message or an empty string
+    return `1 ${props.quote.sellCcy} = N/A ${props.quote.buyCcy}`
+  }
+  return `1 ${props.quote.sellCcy} = ${rateValue.toFixed(2)} ${props.quote.buyCcy}`
 })
 
 const recipientsWillReceive = computed(() => {
