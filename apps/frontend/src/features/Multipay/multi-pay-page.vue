@@ -93,8 +93,7 @@ import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 import SummaryCard from '@/features/Multipay/ui/SummaryCard.vue'
 import CalendarDropdown from '@/features/Multipay/ui/CalendarDropdown.vue'
 import RecipientList from './ui/RecipientList/RecipientList.vue'
-import type { MultiPayRecipient } from './ui/RecipientList/RecipientList.vue'
-import type { MultipayRecipientValues } from './ui/RecipientList/recipient-list.types'
+import type { MultiPayRecipientContainer, RecipientFields } from './ui/RecipientList/recipient-list.types'
 import { useCreateQuoteOnInputChange, type UseCreateQuoteInput } from './composables/useCreateQuoteOnInputChange'
 import { useGetQuote } from './domain/useGetQuote'
 import WarningModal from '@/components/WarningModal.vue'
@@ -171,7 +170,7 @@ const onRecievingCurrencySelected = async (newVal: CurrencyDropdownOption | null
 
 const receivingCurrencyCode = computed(() => recievingCurrency.value?.value ?? null)
 
-const recipients = ref<MultiPayRecipient[]>([
+const recipients = ref<MultiPayRecipientContainer[]>([
 ])
 
 // --- Collapsible open state ---
@@ -186,7 +185,7 @@ const handleOpenChange = (id: number, open: boolean) => {
 
 const addRecipient = () => {
   const nextIndex = recipients.value.length > 0
-    ? Math.max(...recipients.value.map((r: MultiPayRecipient) => r.index)) + 1
+    ? Math.max(...recipients.value.map((r: MultiPayRecipientContainer) => r.index)) + 1
     : 1
   recipients.value = [
     ...recipients.value,
@@ -209,11 +208,11 @@ const addRecipient = () => {
 }
 
 const removeRecipient = (index: number) => {
-  recipients.value = [...recipients.value].filter((r: MultiPayRecipient) => r.index !== index)
+  recipients.value = [...recipients.value].filter((r: MultiPayRecipientContainer) => r.index !== index)
 }
 
-const updateRecipient = (index: number, newValues: Partial<MultipayRecipientValues>) => {
-  recipients.value = [...recipients.value].map((r: MultiPayRecipient) =>
+const updateRecipient = (index: number, newValues: Partial<RecipientFields>) => {
+  recipients.value = [...recipients.value].map((r: MultiPayRecipientContainer) =>
     r.index === index ? { ...r, values: { ...r.values, ...newValues } } : { ...r }
   )
 }

@@ -1,11 +1,8 @@
 import type { FERecipient } from '../../domain/useRecipients'
-import type {
-  MultipayRecipientValues,
-  ValidatorFn,
-} from './recipient-list.types'
+import type { RecipientFields, ValidatorFn } from './recipient-list.types'
 
 export const multipayRecipientValidators: {
-  [K in keyof MultipayRecipientValues]: ValidatorFn<MultipayRecipientValues[K]>
+  [K in keyof RecipientFields]: ValidatorFn<RecipientFields[K]>
 } = {
   recipient: (input: FERecipient | null) => {
     if (input === null) {

@@ -95,24 +95,14 @@ import {
   TableHead,
 } from '@/components/ui/table'
 import Button from '@/components/ui/button/Button.vue'
-import type { FERecipient } from '../../domain/useRecipients'
-import type { MultipayRecipientValues } from './recipient-list.types'
+import type {
+  MultiPayRecipientContainer,
+  RecipientFields,
+} from './recipient-list.types'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
 
-export type MultiPayRecipient = {
-  index: number
-  values: MultipayRecipientValues
-  state: Record<
-    keyof MultipayRecipientValues,
-    {
-      hasEnteredFocus: boolean
-      hasLeftFocus: boolean
-    }
-  >
-}
-
 const props = defineProps<{
-  recipients: MultiPayRecipient[]
+  recipients: MultiPayRecipientContainer[]
   openIds: number[]
   selectedCurrencyCode?: CurrencyCode | null
 }>()
@@ -120,11 +110,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'add'): void
   (e: 'remove', index: number): void
-  (
-    e: 'update',
-    index: number,
-    newValues: Partial<MultipayRecipientValues>,
-  ): void
+  (e: 'update', index: number, newValues: Partial<RecipientFields>): void
   (e: 'toggle-open', index: number, open: boolean): void
 }>()
 </script>

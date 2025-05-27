@@ -16,18 +16,18 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import ReasonSearch from '../ReasonSearch.vue'
 import type { FERecipient } from '../../domain/useRecipients'
-import type { MultipayRecipientValues } from './recipient-list.types'
+import type { RecipientFields } from './recipient-list.types'
 import Flag from '@/components/Flag.vue'
 
 const props = defineProps<{
   index: number
-  values: MultipayRecipientValues
+  values: RecipientFields
   open: boolean
   selectedCurrencyCode?: CurrencyCode | null
 }>()
 
 const emit = defineEmits<{
-  (e: 'update', data: Partial<MultipayRecipientValues>): void
+  (e: 'update', data: Partial<RecipientFields>): void
   (e: 'remove'): void
   (e: 'update:open', val: boolean): void
 }>()
