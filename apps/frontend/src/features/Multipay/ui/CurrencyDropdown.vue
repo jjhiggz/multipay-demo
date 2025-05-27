@@ -2,24 +2,26 @@
   <Dropdown
     :options="isLoading ? [] : filteredOptions"
     :model-value="selectedValue"
-    variant="outline"
-    :class="rootClass || 'w-full'"
+    :variant="variant"
+    :class="([rootClass || 'w-full', variant === 'borderless' ? 'dropdown-borderless' : '']).join(' ')"
     :menuClass="menuClass || 'max-h-60 overflow-y-auto'"
     @update:modelValue="onSelect"
     @search="onSearch"
     @search-closed="searchClosed"
     :disabled="isLoading"
   >
-    <template #display="{ option }">
-      <div :class="[displayClass, 'flex items-center']">
-        <template v-if="option && !isLoading">
-          <Flag :currency-code="option.value" class="mr-2" />
-          {{ option.value }}
-        </template>
-        <template v-else-if="isLoading">
-          <span class="text-muted-foreground text-sm">Loading...</span>
-        </template>
-        <template v-else> Select... </template>
+    <template #display="{ open }">
+      <div class="flex items-center bg-gray-50 rounded-xl px-4 py-3 gap-3 w-full max-w-xs">
+        <Flag v-if="selectedValue" :currency-code="selectedValue.value" class="w-10 h-10 flex-shrink-0" />
+        <div>
+          <div class="text-gray-500 text-xs mb-0.5">{{ label }}</div>
+          <div class="flex items-center gap-1">
+            <span :class="usdClass || 'text-lg font-bold text-gray-900'">{{ selectedValue ? selectedValue.value : '' }}</span>
+            <svg :class="['w-5 h-5 text-gray-400 transition-transform duration-200', open ? 'rotate-180' : '']" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+        </div>
       </div>
     </template>
     <template #option="{ option }">
@@ -56,6 +58,9 @@ const props = defineProps<{
   rootClass?: string
   menuClass?: string
   displayClass?: string
+  label?: string
+  usdClass?: string
+  variant?: string
 }>()
 const emit =
   defineEmits<(e: 'selected', value: CurrencyDropdownOption) => void>()
@@ -98,4 +103,14 @@ const onSelect = (option: CurrencyDropdownOption) => {
 const searchClosed = () => {
   search.value = ''
 }
+
+const isBorderless = computed(() => props.variant === 'borderless')
+
+const isOpen = ref(false)
 </script>
+
+<style scoped>
+.dropdown-borderless .dropdown-chevron {
+  display: none !important;
+}
+</style>

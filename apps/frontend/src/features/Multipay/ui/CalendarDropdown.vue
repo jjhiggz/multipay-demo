@@ -3,11 +3,24 @@
     <button
       @click="toggleDropdown"
       type="button"
-      class="relative bg-white shadow-sm py-2 pr-10 pl-3 rounded-md focus:outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-blue-300 ring-inset w-full text-gray-900 sm:text-sm text-left sm:leading-6 cursor-default"
+      class="flex items-center gap-3 bg-gray-50 shadow-none p-0 px-4 py-3 border-0 rounded-xl focus:outline-none focus-visible:ring-0 focus:ring-0 w-full max-w-xs cursor-pointer"
     >
-      <span class="block truncate">{{ formattedSelectedDate }}</span>
-      <span class="right-0 absolute inset-y-0 flex items-center pr-2 pointer-events-none">
-        <Icon icon="mdi:calendar" class="w-5 h-5 text-gray-400" />
+      <div class="flex flex-col items-start">
+        <div class="mb-0.5 text-gray-500 text-xs text-left">Send on</div>
+        <div class="flex items-center gap-1">
+          <span class="font-bold text-gray-900 text-sm">{{
+            formattedSelectedDate
+          }}</span>
+        </div>
+      </div>
+      <span class="flex items-center ml-auto">
+        <Icon
+          :icon="'carbon:calendar'"
+          :class="[
+            'w-5 h-5 text-gray-400 transition-transform duration-200',
+            isOpen ? 'rotate-180' : '',
+          ]"
+        />
       </span>
     </button>
 
@@ -27,7 +40,7 @@
             type="button"
             class="hover:bg-gray-100 p-1 rounded-full focus:outline-none"
           >
-            <Icon icon="mdi:chevron-left" class="w-5 h-5 text-gray-500" />
+            <Icon icon="carbon:chevron-left" class="w-5 h-5 text-gray-500" />
           </button>
           <div class="font-semibold text-sm">{{ monthYearLabel }}</div>
           <button
@@ -35,12 +48,14 @@
             type="button"
             class="hover:bg-gray-100 p-1 rounded-full focus:outline-none"
           >
-            <Icon icon="mdi:chevron-right" class="w-5 h-5 text-gray-500" />
+            <Icon icon="carbon:chevron-right" class="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
         <!-- Days of Week -->
-        <div class="gap-1 grid grid-cols-7 px-4 py-1 text-gray-500 text-xs text-center">
+        <div
+          class="gap-1 grid grid-cols-7 px-4 py-1 text-gray-500 text-xs text-center"
+        >
           <div v-for="day in weekDays" :key="day">{{ day }}</div>
         </div>
 
@@ -54,11 +69,15 @@
               :class="[
                 'w-full text-center rounded py-1',
                 day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400',
-                isSameDay(day.date, modelValue) ? 'bg-blue-500 text-white font-semibold' : '',
+                isSameDay(day.date, modelValue)
+                  ? 'bg-blue-500 text-white font-semibold'
+                  : '',
                 !isSameDay(day.date, modelValue) && day.isToday
                   ? 'text-blue-600 font-semibold'
                   : '',
-                !isSameDay(day.date, modelValue) && day.isCurrentMonth ? 'hover:bg-gray-100' : '',
+                !isSameDay(day.date, modelValue) && day.isCurrentMonth
+                  ? 'hover:bg-gray-100'
+                  : '',
                 !day.isCurrentMonth ? 'cursor-not-allowed opacity-50' : '',
               ]"
               :disabled="!day.isCurrentMonth"
@@ -106,7 +125,9 @@ const dateFormat = computed(() => {
 })
 
 const formattedSelectedDate = computed(() => {
-  return props.modelValue ? format(props.modelValue, dateFormat.value) : 'Select a date'
+  return props.modelValue
+    ? format(props.modelValue, dateFormat.value)
+    : 'Select a date'
 })
 
 const monthYearLabel = computed(() => format(currentDate.value, 'MMMM yyyy'))

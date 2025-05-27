@@ -1,41 +1,36 @@
 <template>
-  <IsolatedPageLayout v-if="true">
+  <IsolatedPageLayout v-if="true" class="bg-gray-100">
     <div class="flex flex-col flex-1 mx-auto w-full max-w-5xl min-h-0">
       <div class="flex justify-start items-center mb-2 w-full">
-        <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
+        <h1 class="font-bold text-gray-800 text-2xl">Multiple Recipients</h1>
       </div>
-      <div
-        class="flex flex-col flex-grow gap-8 bg-white shadow p-8 rounded-lg w-full"
-      >
-        <!-- Add a button to trigger the modal for demonstration -->
+      <div class="flex flex-col flex-grow gap-8 bg-white p-8 rounded-xl w-full">
         <div class="flex flex-col gap-6">
           <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
           <div class="flex sm:flex-row flex-col gap-2">
             <div class="w-full sm:w-auto">
-              <label class="block mb-1 text-gray-500 text-xs">Send on</label>
               <CalendarDropdown v-model="sendDate" class="w-full sm:w-64" />
             </div>
             <div
-              class="flex flex-row justify-start sm:justify-end gap-2 w-full"
+              class="flex flex-row justify-start sm:justify-end gap-3 w-full"
             >
               <div class="">
-                <label class="block mb-1 text-gray-500 text-xs"
-                  >Sending currency</label
-                >
                 <CurrencyDropdown
                   :selected="sendingCurrency"
                   @selected="onSendingCurrencySelected"
-                  class="w-28 sm:w-32 md:w-44"
+                  label="You send"
+                  usdClass="text-l font-bold text-gray-900"
+                  variant="borderless"
                 />
               </div>
               <div class="">
-                <label class="block mb-1 text-gray-500 text-xs"
-                  >Recieving currency</label
-                >
                 <CurrencyDropdown
                   :selected="recievingCurrency"
                   @selected="onRecievingCurrencySelected"
-                  class="w-28 sm:w-32 md:w-44"
+                  label="Receiving currency"
+                  class="shadow-none border-0"
+                  usdClass="text-l font-bold text-gray-900"
+                  variant="borderless"
                 />
               </div>
             </div>
@@ -89,6 +84,13 @@
         <!-- Recipients Table Placeholder -->
       </div>
       <SummaryCard
+        total-to-send="$1,500.00 USD"
+        exchange-rate="1 USD = 0.92 GBP"
+        recipients-will-receive="£1,380.00 GBP"
+        total-to-pay="$1,515.00 USD"
+        fee="$15.00 USD"
+        :is-disabled="false"
+        button-aria-label="Continue to payment"
         :quote="quoteData"
         :is-loading="isLoadingQuote"
         @continue="handleContinue"
@@ -247,7 +249,7 @@ const quoteInput = computed<UseCreateQuoteInput>(() => {
   }
 })
 
-const { quoteId, isLoading } = useCreateQuoteOnInputChange(quoteInput)
+const { quoteId } = useCreateQuoteOnInputChange(quoteInput)
 const { data: quoteData, isLoading: isLoadingQuote } = useGetQuote(quoteId)
 
 const resetAllRecipientAmounts = () => {

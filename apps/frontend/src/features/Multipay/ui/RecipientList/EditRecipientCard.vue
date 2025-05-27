@@ -21,7 +21,6 @@ import type {
   MultipayRecipientValidations,
   RecipientFields,
 } from './recipient-list.types'
-import Flag from '@/components/Flag.vue'
 
 const props = defineProps<{
   index: number

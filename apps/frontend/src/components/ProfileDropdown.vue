@@ -3,7 +3,7 @@
     <!-- Profile Panel Trigger -->
     <div
       @click="toggleDropdown"
-      class="flex items-center bg-white shadow-sm px-4 py-2 rounded-xl cursor-pointer"
+      class="flex items-center shadow-sm px-4 py-2 rounded-xl cursor-pointer"
     >
       <!-- Loading/Error states -->
       <div v-if="isSessionLoading || isOrgLoadingHint" class="px-4 py-2 text-gray-500">

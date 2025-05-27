@@ -7,11 +7,11 @@
     >
       <div class="text-gray-500">No recipients added yet</div>
       <Button
+        variant="link"
         @click="$emit('add')"
-        class="flex items-center gap-2 bg-blue-300 hover:bg-blue-400 px-4 py-2 rounded-md text-white transition-colors"
+        class="flex items-center transition-colors"
       >
-        <Icon :icon="'carbon:add'" class="w-5 h-5" />
-        Add Recipient
+        + Add Recipient
       </Button>
     </div>
 
@@ -50,13 +50,13 @@
           </TableBody>
         </Table>
       </div>
-      <div>
+      <div class="flex justify-end mt-2">
         <Button
+          variant="link"
           @click="$emit('add')"
-          class="flex items-center gap-2 bg-blue-300 hover:bg-blue-400 px-4 py-2 rounded-md text-white transition-colors"
+          class="flex items-center gap-2"
         >
-          <Icon :icon="'carbon:add'" class="w-5 h-5" />
-          Add Recipient
+          + Add Recipient
         </Button>
       </div>
     </div>
