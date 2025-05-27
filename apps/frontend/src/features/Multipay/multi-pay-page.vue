@@ -1,10 +1,10 @@
 <template>
-  <IsolatedPageLayout v-if="true">
+  <IsolatedPageLayout v-if="true" class="bg-gray-100">
     <div class="flex flex-col flex-1 mx-auto w-full max-w-5xl min-h-0">
       <div class="flex justify-start items-center mb-2 w-full">
         <h1 class="font-bold text-gray-800 text-2xl">Multiple Recipients</h1>
       </div>
-      <div class="flex flex-col flex-grow gap-8 p-8 rounded-xl w-full">
+      <div class="flex flex-col flex-grow gap-8 bg-white p-8 rounded-xl w-full">
         <div class="flex flex-col gap-6">
           <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
           <div class="flex sm:flex-row flex-col gap-2">
