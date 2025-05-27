@@ -11,6 +11,8 @@ const props = defineProps<{
   class?: string
   shouldShowFlag?: boolean
   shouldShowCurrency?: boolean
+  placeholder?: string
+  isPlaceholderWhenZero?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -23,6 +25,36 @@ const showCurrency = computed(() =>
   props.shouldShowCurrency !== undefined ? props.shouldShowCurrency : true,
 )
 
+const parsedModelValue = computed(() => parseFloat(String(props.modelValue)))
+
+const isEffectivelyNaN = computed(() => Number.isNaN(parsedModelValue.value))
+
+const isEffectivelyZero = computed(() => parsedModelValue.value === 0)
+
+const shouldShowActualPlaceholder = computed(() => {
+  if (isEffectivelyNaN.value) {
+    return true
+  }
+  if (props.isPlaceholderWhenZero && isEffectivelyZero.value) {
+    return true
+  }
+  return false
+})
+
+const currentPlaceholder = computed(() => {
+  if (shouldShowActualPlaceholder.value && props.placeholder) {
+    return props.placeholder
+  }
+  return '0.00' // Default placeholder
+})
+
+const displayValue = computed(() => {
+  if (shouldShowActualPlaceholder.value) {
+    return '' // Show browser placeholder
+  }
+  return props.modelValue
+})
+
 function handleInput(e: Event) {
   let val = (e.target as HTMLInputElement)?.value || ''
   // Only allow digits and a single decimal point
@@ -31,14 +63,22 @@ function handleInput(e: Event) {
   if (parts.length > 2) {
     val = parts[0] + '.' + parts.slice(1).join('')
   }
-  emit('update:modelValue', val)
+  // If the value becomes empty after sanitization, it represents an invalid/NaN state
+  // or if it's just a decimal point.
+  if (val === '' || val === '.') {
+    // Emit something that will evaluate to NaN, or handle as per requirements.
+    // Emitting an empty string is fine as parseFloat('') is NaN.
+    emit('update:modelValue', val)
+  } else {
+    emit('update:modelValue', val)
+  }
 }
 </script>
 
 <template>
   <div :class="cn('relative flex items-center', props.class)">
     <input
-      :value="props.modelValue"
+      :value="displayValue"
       @input="handleInput"
       :disabled="props.disabled"
       type="text"
@@ -51,14 +91,16 @@ function handleInput(e: Event) {
           showFlag || showCurrency ? 'pr-16' : '',
         )
       "
-      placeholder="0.00"
+      :placeholder="currentPlaceholder"
     />
     <span
       v-if="showFlag || showCurrency"
       class="right-4 z-10 absolute flex items-center gap-1 pointer-events-none select-none"
     >
       <Flag v-if="showFlag" :currency-code="props.currency" class="shrink-0" />
-      <span v-if="showCurrency" class="font-medium text-sm">{{ props.currency }}</span>
+      <span v-if="showCurrency" class="font-medium text-sm">{{
+        props.currency
+      }}</span>
     </span>
   </div>
 </template>
