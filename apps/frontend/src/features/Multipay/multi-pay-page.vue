@@ -2,31 +2,33 @@
   <IsolatedPageLayout v-if="true">
     <div class="flex flex-col flex-1 mx-auto w-full max-w-5xl min-h-0">
       <div class="flex justify-start items-center mb-2 w-full">
-        <h1 class="font-semibold text-2xl">Multiple Recipients</h1>
+        <h1 class="font-bold text-2xl text-gray-800">Multiple Recipients</h1>
       </div>
-      <div class="flex flex-col flex-grow gap-8 bg-white shadow p-8 rounded-lg w-full">
+      <div class="flex flex-col flex-grow gap-8 rounded-xl w-full p-8">
         <div class="flex flex-col gap-6">
           <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
           <div class="flex sm:flex-row flex-col gap-2">
             <div class="w-full sm:w-auto">
-              <label class="block mb-1 text-gray-500 text-xs">Send on</label>
               <CalendarDropdown v-model="sendDate" class="w-full sm:w-64" />
             </div>
-            <div class="flex flex-row justify-start sm:justify-end gap-2 w-full">
+            <div class="flex flex-row justify-start sm:justify-end gap-3 w-full">
               <div class="">
-                <label class="block mb-1 text-gray-500 text-xs">Sending currency</label>
                 <CurrencyDropdown
                   :selected="sendingCurrency"
                   @selected="onSendingCurrencySelected"
-                  class="w-28 sm:w-32 md:w-44"
+                  label="You send"
+                  usdClass="text-l font-bold text-gray-900"
+                  variant="borderless"
                 />
               </div>
-              <div class="">
-                <label class="block mb-1 text-gray-500 text-xs">Recieving currency</label>
+              <div>
                 <CurrencyDropdown
                   :selected="recievingCurrency"
                   @selected="onRecievingCurrencySelected"
-                  class="w-28 sm:w-32 md:w-44"
+                  label="Receiving currency"
+                  class="border-0 shadow-none"
+                  usdClass="text-l font-bold text-gray-900"
+                  variant="borderless"
                 />
               </div>
             </div>
@@ -76,7 +78,10 @@
         recipients-will-receive="£1,380.00 GBP"
         total-to-pay="$1,515.00 USD"
         fee="$15.00 USD"
-        @continue="() => {}"
+        :is-loading="false"
+        :is-disabled="false"
+        button-aria-label="Continue to payment"
+        @continue="handleContinue"
       />
     </div>
   </IsolatedPageLayout v-if="false">
@@ -167,5 +172,10 @@ const updateRecipient = (id: number, newData: Partial<MultiPayRecipient>) => {
   recipients.value = [...recipients.value].map((r: MultiPayRecipient) =>
     r.id === id ? { ...r, ...newData } : { ...r }
   )
+}
+
+function handleContinue() {
+  // TODO: Implement continue logic
+  console.log('Continue clicked')
 }
 </script>

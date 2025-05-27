@@ -37,6 +37,13 @@ const variantMap = {
     itemSelected: 'bg-red-100 font-semibold',
     dropdown: '',
   },
+  borderless: {
+    trigger: 'bg-transparent border-0 shadow-none text-gray-900 !p-0 !m-0 focus:ring-0 focus-visible:ring-0',
+    menu: '',
+    item: 'text-gray-900 hover:bg-gray-100',
+    itemSelected: 'bg-gray-100 font-semibold',
+    dropdown: '',
+  },
 }
 
 const getVariant = (variant?: string) =>

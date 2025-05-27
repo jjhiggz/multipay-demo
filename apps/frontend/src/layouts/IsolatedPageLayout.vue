@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col bg-gray-50 min-h-screen">
+  <div class="flex flex-col min-h-screen">
     <!-- Header -->
-    <header class="flex justify-between items-center bg-white px-8 py-4 border-gray-200 border-b">
+    <header class="flex justify-between items-center px-8 py-4 border-gray-200 border-b">
       <div class="flex items-center gap-4">
         <img :src="logoUrl" alt="Logo" class="w-10 h-10" />
       </div>

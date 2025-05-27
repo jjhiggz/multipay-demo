@@ -3,11 +3,16 @@
     <button
       @click="toggleDropdown"
       type="button"
-      class="relative bg-white shadow-sm py-2 pr-10 pl-3 rounded-md focus:outline-none ring-1 ring-gray-300 focus:ring-2 focus:ring-blue-300 ring-inset w-full text-gray-900 sm:text-sm text-left sm:leading-6 cursor-default"
+      class="flex items-center bg-gray-50 rounded-xl px-4 py-3 gap-3 w-full max-w-xs p-0 border-0 shadow-none focus:outline-none focus:ring-0 focus-visible:ring-0 cursor-pointer"
     >
-      <span class="block truncate">{{ formattedSelectedDate }}</span>
-      <span class="right-0 absolute inset-y-0 flex items-center pr-2 pointer-events-none">
-        <Icon icon="mdi:calendar" class="w-5 h-5 text-gray-400" />
+      <div class="flex flex-col items-start">
+        <div class="text-gray-500 text-xs mb-0.5 text-left">Send on</div>
+        <div class="flex items-center gap-1">
+          <span class="text-sm font-bold text-gray-900">{{ formattedSelectedDate }}</span>
+        </div>
+      </div>
+      <span class="ml-auto flex items-center">
+        <Icon :icon="'mdi:calendar'" :class="['w-5 h-5 text-gray-400 transition-transform duration-200', isOpen ? 'rotate-180' : '']" />
       </span>
     </button>
 

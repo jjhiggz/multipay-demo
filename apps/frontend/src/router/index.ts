@@ -13,6 +13,11 @@ const routes = [
     meta: { requiresGuest: true },
   },
   {
+    path: '/tailwind',
+    name: 'tailwind',
+    component: () => import('../views/TailWind.vue'),
+  },
+  {
     path: '/dashboard',
     name: 'dashboard',
     meta: { requiresAuth: true },

@@ -11,12 +11,13 @@
         ref="triggerRef"
       >
         <span class="flex flex-1 items-center gap-2 text-left">
-          <slot name="display" :option="props.modelValue">
+          <slot name="display" :option="props.modelValue" :open="open">
             {{ selectedLabel }}
           </slot>
         </span>
         <svg
-          class="ml-2 w-4 h-4 transition-transform duration-200"
+          v-if="!isBorderless"
+          class="ml-2 w-4 h-4 transition-transform duration-200 dropdown-chevron"
           :class="{ 'rotate-180': open }"
           fill="none"
           stroke="currentColor"
@@ -290,6 +291,8 @@ const onKeydown = (e: KeyboardEvent) => {
     }
   }
 }
+
+const isBorderless = computed(() => props.variant === 'borderless')
 
 onMounted(() => {
   document.addEventListener('mousedown', onClickOutside)
