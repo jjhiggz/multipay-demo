@@ -7,11 +7,11 @@
     >
       <div class="text-gray-500">No recipients added yet</div>
       <Button
+        variant="link"
         @click="$emit('add')"
         class="flex items-center transition-colors"
       >
-        <Icon :icon="'carbon:add'" class="w-5 h-5" />
-        Add Recipient
+        + Add Recipient
       </Button>
     </div>
 
@@ -56,8 +56,7 @@
           @click="$emit('add')"
           class="flex items-center gap-2"
         >
-          <Icon :icon="'carbon:add'" class="w-5 h-5" />
-          Add Recipient
+          + Add Recipient
         </Button>
       </div>
     </div>
