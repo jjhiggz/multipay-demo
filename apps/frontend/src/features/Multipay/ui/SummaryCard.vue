@@ -3,8 +3,6 @@
     :class="[
       'bg-white border border-gray-200 p-4 rounded-t-xl w-full',
       'mt-6',
-      'sticky bottom-0 z-50',
-      'mx-auto md:max-w-5xl',
     ]"
     style="max-width: 100vw"
     role="region"
@@ -15,32 +13,47 @@
     >
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Total to send</span>
-        <span class="mt-0.5 font-medium text-gray-700 text-base">{{
+        <div v-if="props.isLoading" class="mt-0.5 h-6 flex items-center">
+          <span class="h-4 bg-gray-200 rounded animate-pulse w-16"></span>
+        </div>
+        <span v-else class="mt-0.5 font-medium text-gray-700 text-base">{{
           totalToSend
         }}</span>
       </div>
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Exchange rate</span>
-        <span class="mt-0.5 font-medium text-gray-700 text-base">{{
+        <div v-if="props.isLoading" class="mt-0.5 h-6 flex items-center">
+          <span class="h-4 bg-gray-200 rounded animate-pulse w-20"></span>
+        </div>
+        <span v-else class="mt-0.5 font-medium text-gray-700 text-base">{{
           exchangeRate
         }}</span>
       </div>
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Recipients will receive</span>
-        <span class="mt-0.5 font-medium text-gray-700 text-base">{{
+        <div v-if="props.isLoading" class="mt-0.5 h-6 flex items-center">
+          <span class="h-4 bg-gray-200 rounded animate-pulse w-16"></span>
+        </div>
+        <span v-else class="mt-0.5 font-medium text-gray-700 text-base">{{
           recipientsWillReceive
         }}</span>
       </div>
       <div class="flex flex-col col-span-1">
         <span class="text-gray-500 text-xs">Total to pay</span>
-        <span class="mt-0.5 font-bold text-gray-700 text-base">{{
+        <div v-if="props.isLoading" class="mt-0.5 h-6 flex items-center">
+          <span class="h-4 bg-gray-200 rounded animate-pulse w-20"></span>
+        </div>
+        <span v-else class="mt-0.5 font-bold text-gray-700 text-base">{{
           totalToPay
         }}</span>
-        <span class="mt-0.5 text-gray-400 text-xs"
+        <div v-if="props.isLoading" class="mt-0.5 h-4 flex items-center">
+          <span class="h-3 bg-gray-200 rounded animate-pulse w-12"></span>
+        </div>
+        <span v-else class="mt-0.5 text-gray-400 text-xs"
           >Includes fee: {{ fee }}</span
         >
       </div>
-      <div class="flex md:justify-end col-span-2 md:col-span-1 mt-2 md:mt-0">
+      <div class="flex justify-center md:justify-end col-span-2 md:col-span-1 mt-2 md:mt-0">
         <slot name="action">
           <Button
             variant="default"

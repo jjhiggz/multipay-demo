@@ -7,7 +7,7 @@
       </div>
       <ProfileDropdown />
     </header>
-    <main class="flex flex-col flex-1 items-center px-4 py-8">
+    <main class="flex flex-col flex-1 items-center px-4 pt-8 pb-0">
       <slot />
     </main>
   </div>

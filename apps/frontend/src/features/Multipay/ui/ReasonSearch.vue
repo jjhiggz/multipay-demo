@@ -9,11 +9,11 @@
         <Button
           :ref="triggerRefToUse"
           variant="outline"
-          :class="cn('w-full justify-between', props.class)"
+          :class="cn('w-full justify-between border-0 h-10 font-normal rounded-lg', props.class)"
           :aria-expanded="open"
         >
           {{ selectedComboboxValue?.label ?? 'Select reason' }}
-          <ChevronsUpDown class="opacity-50 ml-2 w-4 h-4 shrink-0" />
+          <Icon :icon="'carbon:chevron-down'" class="opacity-50 ml-2 w-4 h-4 shrink-0" />
         </Button>
       </ComboboxTrigger>
     </ComboboxAnchor>
@@ -22,12 +22,14 @@
       :class="cn('w-full', props.menuClass)"
       :style="{ width: menuWidth }"
     >
-      <ComboboxInput
-        v-model="searchQuery"
-        class="w-full"
-        placeholder="Search reason..."
-        :disabled="isLoading"
-      />
+      <div class="py-1 pt-1 pb-0">
+        <ComboboxInput
+          v-model="searchQuery"
+          class="w-full placeholder:opacity-50"
+          placeholder="Search reason..."
+          :disabled="isLoading"
+        />
+      </div>
       <template v-if="isLoading">
         <div class="p-2 text-center">
           <LoadingDots />
@@ -42,11 +44,21 @@
             v-for="reasonOpt in filteredReasonOptions"
             :key="reasonOpt.value"
             :value="reasonOpt"
+            :class="cn(
+              'flex justify-between items-center w-full hover:bg-gray-100',
+              selectedComboboxValue?.value === reasonOpt.value ? 'bg-gray-100 font-medium' : ''
+            )"
             @select="handleSelect(reasonOpt)"
           >
             {{ reasonOpt.label }}
             <ComboboxItemIndicator>
-              <Check :class="cn('ml-auto h-4 w-4')" />
+              <svg 
+                class="w-4 h-4 text-blue-500 ml-2 flex-shrink-0"
+                fill="currentColor" 
+                viewBox="0 0 32 32"
+              >
+                <path d="M16 2C8.3 2 2 8.3 2 16s6.3 14 14 14 14-6.3 14-14S23.7 2 16 2zm-2 20L7 15l1.4-1.4L14 19.2l9.6-9.6L25 11l-11 11z"/>
+              </svg>
             </ComboboxItemIndicator>
           </ComboboxItem>
         </ComboboxGroup>
@@ -57,7 +69,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, type Ref, type VNodeRef } from 'vue'
-import { Check, ChevronsUpDown } from 'lucide-vue-next'
+import { Check } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import {
   Combobox,
@@ -77,6 +89,7 @@ import {
 } from '@/features/Multipay/domain/useReasonsForTransfer'
 import { useElementWidth } from '@/composables/useElementWidth'
 import LoadingDots from '@/components/ui/LoadingDots.vue'
+import { Icon } from '@iconify/vue'
 
 // Transformed option type for the combobox
 export type ReasonSearchOption = {
