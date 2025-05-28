@@ -15,21 +15,6 @@
             {{ selectedLabel }}
           </slot>
         </span>
-        <svg
-          v-if="!isBorderless"
-          class="ml-2 w-4 h-4 transition-transform duration-200 dropdown-chevron"
-          :class="{ 'rotate-180': open }"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
       </button>
     </slot>
     <transition name="fade">
@@ -43,14 +28,29 @@
       >
         <div class="top-0 z-10 sticky flex-shrink-0 bg-white">
           <div class="py-1 pt-1 pb-0">
-            <div data-slot="command-input-wrapper" class="flex items-center gap-2 px-3 border-b border-gray-100 h-9">
-              <svg class="opacity-50 size-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <div
+              data-slot="command-input-wrapper"
+              class="flex items-center gap-2 px-3 border-gray-100 border-b h-9"
+            >
+              <svg
+                class="opacity-50 size-4 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+              >
                 <circle cx="11" cy="11" r="7" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-linecap="round" />
+                <line
+                  x1="21"
+                  y1="21"
+                  x2="16.65"
+                  y2="16.65"
+                  stroke-linecap="round"
+                />
               </svg>
               <input
                 type="text"
-                class="placeholder:text-muted-foreground placeholder:opacity-50 flex w-full rounded-md bg-transparent py-1 text-sm outline-none border-0 disabled:cursor-not-allowed disabled:opacity-50"
+                class="flex bg-transparent disabled:opacity-50 placeholder:opacity-50 py-1 border-0 rounded-md outline-none w-full placeholder:text-muted-foreground text-sm disabled:cursor-not-allowed"
                 placeholder="Search..."
                 v-model="searchValue"
                 @input="onSearch"
@@ -84,19 +84,27 @@
               @keydown.enter.prevent="select(option)"
               tabindex="0"
             >
-              <div class="flex items-center justify-between w-full">
-                <div :class="{ 'font-medium': option.value === modelValue?.value }">
-                  <slot name="option" :option="option" :selected="option.value === modelValue?.value">
+              <div class="flex justify-between items-center w-full">
+                <div
+                  :class="{ 'font-medium': option.value === modelValue?.value }"
+                >
+                  <slot
+                    name="option"
+                    :option="option"
+                    :selected="option.value === modelValue?.value"
+                  >
                     {{ option.label }}
                   </slot>
                 </div>
-                <svg 
+                <svg
                   v-if="option.value === modelValue?.value"
-                  class="w-4 h-4 text-blue-500 ml-2 flex-shrink-0"
-                  fill="currentColor" 
+                  class="flex-shrink-0 ml-2 w-4 h-4 text-blue-500"
+                  fill="currentColor"
                   viewBox="0 0 32 32"
                 >
-                  <path d="M16 2C8.3 2 2 8.3 2 16s6.3 14 14 14 14-6.3 14-14S23.7 2 16 2zm-2 20L7 15l1.4-1.4L14 19.2l9.6-9.6L25 11l-11 11z"/>
+                  <path
+                    d="M16 2C8.3 2 2 8.3 2 16s6.3 14 14 14 14-6.3 14-14S23.7 2 16 2zm-2 20L7 15l1.4-1.4L14 19.2l9.6-9.6L25 11l-11 11z"
+                  />
                 </svg>
               </div>
             </li>
