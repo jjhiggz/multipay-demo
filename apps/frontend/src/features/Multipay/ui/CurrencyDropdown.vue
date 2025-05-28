@@ -3,7 +3,12 @@
     :options="isLoading ? [] : filteredOptions"
     :model-value="selectedValue"
     :variant="variant"
-    :class="([rootClass || 'w-full', variant === 'borderless' ? 'dropdown-borderless' : '']).join(' ')"
+    :class="
+      [
+        rootClass || 'w-full',
+        variant === 'borderless' ? 'dropdown-borderless' : '',
+      ].join(' ')
+    "
     :menuClass="menuClass || 'max-h-60 overflow-y-auto'"
     @update:modelValue="onSelect"
     @search="onSearch"
@@ -11,23 +16,43 @@
     :disabled="isLoading"
   >
     <template #display="{ open }">
-      <div class="flex items-center bg-gray-50 rounded-xl px-4 py-3 gap-3 w-full max-w-xs">
-        <Flag v-if="selectedValue" :currency-code="selectedValue.value" class="w-10 h-10 flex-shrink-0" />
+      <div
+        class="flex items-center gap-3 bg-gray-50 px-4 py-3 rounded-lg w-full max-w-xs"
+      >
+        <Flag
+          v-if="selectedValue && !isLoading"
+          :currency-code="selectedValue.value"
+          class="flex-shrink-0 w-6 h-6"
+        />
+        <div v-else class="flex-shrink-0 w-6 h-6"></div>
         <div>
-          <div class="text-gray-500 text-xs mb-0.5">{{ label }}</div>
+          <div class="mb-0.5 text-gray-500 text-xs">{{ label }}</div>
           <div class="flex items-center gap-1">
-            <span :class="usdClass || 'text-lg font-bold text-gray-900'">{{ selectedValue ? selectedValue.value : '' }}</span>
-            <svg :class="['w-5 h-5 text-gray-400 transition-transform duration-200', open ? 'rotate-180' : '']" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-            </svg>
+            <div v-if="isLoading" class="flex items-center h-6">
+              <span
+                class="bg-gray-200 rounded w-[1.5rem] h-4 animate-pulse"
+              ></span>
+            </div>
+            <span
+              v-else
+              :class="usdClass || 'text-lg font-bold text-gray-900'"
+              >{{ selectedValue ? selectedValue.value : '' }}</span
+            >
+            <Icon
+              :icon="'carbon:chevron-down'"
+              :class="[
+                'w-5 h-5 text-gray-400 transition-transform duration-200',
+                open ? 'rotate-180' : '',
+              ]"
+            />
           </div>
         </div>
       </div>
     </template>
-    <template #option="{ option }">
+    <template #option="{ option, selected }">
       <div class="flex items-center gap-2">
         <Flag :currency-code="option.value" />
-        {{ option.value }}
+        <span :class="{ 'font-medium': selected }">{{ option.value }}</span>
       </div>
     </template>
     <template #no-options>
@@ -48,6 +73,7 @@ import { useCurrencies } from '../domain/useCurrencies'
 import Flag from '@/components/Flag.vue'
 import Dropdown, { type BaseDropdownOption } from '@/components/Dropdown.vue'
 import LoadingDots from '@/components/ui/LoadingDots.vue'
+import { Icon } from '@iconify/vue'
 
 export interface CurrencyDropdownOption extends BaseDropdownOption {
   value: CurrencyCode
@@ -103,10 +129,6 @@ const onSelect = (option: CurrencyDropdownOption) => {
 const searchClosed = () => {
   search.value = ''
 }
-
-const isBorderless = computed(() => props.variant === 'borderless')
-
-const isOpen = ref(false)
 </script>
 
 <style scoped>

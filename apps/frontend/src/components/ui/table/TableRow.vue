@@ -12,7 +12,7 @@ const props = defineProps<{
     data-slot="table-row"
     :class="
       cn(
-        'hover:bg-muted/15 data-[state=selected]:bg-muted border-b transition-colors',
+        'hover:bg-muted/15 data-[state=selected]:bg-muted border-b border-gray-100 transition-colors',
         props.class,
       )
     "

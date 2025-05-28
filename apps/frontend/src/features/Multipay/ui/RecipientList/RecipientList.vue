@@ -3,11 +3,10 @@
     <!-- Show when no recipients -->
     <div
       v-if="props.recipients.length === 0"
-      class="flex flex-col items-center gap-4 py-8"
+      class="flex flex-col items-center justify-center gap-4 py-16 min-h-[200px]"
     >
       <div class="text-gray-500">No recipients added yet</div>
       <Button
-        variant="link"
         @click="$emit('add')"
         class="flex items-center transition-colors"
       >
@@ -21,7 +20,7 @@
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead> Recipient </TableHead>
+              <TableHead class="pl-0"> Recipient </TableHead>
               <TableHead> Amount </TableHead>
               <TableHead> Reason </TableHead>
               <TableHead> Reference </TableHead>
@@ -50,7 +49,7 @@
           </TableBody>
         </Table>
       </div>
-      <div class="flex justify-end mt-2">
+      <div class="flex justify-end mt-2 pt-0">
         <Button
           variant="link"
           @click="$emit('add')"

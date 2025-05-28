@@ -5,84 +5,185 @@
         <Button
           :ref="triggerRefToUse"
           variant="outline"
-          :class="cn('w-full justify-between', props.class)"
+          :class="
+            cn(
+              'w-full justify-between border-0 h-10 font-medium rounded-lg',
+              props.class,
+            )
+          "
         >
           {{ selectedComboboxValue?.label ?? 'Select recipient' }}
-          <ChevronsUpDown class="opacity-50 ml-2 w-4 h-4 shrink-0" />
+          <Icon
+            :icon="'carbon:chevron-down'"
+            class="opacity-50 ml-2 w-4 h-4 shrink-0"
+          />
         </Button>
       </ComboboxTrigger>
     </ComboboxAnchor>
 
     <ComboboxList
-      :class="cn('w-full', props.menuClass)"
-      :style="{ width: menuWidth }"
+      :class="cn('overflow-hidden box-border', props.menuClass)"
+      :style="{
+        width: menuWidth,
+        minWidth: menuWidth,
+        maxWidth: menuWidth,
+        boxSizing: 'border-box',
+      }"
     >
-      <ComboboxInput
-        v-model="search"
-        class="w-full"
-        placeholder="Search recipient..."
-        :disabled="isLoading"
-      />
+      <div class="py-1 pt-1 pb-0">
+        <ComboboxInput
+          v-model="search"
+          class="placeholder:opacity-50 w-full"
+          placeholder="Search recipient..."
+          :disabled="isLoading"
+        />
+      </div>
 
-      <template v-if="isLoading">
-        <div class="p-2 text-center">
-          <Loader2 class="mx-auto w-6 h-6 animate-spin" />
-        </div>
-      </template>
-      <template v-else>
-        <ComboboxEmpty v-if="filteredRecipients.length === 0">
-          No recipient found.
-        </ComboboxEmpty>
-        <ComboboxGroup v-else>
-          <ComboboxItem
-            v-for="recipient in filteredRecipients"
-            :key="recipient.value"
-            :value="recipient"
-            :disabled="!recipient.isValid"
-            class="flex justify-between items-center w-full"
+      <div class="w-full max-h-[280px] overflow-x-hidden overflow-y-auto">
+        <template v-if="isLoading">
+          <div class="p-2 text-center">
+            <Loader2 class="mx-auto w-6 h-6 animate-spin" />
+          </div>
+        </template>
+        <template v-else>
+          <ComboboxEmpty
+            v-if="
+              filteredRecipients.validRecipients.length === 0 &&
+              filteredRecipients.invalidRecipients.length === 0
+            "
           >
-            <template v-if="!recipient.isValid && $slots['invalid-item']">
-              <slot name="invalid-item" :recipient="recipient"></slot>
-            </template>
-            <template v-else>
-              <div class="flex items-center">
-                <Flag
-                  v-if="recipient.isValid"
-                  :currencyCode="recipient.currencyCode as CurrencyCode"
-                  class="mr-2"
-                />
-                <span :class="{ 'opacity-50': !recipient.isValid }">{{
-                  recipient.label
-                }}</span>
-                <span
-                  v-if="
-                    !recipient.isValid &&
-                    recipient.validationReason &&
-                    !$slots['invalid-item']
-                  "
-                  class="ml-2 text-red-500 text-xs italic"
+            No recipient found.
+          </ComboboxEmpty>
+          <ComboboxGroup v-else>
+            <!-- Valid recipients first -->
+            <ComboboxItem
+              v-for="recipient in filteredRecipients.validRecipients"
+              :key="recipient.value"
+              :value="recipient"
+              :disabled="!recipient.isValid"
+              :class="
+                cn(
+                  'flex justify-between items-center w-full hover:bg-gray-100',
+                  selectedComboboxValue?.value === recipient.value
+                    ? 'bg-gray-100'
+                    : '',
+                )
+              "
+            >
+              <template v-if="!recipient.isValid && $slots['invalid-item']">
+                <slot name="invalid-item" :recipient="recipient"></slot>
+              </template>
+              <template v-else>
+                <div class="flex items-center">
+                  <span
+                    :class="{
+                      'opacity-50': !recipient.isValid,
+                      'font-medium':
+                        selectedComboboxValue?.value === recipient.value,
+                    }"
+                    >{{ recipient.label }}</span
+                  >
+                  <span
+                    v-if="
+                      !recipient.isValid &&
+                      recipient.validationReason &&
+                      !$slots['invalid-item']
+                    "
+                    class="ml-2 text-red-500 text-xs italic"
+                  >
+                    ({{ recipient.validationReason }})
+                  </span>
+                </div>
+              </template>
+              <ComboboxItemIndicator>
+                <svg
+                  class="flex-shrink-0 ml-2 w-4 h-4 text-blue-500"
+                  fill="currentColor"
+                  viewBox="0 0 32 32"
                 >
-                  ({{ recipient.validationReason }})
-                </span>
-              </div>
-            </template>
-            <ComboboxItemIndicator>
-              <Check
-                :class="
-                  cn('ml-auto h-4 w-4', { 'opacity-50': !recipient.isValid })
+                  <path
+                    d="M16 2C8.3 2 2 8.3 2 16s6.3 14 14 14 14-6.3 14-14S23.7 2 16 2zm-2 20L7 15l1.4-1.4L14 19.2l9.6-9.6L25 11l-11 11z"
+                  />
+                </svg>
+              </ComboboxItemIndicator>
+            </ComboboxItem>
+
+            <!-- Divider and invalid recipients section -->
+            <template v-if="filteredRecipients.invalidRecipients.length > 0">
+              <div class="my-1 border-gray-200 border-t"></div>
+              <div
+                class="box-border px-2 py-1 max-w-full overflow-wrap-break-word font-medium text-gray-500 text-xs whitespace-normal hyphens-auto"
+                style="
+                  word-wrap: break-word;
+                  overflow-wrap: break-word;
+                  width: 100%;
+                  box-sizing: border-box;
                 "
-              />
-            </ComboboxItemIndicator>
-          </ComboboxItem>
-        </ComboboxGroup>
-      </template>
+              >
+                Not available recipients:
+              </div>
+              <ComboboxItem
+                v-for="recipient in filteredRecipients.invalidRecipients"
+                :key="recipient.value"
+                :value="recipient"
+                :disabled="!recipient.isValid"
+                :class="
+                  cn(
+                    'flex justify-between items-center w-full hover:bg-gray-100',
+                    selectedComboboxValue?.value === recipient.value
+                      ? 'bg-gray-100'
+                      : '',
+                  )
+                "
+              >
+                <template v-if="!recipient.isValid && $slots['invalid-item']">
+                  <slot name="invalid-item" :recipient="recipient"></slot>
+                </template>
+                <template v-else>
+                  <div class="flex items-center">
+                    <span
+                      :class="{
+                        'opacity-50': !recipient.isValid,
+                        'font-medium':
+                          selectedComboboxValue?.value === recipient.value,
+                      }"
+                      >{{ recipient.label }}</span
+                    >
+                    <span
+                      v-if="
+                        !recipient.isValid &&
+                        recipient.validationReason &&
+                        !$slots['invalid-item']
+                      "
+                      class="ml-2 text-red-500 text-xs italic"
+                    >
+                      ({{ recipient.validationReason }})
+                    </span>
+                  </div>
+                </template>
+                <ComboboxItemIndicator>
+                  <svg
+                    class="flex-shrink-0 ml-2 w-4 h-4 text-blue-500"
+                    fill="currentColor"
+                    viewBox="0 0 32 32"
+                  >
+                    <path
+                      d="M16 2C8.3 2 2 8.3 2 16s6.3 14 14 14 14-6.3 14-14S23.7 2 16 2zm-2 20L7 15l1.4-1.4L14 19.2l9.6-9.6L25 11l-11 11z"
+                    />
+                  </svg>
+                </ComboboxItemIndicator>
+              </ComboboxItem>
+            </template>
+          </ComboboxGroup>
+        </template>
+      </div>
     </ComboboxList>
   </Combobox>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, type Ref, type VNodeRef } from 'vue'
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-vue-next'
+import { Loader2 } from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import {
   Combobox,
@@ -102,8 +203,8 @@ import {
   type FERecipient,
 } from '@/features/Multipay/domain/useRecipients'
 import LoadingDots from '@/components/ui/LoadingDots.vue'
-import Flag from '@/components/Flag.vue'
 import type { CurrencyCode } from '@/constants/from-api/currency.constants'
+import { Icon } from '@iconify/vue'
 
 const props = defineProps<{
   class?: string
@@ -138,6 +239,14 @@ const localTriggerRef = ref<HTMLElement | null>(null)
 const triggerRefToUse = computed(() => props.triggerRef ?? localTriggerRef)
 
 const menuWidth = computed(() => {
+  const triggerElement = triggerRefToUse.value
+  if (
+    triggerElement &&
+    typeof triggerElement.getBoundingClientRect === 'function'
+  ) {
+    const rect = triggerElement.getBoundingClientRect()
+    return `${rect.width}px`
+  }
   const width = useElementWidth(props.dropdownWidthRef)
   return width.value ? `${width.value}px` : 'auto'
 })
@@ -146,6 +255,7 @@ const { data: recipientsFromAPI, isLoading } = useRecipients()
 
 // Transform API recipients to RecipientSearchOption for the combobox
 const recipientOptions = computed<RecipientSearchOption[]>(() => {
+  // Original API data (commented out for testing)
   return (
     recipientsFromAPI.value?.map((r: FERecipient) => {
       let validationResult:
@@ -173,12 +283,21 @@ const recipientOptions = computed<RecipientSearchOption[]>(() => {
 
 const search = ref('')
 const filteredRecipients = computed(() => {
-  if (isLoading.value) return []
+  if (isLoading.value) return { validRecipients: [], invalidRecipients: [] }
   const baseOptions = recipientOptions.value
-  if (!search.value) return baseOptions.slice(0, 8)
-  return baseOptions
-    .filter((r) => r.label.toLowerCase().includes(search.value.toLowerCase()))
-    .slice(0, 8)
+  let options = baseOptions
+
+  if (search.value) {
+    options = baseOptions.filter((r) =>
+      r.label.toLowerCase().includes(search.value.toLowerCase()),
+    )
+  }
+
+  // Separate valid and invalid recipients
+  const validRecipients = options.filter((r) => r.isValid).slice(0, 8)
+  const invalidRecipients = options.filter((r) => !r.isValid).slice(0, 8)
+
+  return { validRecipients, invalidRecipients }
 })
 
 // v-model for the Combobox, holds the full selected RecipientSearchOption object

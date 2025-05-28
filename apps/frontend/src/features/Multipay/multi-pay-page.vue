@@ -2,100 +2,122 @@
   <IsolatedPageLayout v-if="true" class="bg-gray-100">
     <div class="flex flex-col flex-1 mx-auto w-full max-w-5xl min-h-0">
       <div class="flex justify-start items-center mb-2 w-full">
-        <h1 class="font-bold text-gray-800 text-2xl">Multiple Recipients</h1>
+        <h1 class="font-bold text-gray-800 text-2xl pb-4">Multiple Recipients</h1>
       </div>
-      <div class="flex flex-col flex-grow gap-8 bg-white p-8 rounded-xl w-full">
-        <div class="flex flex-col gap-6">
-          <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
-          <div class="flex sm:flex-row flex-col gap-2">
-            <div class="w-full sm:w-auto">
-              <CalendarDropdown v-model="sendDate" class="w-full sm:w-64" />
-            </div>
-            <div
-              class="flex flex-row justify-start sm:justify-end gap-3 w-full"
-            >
-              <div class="">
-                <CurrencyDropdown
-                  :selected="sendingCurrency"
-                  @selected="onSendingCurrencySelected"
-                  label="You send"
-                  usdClass="text-l font-bold text-gray-900"
-                  variant="borderless"
-                />
+      
+      <!-- Main content area -->
+      <div class="flex flex-col flex-1 pb-32">
+        <div class="flex flex-col flex-grow gap-8 bg-white p-8 rounded-xl w-full">
+          <div class="flex flex-col gap-6">
+            <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
+            <div class="flex sm:flex-row flex-col gap-2">
+              <div class="w-full sm:w-auto">
+                <CalendarDropdown v-model="sendDate" class="w-full sm:w-64" />
               </div>
-              <div class="">
-                <CurrencyDropdown
-                  :selected="recievingCurrency"
-                  @selected="onRecievingCurrencySelected"
-                  label="Receiving currency"
-                  class="shadow-none border-0"
-                  usdClass="text-l font-bold text-gray-900"
-                  variant="borderless"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <ToggleButton
-              :disabled="!selectedCurrency.value"
-              :model-value="distributeCurrencyBy === 'send-currency'"
-              @update:model-value="toggleDistributeCurrencyBy"
-            />
-
-            <div
-              :class="[
-                'flex items-center gap-2',
-                {
-                  'opacity-50 text-gray-600': !selectedCurrency.value,
-                  'text-gray-700': selectedCurrency.value,
-                },
-              ]"
-            >
               <div
-                v-if="selectedCurrency.value"
-                class="flex items-center gap-2"
+                class="flex flex-row justify-start sm:justify-end gap-3 w-full"
               >
-                <p class="whitespace-nowrap">Distribute with:</p>
-                <Flag :currency-code="selectedCurrency.value.value" />
-                <b class="whitespace-nowrap">{{
-                  selectedCurrency.value.value
-                }}</b>
+                <div class="">
+                  <CurrencyDropdown
+                    :selected="sendingCurrency"
+                    @selected="onSendingCurrencySelected"
+                    label="You send"
+                    usdClass="text-l font-bold text-gray-900"
+                    variant="borderless"
+                  />
+                </div>
+                <div class="">
+                  <CurrencyDropdown
+                    :selected="recievingCurrency"
+                    @selected="onRecievingCurrencySelected"
+                    label="Receiving currency"
+                    class="shadow-none border-0"
+                    usdClass="text-l font-bold text-gray-900"
+                    variant="borderless"
+                  />
+                </div>
               </div>
-              <p v-else class="whitespace-nowrap">Select Currency</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <ToggleButton
+                :disabled="!selectedCurrency.value"
+                :model-value="distributeCurrencyBy === 'send-currency'"
+                @update:model-value="toggleDistributeCurrencyBy"
+              />
+
+              <div
+                :class="[
+                  'flex items-center gap-2',
+                  {
+                    'opacity-50 text-gray-600': !selectedCurrency.value,
+                    'text-gray-700': selectedCurrency.value,
+                  },
+                ]"
+              >
+                <div
+                  v-if="selectedCurrency.value"
+                  class="flex items-center gap-2"
+                >
+                  <p class="whitespace-nowrap">Distribute with:</p>
+                  <Flag :currency-code="selectedCurrency.value.value" />
+                  <b class="whitespace-nowrap">{{
+                    selectedCurrency.value.value
+                  }}</b>
+                </div>
+                <p v-else class="whitespace-nowrap">Select Currency</p>
+              </div>
             </div>
           </div>
+          <!-- Select Recipients List -->
+          <div class="">
+            <RecipientList
+              :recipients="recipients"
+              @add="addRecipient"
+              @remove="removeRecipient"
+              @update="updateRecipient"
+              @recipient-field-focus="handleFieldFocus"
+              @recipient-field-blur="handleFieldBlur"
+              :open-ids="openIds"
+              @toggle-open="handleOpenChange"
+              :selectedCurrencyCode="receivingCurrencyCode"
+              :has-form-been-submitted="hasFormBeenSubmitted"
+            />
+          </div>
+          <!-- Recipients Table Placeholder -->
         </div>
-        <!-- Select Recipients List -->
-        <div class="">
-          <RecipientList
-            :recipients="recipients"
-            @add="addRecipient"
-            @remove="removeRecipient"
-            @update="updateRecipient"
-            @recipient-field-focus="handleFieldFocus"
-            @recipient-field-blur="handleFieldBlur"
-            :open-ids="openIds"
-            @toggle-open="handleOpenChange"
-            :selectedCurrencyCode="receivingCurrencyCode"
-            :has-form-been-submitted="hasFormBeenSubmitted"
-          />
-        </div>
-        <!-- Recipients Table Placeholder -->
       </div>
-      <SummaryCard
-        total-to-send="$1,500.00 USD"
-        exchange-rate="1 USD = 0.92 GBP"
-        recipients-will-receive="£1,380.00 GBP"
-        total-to-pay="$1,515.00 USD"
-        fee="$15.00 USD"
-        :is-disabled="false"
-        button-aria-label="Continue to payment"
-        :quote="quoteData"
-        :is-loading="isLoadingQuote"
-        @continue="handleContinue"
-      />
     </div>
+    
+    <!-- Summary Card with transition - positioned fixed so it doesn't affect main container height -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 w-full bg-gray-100">
+      <div class="mx-auto w-full max-w-5xl">
+        <Transition
+          name="slide-up"
+          enter-active-class="transition-all duration-300 ease-out"
+          enter-from-class="transform translate-y-full opacity-0"
+          enter-to-class="transform translate-y-0 opacity-100"
+          leave-active-class="transition-all duration-300 ease-in"
+          leave-from-class="transform translate-y-0 opacity-100"
+          leave-to-class="transform translate-y-full opacity-0"
+        >
+          <SummaryCard
+            v-if="showSummaryCard"
+            total-to-send="$1,500.00 USD"
+            exchange-rate="1 USD = 0.92 GBP"
+            recipients-will-receive="£1,380.00 GBP"
+            total-to-pay="$1,515.00 USD"
+            fee="$15.00 USD"
+            :is-disabled="false"
+            button-aria-label="Continue to payment"
+            :quote="quoteData"
+            :is-loading="isLoadingQuote"
+            @continue="handleContinue"
+          />
+        </Transition>
+      </div>
+    </div>
+    
     <WarningModal :state="warningModal" />
   </IsolatedPageLayout>
 </template>
@@ -179,15 +201,15 @@ const addRecipient = () => {
       ? Math.max(
           ...recipients.value.map((r: MultiPayRecipientContainer) => r.index),
         ) + 1
-      : 1
+    : 1
   recipients.value = [
     ...recipients.value,
     {
       index: nextIndex,
       values: {
         recipient: null,
-        amount: null,
-        reason: '',
+      amount: null,
+      reason: '',
         reference: '',
       },
       state: {
@@ -232,6 +254,57 @@ const totalAmount = computed(() =>
   ),
 )
 
+// Check if any recipient has an amount set (greater than 0)
+const hasAnyAmounts = computed(() => {
+  return recipients.value.some(
+    (recipient) => recipient.values.amount && recipient.values.amount > 0
+  )
+})
+
+// Track if summary card should be shown with delay (visual display only)
+const showSummaryCard = ref(false)
+const delayCompleted = ref(false)
+const hasEverShownSummaryCard = ref(false)
+let summaryCardTimeout: NodeJS.Timeout | null = null
+
+// Watch for changes in hasAnyAmounts and apply delay for visual display only
+watchEffect(() => {
+  if (hasAnyAmounts.value) {
+    // Clear any existing timeout
+    if (summaryCardTimeout) {
+      clearTimeout(summaryCardTimeout)
+    }
+    // Set 1-second delay before marking delay as completed
+    summaryCardTimeout = setTimeout(() => {
+      delayCompleted.value = true
+    }, 1000)
+  } else {
+    // Hide immediately when no amounts
+    if (summaryCardTimeout) {
+      clearTimeout(summaryCardTimeout)
+      summaryCardTimeout = null
+    }
+    delayCompleted.value = false
+    showSummaryCard.value = false
+    hasEverShownSummaryCard.value = false
+  }
+})
+
+// Show summary card only when delay is completed AND quote is not loading (for first time)
+// After first time, keep it visible and show loading states instead
+watchEffect(() => {
+  if (!hasEverShownSummaryCard.value) {
+    // First time showing - wait for delay and data
+    showSummaryCard.value = delayCompleted.value && !isLoadingQuote.value && !!quoteData.value
+    if (showSummaryCard.value) {
+      hasEverShownSummaryCard.value = true
+    }
+  } else {
+    // Already shown once - keep visible as long as there are amounts
+    showSummaryCard.value = hasAnyAmounts.value
+  }
+})
+
 const quoteInput = computed<UseCreateQuoteInput>(() => {
   return {
     amount: totalAmount.value,
@@ -249,6 +322,7 @@ const quoteInput = computed<UseCreateQuoteInput>(() => {
   }
 })
 
+// Start quote calculation immediately when hasAnyAmounts is true
 const { quoteId } = useCreateQuoteOnInputChange(quoteInput)
 const { data: quoteData, isLoading: isLoadingQuote } = useGetQuote(quoteId)
 

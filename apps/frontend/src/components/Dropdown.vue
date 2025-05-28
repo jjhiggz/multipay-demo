@@ -15,21 +15,6 @@
             {{ selectedLabel }}
           </slot>
         </span>
-        <svg
-          v-if="!isBorderless"
-          class="ml-2 w-4 h-4 transition-transform duration-200 dropdown-chevron"
-          :class="{ 'rotate-180': open }"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
       </button>
     </slot>
     <transition name="fade">
@@ -41,11 +26,14 @@
         role="listbox"
         tabindex="-1"
       >
-        <div class="top-0 z-10 sticky flex-shrink-0 bg-white px-2 pt-2 pb-1">
-          <div class="relative flex items-center">
-            <span class="left-2 absolute text-gray-400">
+        <div class="top-0 z-10 sticky flex-shrink-0 bg-white">
+          <div class="py-1 pt-1 pb-0">
+            <div
+              data-slot="command-input-wrapper"
+              class="flex items-center gap-2 px-3 border-gray-100 border-b h-9"
+            >
               <svg
-                class="w-4 h-4"
+                class="opacity-50 size-4 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
@@ -60,19 +48,19 @@
                   stroke-linecap="round"
                 />
               </svg>
-            </span>
-            <input
-              type="text"
-              class="py-1 pr-2 pl-7 border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-100 w-full text-sm"
-              placeholder="Search..."
-              v-model="searchValue"
-              @input="onSearch"
-              :disabled="
-                disabled ||
-                (options.length === 0 && !$slots['no-options']) ||
-                (options.length === 0 && !!$slots['no-options'])
-              "
-            />
+              <input
+                type="text"
+                class="flex bg-transparent disabled:opacity-50 placeholder:opacity-50 py-1 border-0 rounded-md outline-none w-full placeholder:text-muted-foreground text-sm disabled:cursor-not-allowed"
+                placeholder="Search..."
+                v-model="searchValue"
+                @input="onSearch"
+                :disabled="
+                  disabled ||
+                  (options.length === 0 && !$slots['no-options']) ||
+                  (options.length === 0 && !!$slots['no-options'])
+                "
+              />
+            </div>
           </div>
         </div>
         <div class="flex-1 overflow-y-auto custom-scrollbar">
@@ -88,7 +76,6 @@
                     idx === activeIndex && option.value !== modelValue?.value,
                   'bg-blue-50 border border-blue-100':
                     option.value === modelValue?.value,
-                  'font-bold': option.value === modelValue?.value,
                 },
               ]"
               role="option"
@@ -97,9 +84,29 @@
               @keydown.enter.prevent="select(option)"
               tabindex="0"
             >
-              <slot name="option" :option="option">
-                {{ option.label }}
-              </slot>
+              <div class="flex justify-between items-center w-full">
+                <div
+                  :class="{ 'font-medium': option.value === modelValue?.value }"
+                >
+                  <slot
+                    name="option"
+                    :option="option"
+                    :selected="option.value === modelValue?.value"
+                  >
+                    {{ option.label }}
+                  </slot>
+                </div>
+                <svg
+                  v-if="option.value === modelValue?.value"
+                  class="flex-shrink-0 ml-2 w-4 h-4 text-blue-500"
+                  fill="currentColor"
+                  viewBox="0 0 32 32"
+                >
+                  <path
+                    d="M16 2C8.3 2 2 8.3 2 16s6.3 14 14 14 14-6.3 14-14S23.7 2 16 2zm-2 20L7 15l1.4-1.4L14 19.2l9.6-9.6L25 11l-11 11z"
+                  />
+                </svg>
+              </div>
             </li>
           </ul>
           <div v-else class="p-4 text-muted-foreground text-sm text-center">

@@ -8,13 +8,13 @@
     @keydown.space.prevent="toggle"
     @keydown.enter.prevent="toggle"
     :class="[
-      'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500',
+      'relative inline-flex h-6 w-10 items-center rounded-full transition-colors focus:outline-none focus:outline-none',
       disabled
         ? modelValue
-          ? 'bg-blue-200'
+          ? 'bg-blue-500'
           : 'bg-gray-200'
         : modelValue
-          ? 'bg-blue-400'
+          ? 'bg-blue-500'
           : 'bg-gray-300',
       disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
     ]"

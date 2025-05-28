@@ -73,7 +73,7 @@ const handleRecipientSelected = (
 <template>
   <TableRow
     :class="[
-      'data-[state=selected]:bg-muted border-b h-10 transition-colors',
+      'data-[state=selected]:bg-muted border-b border-gray-100 h-10 transition-colors',
       {
         'border-l-4 border-red-500':
           validationState?.recipientErrors &&
@@ -82,7 +82,7 @@ const handleRecipientSelected = (
     ]"
   >
     <TableCell
-      class="py-2 w-[220px] align-top"
+      class="py-3 w-[220px] align-top pl-0"
       ref="recipientSearchContainerRef"
     >
       <RecipientSearch
@@ -95,11 +95,10 @@ const handleRecipientSelected = (
       >
         <template #invalid-item="{ recipient: invalidRecipientInfo }">
           <div
-            class="flex justify-between items-center w-full"
+            class="flex justify-between items-center w-full cursor-not-allowed"
             :title="invalidRecipientInfo.validationReason"
           >
             <span class="opacity-50">{{ invalidRecipientInfo.label }}</span>
-            <Icon icon="carbon:misuse" class="ml-1 w-4 h-4 text-red-500" />
           </div>
         </template>
       </RecipientSearch>
@@ -115,7 +114,7 @@ const handleRecipientSelected = (
         </div>
       </div>
     </TableCell>
-    <TableCell class="py-2 align-top">
+    <TableCell class="py-3 align-top">
       <MoneyInput
         :model-value="props.values.amount !== null ? props.values.amount : ''"
         :currency="props.selectedCurrencyCode || 'USD'"
@@ -134,7 +133,7 @@ const handleRecipientSelected = (
         </div>
       </div>
     </TableCell>
-    <TableCell class="py-2 w-[220px] align-top" ref="reasonSearchContainerRef">
+    <TableCell class="py-3 w-[220px] align-top" ref="reasonSearchContainerRef">
       <ReasonSearch
         :model-value="props.values.reason"
         @update:modelValue="
@@ -154,7 +153,7 @@ const handleRecipientSelected = (
         </div>
       </div>
     </TableCell>
-    <TableCell class="py-2 align-top">
+    <TableCell class="py-3 align-top">
       <input
         :value="props.values.reference || ''"
         @input="
@@ -165,7 +164,7 @@ const handleRecipientSelected = (
         "
         @focus="emit('field-focus', 'reference')"
         @blur="emit('field-blur', 'reference')"
-        class="p-2 border rounded w-full"
+        class="p-2 border rounded-lg w-full h-10 border-gray-150"
         placeholder="Optional reference"
       />
       <div
@@ -180,12 +179,11 @@ const handleRecipientSelected = (
         </div>
       </div>
     </TableCell>
-    <TableCell class="py-2 align-top">
+    <TableCell class="py-3 align-top">
       <Button
         @click="$emit('remove')"
         title="Remove Recipient"
-        class="text-red-500 hover:text-red-700"
-        variant="ghost"
+        class="text-gray-400 hover:text-gray-500 hover:bg-gray-50 bg-transparent border-0 shadow-none"
       >
         <Icon :icon="'carbon:trash-can'" class="w-5 h-5" />
       </Button>

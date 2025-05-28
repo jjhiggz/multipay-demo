@@ -150,16 +150,12 @@ const recipientValidator = computed(() => {
             >
               <template #invalid-item="{ recipient: invalidRecipientInfo }">
                 <div
-                  class="flex justify-between items-center w-full"
+                  class="flex justify-between items-center w-full cursor-not-allowed"
                   :title="invalidRecipientInfo.validationReason"
                 >
                   <span class="opacity-50">{{
                     invalidRecipientInfo.label
                   }}</span>
-                  <Icon
-                    icon="carbon:misuse"
-                    class="ml-1 w-4 h-4 text-red-500"
-                  />
                 </div>
               </template>
             </RecipientSearch>
