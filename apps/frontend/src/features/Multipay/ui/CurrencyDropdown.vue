@@ -3,7 +3,12 @@
     :options="isLoading ? [] : filteredOptions"
     :model-value="selectedValue"
     :variant="variant"
-    :class="([rootClass || 'w-full', variant === 'borderless' ? 'dropdown-borderless' : '']).join(' ')"
+    :class="
+      [
+        rootClass || 'w-full',
+        variant === 'borderless' ? 'dropdown-borderless' : '',
+      ].join(' ')
+    "
     :menuClass="menuClass || 'max-h-60 overflow-y-auto'"
     @update:modelValue="onSelect"
     @search="onSearch"
@@ -11,17 +16,35 @@
     :disabled="isLoading"
   >
     <template #display="{ open }">
-      <div class="flex items-center bg-gray-50 rounded-lg px-4 py-3 gap-3 w-full max-w-xs">
-        <Flag v-if="selectedValue && !isLoading" :currency-code="selectedValue.value" class="w-6 h-6 flex-shrink-0" />
-        <div v-else class="w-6 h-6 flex-shrink-0"></div>
+      <div
+        class="flex items-center gap-3 bg-gray-50 px-4 py-3 rounded-lg w-full max-w-xs"
+      >
+        <Flag
+          v-if="selectedValue && !isLoading"
+          :currency-code="selectedValue.value"
+          class="flex-shrink-0 w-6 h-6"
+        />
+        <div v-else class="flex-shrink-0 w-6 h-6"></div>
         <div>
-          <div class="text-gray-500 text-xs mb-0.5">{{ label }}</div>
+          <div class="mb-0.5 text-gray-500 text-xs">{{ label }}</div>
           <div class="flex items-center gap-1">
-            <div v-if="isLoading" class="h-6 flex items-center">
-              <span class="h-4 bg-gray-200 rounded animate-pulse w-[1.5rem]"></span>
+            <div v-if="isLoading" class="flex items-center h-6">
+              <span
+                class="bg-gray-200 rounded w-[1.5rem] h-4 animate-pulse"
+              ></span>
             </div>
-            <span v-else :class="usdClass || 'text-lg font-bold text-gray-900'">{{ selectedValue ? selectedValue.value : '' }}</span>
-            <Icon :icon="'carbon:chevron-down'" :class="['w-5 h-5 text-gray-400 transition-transform duration-200', open ? 'rotate-180' : '']" />
+            <span
+              v-else
+              :class="usdClass || 'text-lg font-bold text-gray-900'"
+              >{{ selectedValue ? selectedValue.value : '' }}</span
+            >
+            <Icon
+              :icon="'carbon:chevron-down'"
+              :class="[
+                'w-5 h-5 text-gray-400 transition-transform duration-200',
+                open ? 'rotate-180' : '',
+              ]"
+            />
           </div>
         </div>
       </div>
@@ -106,10 +129,6 @@ const onSelect = (option: CurrencyDropdownOption) => {
 const searchClosed = () => {
   search.value = ''
 }
-
-const isBorderless = computed(() => props.variant === 'borderless')
-
-const isOpen = ref(false)
 </script>
 
 <style scoped>
