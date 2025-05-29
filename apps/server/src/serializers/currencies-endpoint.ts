@@ -1,6 +1,7 @@
 import { VALID_CURRENCY_CODES } from "@/constants/currency.constants";
-import type { s } from "@/zod-schemas";
+import {maxForwardDaysByCurrency} from "./max-forward-days-by-currency"
 import { z } from "zod";
+import type { userToCurrencies } from "@/db/schema/auth-schema";
 
 export const xeCurrencyEndpointResultSchema = z.array(
   z.object({
@@ -11,13 +12,14 @@ export const xeCurrencyEndpointResultSchema = z.array(
     canSell: z.boolean(),
     sameCurrencySupported: z.boolean(),
     marketOrderEnabled: z.boolean(),
+    maxForwardDays: z.number()
   })
 );
 
 export function serializeCurrenciesEndpoint(
-  userToCurrencies: z.infer<(typeof s)["userToCurrencies"]["insert"]>[]
+  userToCurrenciesData: (typeof userToCurrencies.$inferSelect)[]
 ): z.infer<typeof xeCurrencyEndpointResultSchema> {
-  return userToCurrencies.map((userCurrency) => {
+  return userToCurrenciesData.map((userCurrency) => {
     const currencyInfo = VALID_CURRENCY_CODES.find(
       (c) => c.code === userCurrency.currencyIsoCode
     );
@@ -32,6 +34,7 @@ export function serializeCurrenciesEndpoint(
       canSell: true,
       sameCurrencySupported: true,
       marketOrderEnabled: true,
+      maxForwardDays: maxForwardDaysByCurrency[currencyInfo.code]
     };
   });
 }

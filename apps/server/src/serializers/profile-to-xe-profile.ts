@@ -1,5 +1,7 @@
 import { z } from "zod";
-import { s } from "@/zod-schemas";
+import { profile } from "../db/schema/auth-schema";
+import { currencyCodeSchema } from "@/zod-schemas/currency-schemas";
+import type { CurrencyCode } from "@/constants/currency.constants";
 
 export const xeProfileResponseSchema = z.object({
   profile: z.object({
@@ -61,10 +63,10 @@ export const xeProfileResponseSchema = z.object({
       name: z.string(),
       privileges: z.array(z.string()),
     }),
-    expectedTradeCurrency: s.currencyCode,
-    expectedPayoutCurrency: s.currencyCode,
+    expectedTradeCurrency: currencyCodeSchema,
+    expectedPayoutCurrency: currencyCodeSchema,
     expectedAnnualTradingVolume: z.number(),
-    regionalAccountingCurrency: s.currencyCode,
+    regionalAccountingCurrency: currencyCodeSchema,
     expectedVolumeInRegionalAccountingCurrency: z.number(),
     expectedFrequency: z.string(),
     onlineDirectDebitEnabled: z.boolean(),
@@ -132,7 +134,7 @@ export const xeProfileResponseSchema = z.object({
 export type XeProfile = z.infer<typeof xeProfileResponseSchema>;
 
 export const mapToXeProfileResponse = (
-  rawProfile: z.infer<typeof s.profile.select>
+  rawProfile: typeof profile.$inferSelect
 ): XeProfile => {
   return {
     profile: {
@@ -197,10 +199,10 @@ export const mapToXeProfileResponse = (
           ? rawProfile.userRolePrivileges
           : JSON.parse(rawProfile.userRolePrivileges || "[]"),
       },
-      expectedTradeCurrency: rawProfile.expectedTradeCurrency,
-      expectedPayoutCurrency: rawProfile.expectedPayoutCurrency,
+      expectedTradeCurrency: rawProfile.expectedTradeCurrency as CurrencyCode,
+      expectedPayoutCurrency: rawProfile.expectedPayoutCurrency as CurrencyCode,
       expectedAnnualTradingVolume: rawProfile.expectedAnnualTradingVolume,
-      regionalAccountingCurrency: rawProfile.regionalAccountingCurrency,
+      regionalAccountingCurrency: rawProfile.regionalAccountingCurrency as CurrencyCode,
       expectedVolumeInRegionalAccountingCurrency:
         rawProfile.expectedVolumeInRegionalAccountingCurrency,
       expectedFrequency: rawProfile.expectedFrequency,

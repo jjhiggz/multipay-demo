@@ -3,9 +3,10 @@ import {
   SETTLEMENT_METHODS,
 } from "@/constants/quote.constants";
 import { z } from "zod";
-import { countryCodeSchema, currencyCodeSchema } from "@/zod-schemas";
+import { countryCodeSchema, } from "@/zod-schemas";
 import { countryCodes, type CountryCode } from "@/constants/country.constants";
 import { getRate } from "@/utils/quote-helpers";
+import { currencyCodeSchema } from "@/zod-schemas/currency-schemas";
 
 export const settlementMethodSchema = z.enum(SETTLEMENT_METHODS);
 export const deliveryMethodSchema = z.enum(DELIVERY_METHODS);

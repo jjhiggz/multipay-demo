@@ -23,8 +23,9 @@ import {
   getQuoteById,
   individualQuoteSchema,
 } from "@/serializers/get-quotes";
-import { countryCodeSchema, currencyCodeSchema, s } from "@/zod-schemas";
+import { countryCodeSchema,  s } from "@/zod-schemas";
 import { countryCodes, type CountryCode } from "@/constants/country.constants";
+import { currencyCodeSchema } from "@/zod-schemas/currency-schemas";
 
 const healthcheckRoute = os
   .route({ method: "GET", path: "/healthcheck" })
