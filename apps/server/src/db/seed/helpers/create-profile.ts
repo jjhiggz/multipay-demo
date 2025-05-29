@@ -3,13 +3,16 @@ import { profile } from "../../schema/auth-schema";
 import { faker } from "@faker-js/faker";
 import type { s } from "@/zod-schemas";
 import type { z } from "zod";
+import { merge } from "remeda";
 
 /**
- * Creates a profile for a user. Pass in a user object (must have email) and a partial profile object to override defaults.
+ * Creates a profile for a user. Pass in a user object (must have email) 
+ * and an overrides object, which can contain a profile key with partial profile data.
+ * Example: _createProfile({email: "test@example.com"}, { profile: { maxScheduledPaymentDays: 300 } })
  */
 export async function _createProfile(
   user: { email: string },
-  partialProfile: Partial<z.input<(typeof s)["profile"]["insert"]>> = {}
+  overrides: { profile?: Partial<z.input<(typeof s)["profile"]["insert"]>> } = {}
 ) {
   // Provide sensible defaults for all fields
   const defaults: z.infer<(typeof s)["profile"]["insert"]> = {
@@ -21,8 +24,8 @@ export async function _createProfile(
     brandRegionId: faker.number.int({ min: 10, max: 99 }),
     trmBusinessUnitId: faker.number.int({ min: 10, max: 99 }),
     brandId: faker.number.int({ min: 1, max: 99 }),
-    userEmail: user.email,
-    email: user.email,
+    userEmail: user.email, // Default, will be specifically set later
+    email: user.email,     // Default, will be specifically set later
     accountStatus: "Active",
     accountType: "Corporate",
     accountKycStatus: "Approved",
@@ -102,14 +105,22 @@ export async function _createProfile(
     maxScheduledPaymentDays: 700,
     onlineCredentialStatus: "Active",
     modifyRolesEnabled: true,
-    // Add more defaults as needed
   };
-  const values = {
-    ...defaults,
-    ...partialProfile,
-    userEmail: user.email,
-    email: user.email,
-  };
-  const result = await db.insert(profile).values(values);
+
+  const profileOverrides = overrides.profile || {};
+
+  // Perform the merge. The order ensures overrides take precedence over defaults,
+  // and the final object ensures userEmail and email are correctly set from the user object.
+  const mergedValues = merge(
+    defaults,
+    profileOverrides
+  );
+
+  const finalValues = merge(mergedValues, { userEmail: user.email, email: user.email });
+
+  // Cast to the exact insert type expected by Drizzle
+  const valuesToInsert = finalValues as z.infer<(typeof s)["profile"]["insert"]>;
+
+  const result = await db.insert(profile).values(valuesToInsert);
   return result;
 }

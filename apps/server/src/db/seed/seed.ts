@@ -124,18 +124,23 @@ const main = async () => {
   }).then(tag("added india to american-chairs"));
 
   // Create profiles
-  await createProfile({ email: jonAmerica.user.email }, {}).then(
+  await createProfile({ email: jonAmerica.user.email }, {
+    profile:  {
+      maxScheduledPaymentDays: 200
+    }
+  }).then(
     tag("created jon profile")
   );
 
   await createProfile(
     { email: canadianUser.user.email },
-    { region: "CA" }
+    { profile: { region: "CA" } }
   ).then(tag("created canada profile"));
 
-  await createProfile({ email: indiaUser.user.email }, { region: "IN" }).then(
-    tag("created india profile")
-  );
+  await createProfile(
+    { email: indiaUser.user.email }, 
+    { profile: { region: "IN" } }
+  ).then(tag("created india profile"));
 
   await seedHelpers
     .createRecipientsForOrganization(
