@@ -11,7 +11,7 @@
           variant="outline"
           :class="
             cn(
-              'w-full justify-between border-0 h-10 font-normal rounded-lg',
+              'w-full justify-between h-10 font-normal rounded-lg',
               props.class,
             )
           "
