@@ -1,0 +1,137 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# AI-Assisted Frontend Coding Guidelines for Designers
+
+Welcome! This guide is here to help you leverage AI tools effectively while contributing to our frontend codebase. Our goal is to ensure that AI-generated code is high-quality, consistent with our project's standards, and doesn't duplicate existing work. Remember, AI is a powerful assistant, but your critical eye and understanding of these guidelines are essential.
+
+## 1. Before You Ask AI to Generate: Think & Search!
+
+**Goal:** Avoid reinventing the wheel and maintain a lean codebase.
+
+**Your Steps:**
+
+1.  **Clearly Define:** What UI element or functionality do you need? Sketch it out or describe it precisely.
+2.  **Search First!** Before prompting AI, explore if a solution already exists:
+    *   **Our Component Library:**
+        *   Reusable UI components: `apps/frontend/src/components/ui/`
+        *   Feature-specific components: `apps/frontend/src/features/[FeatureName]/ui/`
+        *   Shared components: `apps/frontend/src/components/` (for more general, non-UI specific shared components)
+    *   **ShadCN-Vue Components:**
+        *   Check the @ShadCN-Vue documentation to see if it offers the component.
+        *   See Section 5 for how we add and use ShadCN components.
+    *   **Utility Functions & Composables:**
+        *   General utilities: `apps/frontend/src/lib/utils.ts`
+        *   Vue Composables for reusable logic: `apps/frontend/src/composables/`
+3.  **Adapt or Extend:** If you find something similar, could it be modified or extended? This is often preferable to creating new code.
+4.  **Ask:** If you're unsure or can't find anything, please ask a developer before having AI generate new code.
+
+## 2. Guiding the AI: Effective Prompting
+
+**Goal:** Get AI to generate code that's closer to our project's needs and standards from the start.
+
+**Your Steps:**
+
+1.  **Be Specific:**
+    *   **Framework & Libraries:** "Using Vue 3 with `<script setup lang="ts">`, TypeScript, and Tailwind CSS..."
+    *   **Existing References:** "Create a form similar to `ExistingForm.vue` for collecting user feedback." or "Use our `useApiData` composable for this data."
+    *   **Styling:** "Style this component using Tailwind CSS utility classes to match our `PrimaryButton.vue`."
+    *   **Accessibility (A11y):** "Ensure the component is keyboard navigable and includes necessary ARIA attributes for a modal dialog."
+2.  **Provide Context:** If the AI needs to understand existing data structures, types, or related code, provide relevant snippets or descriptions from our codebase.
+3.  **Iterate:** The first AI output might not be perfect. Refine your prompts or ask for modifications based on the initial output.
+
+## 3. Reviewing AI-Generated Code: Your Critical Eye
+
+**Goal:** Ensure AI-generated code is correct, consistent, doesn't duplicate functionality, and adheres to our standards.
+
+**Your Checklist:**
+
+*   **Don't Trust Blindly:** Treat AI code as a first draft, not the final product.
+*   **Check for Duplication:** Does this new code implement something we already have (see Section 1)?
+*   **Readability & Simplicity:** Is the code clear and easy to understand? Can it be made simpler without losing functionality?
+*   **Project Conventions:** Does it follow our coding style and architectural patterns (see Section 4)?
+*   **ShadCN-Vue Usage:** If using ShadCN, is it integrated according to our practices (see Section 5)?
+*   **Functionality:** Test the code. Does it work as expected? Cover edge cases if applicable.
+*   **Error Handling:** For components involving user input or data fetching, are basic error states or validation handled appropriately?
+*   **Clean Up:** Remove any unnecessary comments, console logs, or boilerplate code AI might have added.
+*   **TypeScript:** Are types used effectively? Avoid `any` where a more specific type can be used.
+*   **Responsiveness & Accessibility:** Does it look and work well on different screen sizes? Are basic accessibility principles followed?
+
+## 4. Coding Style & Conventions
+
+**Goal:** Maintain a consistent, readable, and maintainable codebase.
+
+*   **Formatting:** We use Prettier and ESLint.
+    *   Ensure you have recommended VS Code extensions (ESLint, Prettier - Code formatter).
+    *   Format your code (e.g., format on save, or run `npm run format` in `apps/frontend`).
+    *   Address linter warnings (run `npm run lint` in `apps/frontend`).
+*   **Naming Conventions:**
+    *   Vue Components: `PascalCase.vue` (e.g., `UserProfileCard.vue`).
+    *   TypeScript files (services, composables, utils): `camelCase.ts` (e.g., `useUserSettings.ts`).
+    *   Variables, functions, props: `camelCase`.
+*   **Vue Component Structure:**
+    *   Order: `<template>`, then `<script setup lang="ts">`, then `<style scoped lang="scss/css">`.
+    *   Props: Use `defineProps<{ ... }>()` with clear TypeScript types.
+    *   Emits: Use `defineEmits<{ (e: 'eventName', payload: Type): void }>()` with clear types.
+    *   Logic: Use Vue 3 Composition API (`ref`, `computed`, `watch`, composables).
+*   **TypeScript:**
+    *   **Strive for Strong Types:** Avoid `any`. Define interfaces or types for props, event payloads, API responses, and complex objects.
+    *   **Functional Paradigm:** Where practical (especially in utility functions or composables), prefer pure functions. Minimize side effects. For Vue components, this translates to clear props as inputs, events as outputs, and self-contained composable logic.
+*   **Comments:**
+    *   Explain the *why*, not the *what*, if the code isn't self-evident.
+    *   **No Obvious Comments:** Avoid comments that merely restate what the code clearly does.
+    *   Document complex logic, non-obvious decisions, or workarounds.
+*   **Imports:**
+    *   Organize imports: typically, external libraries first, then project aliases (`@/`), then relative paths.
+    *   Our linter should help auto-sort these.
+
+## 5. Working with ShadCN-Vue
+
+**Goal:** Use ShadCN components effectively and consistently.
+
+*   **Adding New Components:**
+    *   Use the ShadCN-Vue CLI: `cd apps/frontend && npx shadcn-vue@latest add [component-name]`.
+    *   This places the component source code directly into `apps/frontend/src/components/ui/`.
+    *   Commit these newly added components.
+*   **Using Components:**
+    *   Import them directly from `@/components/ui/[component-name]`.
+*   **Customization:**
+    *   **Styling:** Primarily use Tailwind CSS utility classes directly on the component instance in your templates.
+    *   **Structural or Behavioral Changes:** If you need to significantly alter a ShadCN component, first consider if composing it with other components or using its props/slots can achieve the goal. If deeper changes are needed, discuss with a developer. It might involve modifying the component in `src/components/ui/` or creating a new wrapper component.
+*   **Our Project Wrappers/Defaults:** Before using a raw ShadCN component, check if we've already created a project-specific version or wrapper around it that includes our standard styling or default props.
+*   **Accessibility (A11y):** ShadCN components are designed with accessibility in mind. When using them, ensure you provide necessary information (e.g., `aria-label` for icon buttons) to maintain their accessibility.
+*   **Documentation:** Always refer to the @official ShadCN-Vue documentation for props, events, and usage examples.
+
+## 6. Other Key Areas
+
+*   **State Management (Pinia):**
+    *   For complex state shared across multiple components, use Pinia stores (located in `apps/frontend/src/stores`).
+    *   Consult with a developer if you think new shared state is needed.
+*   **API Calls:**
+    *   Check for existing composables (e.g., `useQuery`, `useMutation` wrappers) or services in `apps/frontend/src/services` or `apps/frontend/src/features/**/api/` before asking AI to write new data-fetching logic.
+*   **Directory Structure:**
+    *   **Pages:** `apps/frontend/src/pages`
+    *   **Layouts:** `apps/frontend/src/layouts`
+    *   **Reusable UI Components:** `apps/frontend/src/components/ui/` (Often ShadCN sourced)
+    *   **Generic Reusable Components:** `apps/frontend/src/components/`
+    *   **Feature-Specific Code:** `apps/frontend/src/features/[FeatureName]/` (can contain `ui`, `api`, `composables`, `types`, etc.)
+    *   **Composables:** `apps/frontend/src/composables/`
+    *   **Stores:** `apps/frontend/src/stores/`
+    *   **Utilities:** `apps/frontend/src/lib/`
+*   **Git Practices:**
+    *   Small, focused commits with clear messages (e.g., "feat(profile): add avatar upload component", "fix(header): correct responsive layout").
+    *   If AI generates a significant chunk of code:
+        1.  Commit the raw AI-generated code with a message like "chore: initial AI generation for X feature".
+        2.  Review, refactor, and test.
+        3.  Commit your changes with a message detailing the refinements: "refactor(profile): refine AI-generated avatar component, add tests".
+
+## Final Check
+
+*   Before submitting your work, quickly re-read these guidelines.
+*   **When in doubt, ask a developer!** We're here to help.
+
+---
+
+This guide should provide a solid foundation. You can adapt and expand it as your team and project evolve. For example, you might add specific links to internal documentation or examples within your codebase as they become relevant.
