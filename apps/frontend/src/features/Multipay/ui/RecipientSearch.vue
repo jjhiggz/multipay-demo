@@ -7,7 +7,10 @@
           variant="outline"
           :class="
             cn(
-              'w-full justify-between border-0 h-10 font-medium rounded-lg',
+              'w-full justify-between h-10 font-medium rounded-lg',
+              props.class?.includes('border-red-500') 
+                ? '!border-red-500' 
+                : 'border-0',
               props.class,
             )
           "

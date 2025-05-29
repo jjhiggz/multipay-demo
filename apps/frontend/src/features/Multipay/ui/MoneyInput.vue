@@ -21,9 +21,7 @@ const emit = defineEmits<{
 }>()
 
 const showFlag = computed(() => true)
-const showCurrency = computed(() =>
-  props.shouldShowCurrency !== undefined ? props.shouldShowCurrency : true,
-)
+const showCurrency = computed(() => true)
 
 const parsedModelValue = computed(() => parseFloat(String(props.modelValue)))
 
@@ -76,7 +74,7 @@ function handleInput(e: Event) {
 </script>
 
 <template>
-  <div :class="cn('relative flex items-center', props.class)">
+  <div class="relative flex items-center">
     <input
       :value="displayValue"
       @input="handleInput"
@@ -87,18 +85,19 @@ function handleInput(e: Event) {
       spellcheck="false"
       :class="
         cn(
-          'flex-1 bg-background file:bg-transparent disabled:opacity-50 px-3 py-2 border border-input file:border-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 w-full h-10 file:font-medium placeholder:text-muted-foreground file:text-foreground md:text-sm file:text-sm text-base disabled:cursor-not-allowed pr-16 text-right',
-          showFlag || showCurrency ? 'pr-16' : '',
+          'flex-1 bg-background file:bg-transparent disabled:opacity-50 px-3 py-2 border border-input file:border-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 w-full h-10 file:font-medium placeholder:text-muted-foreground file:text-foreground md:text-sm file:text-sm text-base disabled:cursor-not-allowed text-left font-medium',
+          showFlag || showCurrency ? 'pr-24' : 'pr-3',
+          props.class,
         )
       "
       :placeholder="currentPlaceholder"
     />
     <span
       v-if="showFlag || showCurrency"
-      class="right-4 z-10 absolute flex items-center gap-1 pointer-events-none select-none"
+      class="right-4 z-10 absolute flex items-center gap-2 pointer-events-none select-none"
     >
       <Flag v-if="showFlag" :currency-code="props.currency" class="shrink-0" />
-      <span v-if="showCurrency" class="font-medium text-sm">{{
+      <span v-if="showCurrency" class="font-medium text-sm text-gray-500">{{
         props.currency
       }}</span>
     </span>

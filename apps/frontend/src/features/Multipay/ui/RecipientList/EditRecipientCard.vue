@@ -21,6 +21,7 @@ import type {
   MultipayRecipientValidations,
   RecipientFields,
 } from './recipient-list.types'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<{
   index: number
@@ -102,11 +103,6 @@ const recipientValidator = computed(() => {
     @update:open="(val) => emit('update:open', val)"
     :class="[
       'bg-card shadow-sm mb-3 border border-gray-200 rounded-lg overflow-hidden',
-      {
-        'border-l-4 border-red-500':
-          validationState?.recipientErrors &&
-          validationState.recipientErrors.length > 0,
-      },
     ]"
   >
     <div
@@ -140,13 +136,18 @@ const recipientValidator = computed(() => {
           <Label class="font-normal text-gray-500">Recipient</Label>
           <div ref="recipientSearchContainerRef" class="w-full">
             <RecipientSearch
-              class="w-full"
               :initial-recipient="props.values.recipient"
               :dropdownWidthRef="recipientSearchContainerRef"
               @recipientSelected="handleRecipientSelected"
               @focus="emit('field-focus', 'recipient')"
               @blur="emit('field-blur', 'recipient')"
               :validator="recipientValidator"
+              :class="cn(
+                'w-full',
+                {
+                  'border-red-500': validationState?.fieldErrors?.recipient?.length
+                }
+              )"
             >
               <template #invalid-item="{ recipient: invalidRecipientInfo }">
                 <div
@@ -185,7 +186,12 @@ const recipientValidator = computed(() => {
             "
             @focus="emit('field-focus', 'amount')"
             @blur="emit('field-blur', 'amount')"
-            class="w-full"
+            :class="cn(
+              'w-full',
+              {
+                'border-red-500': validationState?.fieldErrors?.amount?.length
+              }
+            )"
           />
           <div
             v-if="validationState?.fieldErrors?.amount?.length"
@@ -209,9 +215,14 @@ const recipientValidator = computed(() => {
             "
             @focus="emit('field-focus', 'reason')"
             @blur="emit('field-blur', 'reason')"
-            class="w-full"
             ref="reasonSearchContainerRef"
             :dropdownWidthRef="reasonSearchContainerRef"
+            :class="cn(
+              'w-full',
+              {
+                'border-red-500': validationState?.fieldErrors?.reason?.length
+              }
+            )"
           />
           <div
             v-if="validationState?.fieldErrors?.reason?.length"
@@ -234,6 +245,9 @@ const recipientValidator = computed(() => {
             @input="handleReferenceInput"
             @focus="emit('field-focus', 'reference')"
             @blur="emit('field-blur', 'reference')"
+            :class="cn({
+              'border-red-500': validationState?.fieldErrors?.reference?.length
+            })"
           />
           <div
             v-if="validationState?.fieldErrors?.reference?.length"

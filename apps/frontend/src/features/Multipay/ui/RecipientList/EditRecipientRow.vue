@@ -16,6 +16,7 @@ import type {
   MultipayRecipientValidations,
   RecipientFields,
 } from './recipient-list.types'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<{
   index: number
@@ -74,11 +75,6 @@ const handleRecipientSelected = (
   <TableRow
     :class="[
       'data-[state=selected]:bg-muted border-b border-gray-100 h-10 transition-colors',
-      {
-        'border-l-4 border-red-500':
-          validationState?.recipientErrors &&
-          validationState.recipientErrors.length > 0,
-      },
     ]"
   >
     <TableCell
@@ -92,6 +88,9 @@ const handleRecipientSelected = (
         @blur="emit('field-blur', 'recipient')"
         :dropdownWidthRef="recipientSearchContainerRef"
         :validator="recipientValidator"
+        :class="cn({
+          'border-red-500': validationState?.fieldErrors?.recipient?.length
+        })"
       >
         <template #invalid-item="{ recipient: invalidRecipientInfo }">
           <div
@@ -126,6 +125,9 @@ const handleRecipientSelected = (
         "
         @focus="emit('field-focus', 'amount')"
         @blur="emit('field-blur', 'amount')"
+        :class="cn({
+          'border-red-500': validationState?.fieldErrors?.amount?.length
+        })"
       />
       <div :v-if="true" class="mt-1 text-red-500 text-xs">
         <div v-for="error in validationState?.fieldErrors.amount" :key="error">
@@ -141,8 +143,13 @@ const handleRecipientSelected = (
         "
         @focus="emit('field-focus', 'reason')"
         @blur="emit('field-blur', 'reason')"
-        class="w-full"
         :dropdownWidthRef="reasonSearchContainerRef"
+        :class="cn(
+          'w-full',
+          {
+            'border-red-500': validationState?.fieldErrors?.reason?.length
+          }
+        )"
       />
       <div
         v-if="validationState?.fieldErrors?.reason?.length"
@@ -164,7 +171,12 @@ const handleRecipientSelected = (
         "
         @focus="emit('field-focus', 'reference')"
         @blur="emit('field-blur', 'reference')"
-        class="p-2 border rounded-lg w-full h-10 border-gray-150"
+        :class="cn(
+          'p-2 border rounded-lg w-full h-10 border-gray-150',
+          {
+            'border-red-500': validationState?.fieldErrors?.reference?.length
+          }
+        )"
         placeholder="Optional reference"
       />
       <div
