@@ -7,7 +7,7 @@
     :style="{ width: `${size}px`, height: `${size}px` }"
   >
     <Icon
-      :icon="`flag:${countryCode}-4x3`"
+      :icon="`circle-flags:${countryCode}`"
       :width="computedSize"
       :height="computedSize"
       class="p-0.5"
