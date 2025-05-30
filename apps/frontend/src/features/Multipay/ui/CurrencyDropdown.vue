@@ -17,12 +17,11 @@
   >
     <template #display="{ open }">
       <div
-        class="flex items-center gap-3 bg-gray-50 px-4 py-3 rounded-lg w-full max-w-xs"
+        class="flex items-center gap-2 bg-gray-50 px-2 py-3 rounded-lg w-full"
       >
-        <CircularFlag
+        <Flag
           v-if="selectedValue && !isLoading"
           :currency-code="selectedValue.value"
-          :size="34"
           class="flex-shrink-0"
         />
         <div v-else class="flex-shrink-0 w-6 h-6"></div>
@@ -52,7 +51,7 @@
     </template>
     <template #option="{ option, selected }">
       <div class="flex items-center gap-2">
-        <CircularFlag :currency-code="option.value" :size="28" />
+        <Flag :currency-code="option.value" />
         <span :class="{ 'font-medium': selected }">{{ option.value }}</span>
       </div>
     </template>
@@ -71,7 +70,7 @@
 import { ref, computed } from 'vue'
 import { type CurrencyCode } from '../../../constants/from-api/currency.constants'
 import { useCurrencies } from '../domain/useCurrencies'
-import CircularFlag from '@/components/ui/CircularFlag.vue'
+import Flag from '@/components/Flag.vue'
 import Dropdown, { type BaseDropdownOption } from '@/components/Dropdown.vue'
 import LoadingDots from '@/components/ui/LoadingDots.vue'
 import { Icon } from '@iconify/vue'
