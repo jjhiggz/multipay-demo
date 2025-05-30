@@ -3,7 +3,7 @@
     <button
       @click="toggleDropdown"
       type="button"
-      class="flex items-center gap-3 bg-gray-50 shadow-none p-0 px-4 py-3 border-0 rounded-xl focus:outline-none focus-visible:ring-0 focus:ring-0 w-full max-w-xs cursor-pointer"
+      class="flex items-center gap-3 bg-gray-50 shadow-none p-0 px-4 py-3 border-0 rounded-xl focus:outline-none focus-visible:ring-0 focus:ring-0 w-full cursor-pointer"
     >
       <div class="flex flex-col items-start">
         <div class="mb-0.5 text-gray-500 text-xs text-left">Send on</div>

@@ -6,39 +6,41 @@
       </div>
       
       <!-- Main content area -->
-      <div class="flex flex-col flex-1 pb-32">
-        <div class="flex flex-col flex-grow gap-8 bg-white p-8 rounded-xl w-full">
-          <div class="flex flex-col gap-6">
-            <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
-            <div class="flex sm:flex-row flex-col gap-2">
-              <div class="w-full sm:w-auto">
-                <CalendarDropdown v-model="sendDate" class="w-full sm:w-64" />
-              </div>
+      <div class="flex flex-col flex-1">
+        <div class="flex flex-col flex-grow gap-8 bg-white p-4 sm:p-6 rounded-xl w-full">
+        <div class="flex flex-col gap-3">
+          <!-- Responsive: calendar on its own row on mobile, all in one row on desktop -->
+          <div class="flex sm:flex-row flex-col gap-3">
+            <div class="w-full sm:w-auto sm:min-w-64">
+              <CalendarDropdown v-model="sendDate" class="w-full" />
+            </div>
               <div
                 class="flex flex-row justify-start sm:justify-end gap-3 w-full"
               >
-                <div class="">
+                <div class="flex-[0_0_calc(50%-0.375rem)] sm:flex-none min-h-[80px] flex">
                   <CurrencyDropdown
                     :selected="sendingCurrency"
                     @selected="onSendingCurrencySelected"
                     label="You send"
                     usdClass="text-l font-bold text-gray-900"
                     variant="borderless"
+                    class="h-full w-full"
                   />
                 </div>
-                <div class="">
+                <div class="flex-[0_0_calc(50%-0.375rem)] sm:flex-none min-h-[80px] flex">
                   <CurrencyDropdown
                     :selected="recievingCurrency"
                     @selected="onRecievingCurrencySelected"
                     label="Receiving currency"
-                    class="shadow-none border-0"
+                    class="shadow-none border-0 h-full w-full"
                     usdClass="text-l font-bold text-gray-900"
                     variant="borderless"
                   />
                 </div>
               </div>
-            </div>
+          </div>
 
+          <div class="flex flex-col gap-3">
             <div class="flex items-center gap-2">
               <ToggleButton
                 :disabled="!selectedCurrency.value"
@@ -55,66 +57,65 @@
                   },
                 ]"
               >
-                <div
-                  v-if="selectedCurrency.value"
-                  class="flex items-center gap-2"
-                >
+                  <div
+                    v-if="selectedCurrency.value"
+                    class="flex items-center gap-2"
+                  >
                   <p class="whitespace-nowrap">Distribute with:</p>
                   <Flag :currency-code="selectedCurrency.value.value" />
-                  <b class="whitespace-nowrap">{{
-                    selectedCurrency.value.value
-                  }}</b>
+                    <b class="whitespace-nowrap">{{
+                      selectedCurrency.value.value
+                    }}</b>
                 </div>
                 <p v-else class="whitespace-nowrap">Select Currency</p>
               </div>
             </div>
           </div>
-          <!-- Select Recipients List -->
-          <div class="">
-            <RecipientList
-              :recipients="recipients"
-              @add="addRecipient"
-              @remove="removeRecipient"
-              @update="updateRecipient"
+        </div>
+        <!-- Select Recipients List -->
+        <div class="">
+          <RecipientList
+            :recipients="recipients"
+            @add="addRecipient"
+            @remove="removeRecipient"
+            @update="updateRecipient"
               @recipient-field-focus="handleFieldFocus"
               @recipient-field-blur="handleFieldBlur"
-              :open-ids="openIds"
-              @toggle-open="handleOpenChange"
+            :open-ids="openIds"
+            @toggle-open="handleOpenChange"
               :selectedCurrencyCode="receivingCurrencyCode"
               :has-form-been-submitted="hasFormBeenSubmitted"
-            />
-          </div>
-          <!-- Recipients Table Placeholder -->
-        </div>
-      </div>
-    </div>
-    
-    <!-- Summary Card with transition - positioned fixed so it doesn't affect main container height -->
-    <div class="fixed bottom-0 left-0 right-0 z-50 w-full bg-gray-100">
-      <div class="mx-auto w-full max-w-5xl">
-        <Transition
-          name="slide-up"
-          enter-active-class="transition-all duration-300 ease-out"
-          enter-from-class="transform translate-y-full opacity-0"
-          enter-to-class="transform translate-y-0 opacity-100"
-          leave-active-class="transition-all duration-300 ease-in"
-          leave-from-class="transform translate-y-0 opacity-100"
-          leave-to-class="transform translate-y-full opacity-0"
-        >
-          <SummaryCard
-            v-if="showSummaryCard"
-            total-to-send="$1,500.00 USD"
-            exchange-rate="1 USD = 0.92 GBP"
-            recipients-will-receive="£1,380.00 GBP"
-            total-to-pay="$1,515.00 USD"
-            fee="$15.00 USD"
-            :is-disabled="false"
-            button-aria-label="Continue to payment"
-            :quote="quoteData"
-            :is-loading="isLoadingQuote"
-            @continue="handleContinue"
           />
-        </Transition>
+        </div>
+        <!-- Recipients Table Placeholder -->
+      </div>
+        
+        <!-- Summary Card - in its own separate container -->
+        <div class="w-full">
+          <Transition
+            name="slide-up"
+            enter-active-class="transition-all duration-300 ease-out"
+            enter-from-class="transform translate-y-full opacity-0"
+            enter-to-class="transform translate-y-0 opacity-100"
+            leave-active-class="transition-all duration-300 ease-in"
+            leave-from-class="transform translate-y-0 opacity-100"
+            leave-to-class="transform translate-y-full opacity-0"
+          >
+      <SummaryCard
+              v-if="showSummaryCard"
+        total-to-send="$1,500.00 USD"
+        exchange-rate="1 USD = 0.92 GBP"
+        recipients-will-receive="£1,380.00 GBP"
+        total-to-pay="$1,515.00 USD"
+        fee="$15.00 USD"
+              :is-disabled="false"
+              button-aria-label="Continue to payment"
+              :quote="quoteData"
+              :is-loading="isLoadingQuote"
+              @continue="handleContinue"
+      />
+          </Transition>
+        </div>
       </div>
     </div>
     

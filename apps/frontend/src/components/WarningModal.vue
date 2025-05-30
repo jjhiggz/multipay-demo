@@ -4,25 +4,40 @@
       v-if="props.state.isVisible.value"
       class="z-50 fixed inset-0 flex justify-center items-center bg-black bg-opacity-50"
     >
-      <div class="bg-white shadow-xl m-4 p-6 rounded-lg w-full max-w-md">
-        <div class="flex items-center">
-          <Icon
-            v-if="props.state.icon.value === 'warning'"
-            icon="carbon:warning-filled"
-            class="mr-2 text-yellow-500 text-xl"
-          />
-          <h3 class="font-medium text-gray-900 text-lg leading-6">
+      <div class="bg-white shadow-xl m-4 p-6 rounded-3xl w-full max-w-md">
+        <!-- Icon in circle -->
+        <div class="flex justify-center mb-4">
+          <div class="bg-gray-100 rounded-full p-4 w-14 h-14 flex items-center justify-center">
+            <Icon
+              v-if="props.state.icon.value === 'warning'"
+              icon="carbon:warning-filled"
+              class="text-gray-500 text-2xl"
+            />
+          </div>
+        </div>
+        
+        <!-- Title -->
+        <div class="text-center mb-2 mt-3 pb-2">
+          <h3 class="font-bold text-gray-700 text-lg leading-6">
             {{ props.state.title.value }}
           </h3>
         </div>
-        <div class="mt-2">
+        
+        <!-- Message -->
+        <div class="text-center mb-6">
           <p class="text-gray-500 text-sm">
             {{ props.state.message.value }}
           </p>
         </div>
-        <div class="flex justify-end space-x-3 mt-6">
-          <Button variant="outline" @click="handleCancel"> Cancel </Button>
-          <Button @click="handleConfirm"> Confirm </Button>
+        
+        <!-- Full width buttons side by side -->
+        <div class="grid grid-cols-2 gap-3">
+          <Button variant="outline" @click="handleCancel" class="w-full"> 
+            Cancel 
+          </Button>
+          <Button @click="handleConfirm" class="w-full"> 
+            Confirm 
+          </Button>
         </div>
       </div>
     </div>
