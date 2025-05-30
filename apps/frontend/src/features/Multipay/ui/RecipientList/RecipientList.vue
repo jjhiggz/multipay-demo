@@ -3,13 +3,10 @@
     <!-- Show when no recipients -->
     <div
       v-if="props.recipients.length === 0"
-      class="flex flex-col items-center justify-center gap-4 py-16 min-h-[200px]"
+      class="flex flex-col justify-center items-center gap-4 py-16 min-h-[200px]"
     >
       <div class="text-gray-500">No recipients added yet</div>
-      <Button
-        @click="$emit('add')"
-        class="flex items-center transition-colors"
-      >
+      <Button @click="$emit('add')" class="flex items-center transition-colors">
         + Add Recipient
       </Button>
     </div>
